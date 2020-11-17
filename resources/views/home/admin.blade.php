@@ -11,12 +11,17 @@
 
 @section('content') 
 
-     <!-- pesan error -->
-     @if ($message = Session::get('success'))
-      <div class="alert alert-success alert-block">
-        <button type="button" class="close" data-dismiss="alert">×</button> 
-        <strong>{{ $message }}</strong>
-      </div>
+     
+    @if ($message = Session::get('error'))
+      <script>
+        var pesan = "{{$message}}"
+        swal("Maaf !", pesan, "error"); 
+      </script>
+    @elseif ($message = Session::get('success'))
+      <script>
+        var pesan = "{{$message}}"
+        swal("Selamat !", pesan, "success"); 
+      </script>
     @endif
 
 
