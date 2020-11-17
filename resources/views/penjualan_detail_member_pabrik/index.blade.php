@@ -17,7 +17,18 @@
 <div class="row">
   <div class="col-xs-12">
     <div class="box">
-   
+    <div class="box-header">
+    
+     <!-- pesan error -->
+     @if ($message = Session::get('error'))
+      <div class="alert alert-danger alert-block">
+        <button type="button" class="close" data-dismiss="alert">×</button> 
+        <strong>{{ $message }}</strong>
+      </div>
+    @endif
+
+    
+    </div>
       <div class="box-body">
     
      
@@ -47,6 +58,7 @@
       <th width="30">No</th>
       <th>Kode Produk</th>
       <th>Nama Produk</th>
+<th>Stok</th>
       <th align="right">Harga</th>
       <th>Jumlah</th>
       <th>Diskon</th>
@@ -188,6 +200,8 @@ $(function(){
      "dom" : 'Brt',
      "bSort" : false,
      "processing" : true,
+"scrollY" : "500px",
+"paging": false,
      "ajax" : {
        "url" : "{{ route('memberpabrik.data', $idpenjualan) }}",
        "type" : "GET"

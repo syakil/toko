@@ -15,7 +15,19 @@
 <div class="row">
   <div class="col-xs-12">
     <div class="box">
+   <div class="box-header">
    
+    <!-- pesan error -->
+    @if ($message = Session::get('error'))
+      <div class="alert alert-danger alert-block">
+        <button type="button" class="close" data-dismiss="alert">×</button> 
+        <strong>{{ $message }}</strong>
+      </div>
+    @endif
+
+
+
+   </div>
       <div class="box-body">
 
 <form class="form form-horizontal form-produk" method="post">
@@ -43,6 +55,7 @@
       <th width="30">No</th>
       <th>Kode Produk</th>
       <th>Nama Produk</th>
+      <th>Stok</th>
       <th align="right">Harga</th>
       <th>Jumlah</th>
       <th>Diskon</th>
@@ -112,7 +125,12 @@
           <input type="text" class="form-control" id="kembali" value="0" readonly>
         </div>
       </div>
-
+      <div class="form-group">
+        <label for="donasi" class="col-md-4 control-label">Donasi</label>
+        <div class="col-md-8">
+          <input type="text" class="form-control" id="donasi" name="donasi" value="0">
+        </div>
+      </div>
     </form>
   </div>
 
@@ -136,8 +154,10 @@ $(function(){
 
   table = $('.tabel-penjualan').DataTable({
      "dom" : 'Brt',
-     "bSort" : false,
+     "bSort" : true,
      "processing" : true,
+"scrollY" : "500px",
+"paging" : false,
      "ajax" : {
        "url" : "{{ route('transaksi.data', $idpenjualan) }}",
        "type" : "GET"
@@ -281,3 +301,4 @@ function loadForm(diskon=0, diterima=0){
 </script>
 
 @endsection
+

@@ -25,6 +25,7 @@
 <thead>
    <tr>
       <th width="30">No</th>
+<th>Kode Pembelian </th>
       <th>Tanggal</th>
       <th>Supplier</th>
       <th>Total Item</th>
@@ -60,9 +61,7 @@ $(function(){
    }); 
    
    table1 = $('.tabel-detail').DataTable({
-     "dom" : 'Brt',
-     "bSort" : false,
-     "processing" : true
+     
     });
 
    $('.tabel-supplier').DataTable();

@@ -37,12 +37,11 @@
                 </thead>
                 <tbody>
                     @foreach ($transfer as $p)
-                    @if($p->status == null)
                     <tr>
                         <td><input type="checkbox" name="check[]" value="{{$p->id_pembelian}}"></td>
                         <td>{{$no++}}</td>
                         <td>{{$p->id_pembelian}}</td>
-                        <td>{{$p->kode_gudang}}</td>
+                        <td>{{$p->kode_toko}}</td>
                         <td>{{$p->nama_toko}}</td>
                         <td>{{tanggal_indonesia(substr($p->created_at, 0, 10), false)}}</td>
                         <td>{{$p->total_item}}</td>
@@ -51,7 +50,6 @@
                         <a href="{{ route('retur.detail',$p->id_pembelian) }}" class="btn btn-success btn-sm"> <i class="fa fa-eye"></i> </a>
                         </td>
                     </tr>
-                    @endif
                     @endforeach
                 </tbody>
             </table>
@@ -64,3 +62,4 @@
 
     <!-- /.content -->
 @endsection
+

@@ -9,6 +9,7 @@
   <meta name="csrf-token" content="{{csrf_token()}}">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
  
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   
   <link rel="stylesheet" href="{{ asset('public/adminLTE/bootstrap/css/bootstrap.min.css') }}">
   <link rel="stylesheet" href="{{ asset('public/font-awesome/css/font-awesome.min.css') }}">
@@ -16,7 +17,7 @@
   <link rel="stylesheet" href="{{ asset('public/adminLTE/dist/css/skins/skin-blue.min.css') }}">
   <link rel="stylesheet" href="{{ asset('public/adminLTE/plugins/datatables/dataTables.bootstrap.css') }}">
   <link rel="stylesheet" href="{{ asset('public/adminLTE/plugins/datepicker/datepicker3.css') }}">
-  
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
@@ -86,15 +87,64 @@
         
         <li><a href="{{ route('member.index') }}"><i class="fa fa-credit-card"></i> <span>Member</span></a></li>
         <li><a href="{{ route('supplier.index') }}"><i class="fa fa-truck"></i> <span>Supplier</span></a></li>
-        <li><a href="{{ route('penjualan.index') }}"><i class="fa fa-upload"></i> <span>Penjualan</span></a></li>
+        
+ <li class="treeview">
+          <a href="#">
+            <i class="fa fa-shopping-cart"></i>
+            <span>Penjualan</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{{ route('penjualan.index') }}"><i class="fa fa-tag"></i> <span>Struk Penjualan</span></a></li>
+            <li><a href="{{ route('penjualan.detail') }}"><i class="fa fa-tags"></i> <span>Detail Struk Penjualan</span></a></li>
+         </ul>
+        </li>
+<li class="treeview">
+          <a href="#">
+            <i class="fa fa-file"></i>
+            <span>Write Off</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{{ route('write_off.index_admin') }}"><i class="fa fa-file-pdf-o"></i> <span>Terima Write Off</span></a></li>
+            <li><a href="{{ route('write_off.index_approve') }}"><i class="fa fa-file-pdf-o"></i> <span>Approval Write Off</span></a></li>
+            <li><a href="{{ route('write_off.index_report') }}"><i class="fa fa-file-pdf-o"></i> <span>Report Write Off</span></a></li>
+          </ul>
+        </li>
+        
         <li><a href="{{ route('laporan.index') }}"><i class="fa fa-file-pdf-o"></i> <span>Laporan</span></a></li>
         <li><a href="{{ route('setting.index') }}"><i class="fa fa-gears"></i> <span>Setting</span></a></li>
-        <li><a href="{{ route('user.index') }}""><i class="fa fa-user"></i> <span>User</span></a></li>       
-        <!-- menu approve po  -->
-        <li><a href="{{ route('pembelian.admin') }}"><i class="fa fa-file-pdf-o"></i> <span>Pembelian</span></a></li>
+<li class="treeview">
+          <a href="#">
+            <i class="fa fa-file"></i>
+            <span>Report</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <!-- report pembelian -->
+            <li><a href="{{ route('report_pembelian.index') }}"><i class="fa fa-cubes"></i> <span>Report Pembelian</span></a></li>
+           <li><a href="{{ route('report_kirim.index') }}"><i class="fa fa-cubes"></i> <span>Report Kirim Barang</span></a></li>  
+          </ul>
+        </li>
+  
+       
+<!-- invoice -->
+<li><a href="{{ route('invoice.index') }}"><i class="fa fa-cubes"></i> <span>Invoice</span></a></li>
+              
+        <!-- menu approve po 
+        <li><a href="{{ route('pembelian.admin') }}"><i class="fa fa-file-pdf-o"></i> <span>Pembelian</span></a></li> -->
         <!-- tambah menu pricing -->
         <li><a href=" {{ route('pricing.index') }} "><i class="fa fa-dollar"></i> <span>Pricing</span></a></li>
-        
+        <li><a href=" {{ route('muswamah.index') }} "><i class="fa fa-dollar"></i> <span>Laporan Muswamah</span></a></li>
+<!-- menu approve -->
+        <li><a href="{{ route('approve_admin.index') }}"><i class="fa fa-cubes"></i> <span>Approval Stock</span></a></li>
+       
         @elseif( Auth::user()->level == 2 )
       <li><a href="{{ route('transaksi.menu') }}"><i class="fa fa-shopping-cart"></i> <span>Pilih Transaksi</span></a></li>
       <li><a href="{{ route('transaksi.new') }}"><i class="fa fa-cart-plus"></i> <span>Transaksi Baru</span></a></li>
@@ -103,7 +153,15 @@
       <li><a href="{{ route('musawamahdetail.index') }}"><i class="fa fa-money"></i> <span>Setor Angsuran</span></a></li>
       <li><a href=""><i class="fa fa-cart-plus"></i> <span>Laporan Penjualan</span></a></li>
        <!-- menu jurnal umum -->
+
+      <li><a href="{{ route('cek_harga.index') }}"><i class="fa fa-dollar"></i> <span>Cek Harga</span></a></li>
       <li><a href="{{ route('jurnal_umum_admin.index') }}"><i class="fa fa-file-pdf-o"></i> <span>Jurnal</span></a></li>
+<!-- Saldo_simpanan -->
+      <li><a href="{{ route('saldo_titipan.index') }}"><i class="fa fa-file-pdf-o"></i> <span>Saldo Titipan</span></a></li>
+      <!-- Saldo_simpanan -->
+      <li><a href="{{ route('angsuran.index') }}"><i class="fa fa-file-pdf-o"></i> <span>Angsuran</span></a></li>
+      <!-- stok -->
+      <!-- <li><a href="{{ route('stockToko.index') }}"><i class="fa fa-cubes"></i> <span>Stock Toko</span></a></li> -->
       
         @elseif( Auth::user()->level == 3 )
 
@@ -112,9 +170,16 @@
         <li><a href="{{ route('pembelian.index') }}"><i class="fa fa-download"></i> <span>PO</span></a></li>
         <!-- menu jurnal umum -->
         <li><a href="{{ route('jurnal_umum_po.index') }}"><i class="fa fa-file-pdf-o"></i><span>Jurnal</span></a></li>
+<!-- riwayat stok -->
+        <li><a href="{{ route('riwayat_stok.index') }}"><i class="fa fa-file-pdf-o"></i><span>Stok</span></a></li>
+        
               
         @elseif( Auth::user()->level == 4 )
-
+<li><a href="{{ route('retur_supplier.index') }}"><i class="fa fa-download"></i> <span>Retur Supplier</span></a></li>
+        <li><a href="{{ route('kirim_antar_gudang.index') }}"><i class="fa fa-cubes"></i> <span>Kirim Barang Antar Gudang</span></a></li>
+<li><a href="{{ route('write_off.index') }}"><i class="fa fa-cubes"></i> <span>Write OFF</span></a></li>
+ 
+ 
         <li><a href="{{ route('kirim_barang.index') }}"><i class="fa fa-cubes"></i> <span>Surat Jalan</span></a></li>
         <!-- menu baru di gudang -->
         <li class="treeview">
@@ -127,13 +192,18 @@
           </a>
           <ul class="treeview-menu">
           <li><a href="{{ route('terima_po.index') }}"><i class="fa fa-cubes"></i> <span>Terima Barang PO</span></a></li>
-          <li><a href="{{ route('retur.index') }}"><i class="fa fa-cubes"></i> <span>Terima Barang Retur</span></a></li>            
+          <li><a href="{{ route('retur.index') }}"><i class="fa fa-cubes"></i> <span>Terima Barang Retur</span></a></li>     
+<li><a href="{{ route('terimaGudang.index') }}"><i class="fa fa-cubes"></i> <span>Terima Tranfer Antar Gudang</span></a></li>
+                 
           </ul>
           <!-- tambah menu stock barang -->
-          <li><a href="{{ route('stock.index') }}"><i class="fa fa-cubes"></i> <span>Stock Gudang</span></a></li>
+         <li><a href="{{ route('stock.index') }}"><i class="fa fa-cubes"></i> <span>Stock Gudang</span></a></li>
           <!-- menu approve -->
-          <li><a href="{{ route('approve.index') }}"><i class="fa fa-cubes"></i> <span>Approval Stock</span></a></li>
-
+          <!-- <li><a href="{{ route('approve.index') }}"><i class="fa fa-cubes"></i> <span>Approval Stock</span></a></li> -->
+          <!--<li><a href="{{ route('laporanGudang.index') }}"><i class="fa fa-cubes"></i> <span>Laporan</span></a></li>-->
+        <li><a href="{{ route('stock_opname.index') }}"><i class="fa fa-cubes"></i> <span>Stock Opname</span></a></li>
+        <!-- menu approve -->
+        <li><a href="{{ route('approve_gudang.index') }}"><i class="fa fa-cubes"></i> <span>Approval Stock</span></a></li>
 
         @elseif( Auth::user()->level == 5 )
 
@@ -141,10 +211,13 @@
         <li><a href="{{ route('kirim_barang_toko.index') }}"><i class="fa fa-cubes"></i> <span>Surat Jalan</span></a></li>
         <li><a href="{{ route('terimaToko.index') }}"><i class="fa fa-cubes"></i> <span>Terima Barang</span></a></li> 
         <!-- tambah menu stock barang -->
-        <li><a href="{{ route('stockToko.index') }}"><i class="fa fa-cubes"></i> <span>Stock</span></a></li>
+        <li><a href="{{ route('stockToko.index') }}"><i class="fa fa-cubes"></i> <span>Stock Toko</span></a></li>
+        <!--<li><a href="{{ route('laporanToko.index') }}"><i class="fa fa-cubes"></i> <span>Laporan</span></a></li> -->
+
+        <li><a href="{{ route('stock_opname_toko.index') }}"><i class="fa fa-cubes"></i> <span>Stock Opname</span></a></li>
         
                       
-        @else( Auth::user()->level == 6 )
+        @elseif( Auth::user()->level == 6 )
 
 
         <li><a href="{{ route('produk.index') }}"><i class="fa fa-cubes"></i> <span>Produk</span></a></li>
@@ -153,7 +226,21 @@
         <li><a href="{{ route('jurnal_umum_kp.index') }}"><i class="fa fa-file-pdf-o"></i> <span>Jurnal</span></a></li>
         <!-- menu approve -->
         <li><a href="{{ route('approve_kp.index') }}"><i class="fa fa-cubes"></i> <span>Approval Stock</span></a></li>
+         <!-- report pembayaran -->
+         <li><a href="{{ route('report_jatpo.index') }}"><i class="fa fa-file-pdf-o"></i><span>Pembayaran</span></a></li>
+<!-- pricing_kp -->
+        <li><a href="{{ route('pricing_kp.index') }}"><i class="fa fa-dollar"></i><span>Pricing</span></a></li>
+ <!-- koreksi_po -->
+        <li><a href="{{ route('koreksi_pembelian.index') }}"><i class="fa fa-retweet"></i><span>Koreksi Pembelian</span></a></li>
+        
+        
+        @else
+        <li><a href="{{ route('all_stok.index') }}"><i class="fa fa-cubes"></i> <span>Stok</span></a></li>
+
+        <li><a href="{{ route('user.index') }}""><i class="fa fa-user"></i> <span>User</span></a></li> 
+        
         @endif
+<li><a href="{{ route('ganti_password.index') }}""><i class="fa fa-user"></i> <span>Ganti Password</span></a></li> 
       </ul>
     </section>
   </aside>
@@ -166,6 +253,10 @@
         @yield('title')
       </h1>
       <ol class="breadcrumb">
+      @php
+        $tanggal = Session::get('tanggal');
+      @endphp
+        <li>{{$tanggal}}</li>
         @section('breadcrumb')
         <li><a href="#"><i class="fa fa-home"></i>Home</a></li>
         @show
@@ -203,6 +294,14 @@
 $(document).ready(function(){
   $('#tables').DataTable()
 });
+</script>
+<script type="text/javascript">
+  $(document).ready(function() {
+      window.history.pushState(null, "", window.location.href);        
+      window.onpopstate = function() {
+          window.history.pushState(null, "", window.location.href);
+      };
+  });
 </script>
 @yield('script')
 

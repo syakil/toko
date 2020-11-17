@@ -4,6 +4,12 @@
   Daftar Produk
 @endsection
 
+@section('header')
+
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css">
+
+@endsection
+
 @section('breadcrumb')
    @parent
    <li>produk</li>
@@ -17,28 +23,18 @@
       <div class="box-header">
       </div>
       <div class="box-body"> 
-            <table class="table table-striped" id="tables">
+            <table class="table table-striped tabel-stock" >
                 <thead>
                     <tr>
                         <th width='1%'>No.</th>
                         <th>Barcode</th>
                         <th>Nama Produk</th>
                         <th>Stock</th>
-                        <th>Stock Min</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                @php $no =1 ; @endphp
-                    @foreach ($produk as $p)
-                    <tr>
-                        <td>{{$no++}}</td>
-                        <td>{{$p->kode_produk}}</td>
-                        <td> <a href="{{ route('stockToko.detail',$p->kode_produk)}}"> {{$p->nama_produk}}</a></td>
-                        <td>{{$p->stok}}</td>
-                        <td>{{$p->stok_min}}</td>
-                    </tr>
-                    @endforeach
+
                 </tbody>
             </table>
             </div>
@@ -51,5 +47,36 @@
 @endsection
 
 @section('script')
+
+
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
+
+
+
+<script type="text/javascript">
+var table, save_method, table1;
+$(function(){
+   table = $('.tabel-stock').DataTable({
+     "processing" : true,
+     "serverside" : true,
+     dom: 'Bfrtip',
+        buttons: [
+            'excel'
+        ],
+     "ajax" : {
+       "url" : "{{ route('stockToko.data') }}",
+       "type" : "GET"
+     }
+
+   });
+   $('div.dataTables_filter input').focus(); 
+});
+</script>
 
 @endsection

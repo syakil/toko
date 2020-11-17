@@ -12,8 +12,7 @@ use App\PembelianTemporary;
 class PembelianDetailController extends Controller
 {
    public function  index(){
-      $produk = Produk:: all() 
-      ->where('unit', '=', Auth::user()->unit);
+      $produk = Produk::where('unit',Auth::user()->unit)->get();
       $idpembelian = session('idpembelian');
       // dd($idpembelian);
       $supplier = Supplier::find(session('idsupplier'));
@@ -23,9 +22,11 @@ class PembelianDetailController extends Controller
    {
    // dd($id);
      $detail = PembelianTemporaryDetail::leftJoin('produk', 'produk.kode_produk', '=', 'pembelian_temporary_detail.kode_produk')
-        ->where('id_pembelian', '=', $id)
-        ->where('unit', '=',  Auth::user()->unit)
-        ->get();
+->select('pembelian_temporary_detail.*','produk.nama_produk')
+         ->where('id_pembelian', '=', $id)
+         ->where('unit', '=',  Auth::user()->unit)
+         ->orderBy('id_pembelian_detail','desc')
+         ->get();
      $no = 0;
      $data = array();
      $total = 0;
@@ -36,7 +37,7 @@ class PembelianDetailController extends Controller
        $row[] = $no;
        $row[] = $list->kode_produk;
        $row[] = $list->nama_produk;
-       $row[] = "Rp. ".format_uang($list->harga_beli);
+       $row[] = "<input type='number' class='form-control' name='harga_$list->id_pembelian_detail' value='$list->harga_beli' onChange='changeHarga($list->id_pembelian_detail)'>";
        $row[] = "<input type='number' class='form-control' name='jumlah_$list->id_pembelian_detail' value='$list->jumlah' onChange='changeCount($list->id_pembelian_detail)'>";
        $row[] = "Rp. ".format_uang($list->harga_beli * $list->jumlah);
        $row[] = '<a onclick="deleteItem('.$list->id_pembelian_detail.')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>';
@@ -54,6 +55,7 @@ class PembelianDetailController extends Controller
       $produk = Produk::where('kode_produk', '=', $request['kode'])
       ->where('unit', '=',  Auth::user()->unit)
       ->first();
+      // dd($request);
       $detail = new PembelianTemporaryDetail;
       $detail->id_pembelian = $request['idpembelian'];
       $detail->kode_produk = $request['kode'];
@@ -72,6 +74,16 @@ class PembelianDetailController extends Controller
       $detail = PembelianTemporaryDetail::find($id);
       $detail->jumlah = $request[$nama_input];
       $detail->sub_total = $detail->harga_beli * $request[$nama_input];
+      $detail->update();
+   }
+public function update_harga(Request $request, $id)
+   {
+      $nama_input = "harga_".$id;
+   
+      $detail = PembelianTemporaryDetail::find($id);
+      
+      $detail->harga_beli = $request[$nama_input];
+      $detail->sub_total = $detail->jumlah * $request[$nama_input];
       $detail->update();
    }
    public function destroy($id)

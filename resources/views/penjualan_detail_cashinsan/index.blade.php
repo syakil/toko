@@ -15,6 +15,18 @@
 <div class="row">
   <div class="col-xs-12">
     <div class="box">
+    <div class="box-header">
+    
+     <!-- pesan error -->
+     @if ($message = Session::get('error'))
+      <div class="alert alert-danger alert-block">
+        <button type="button" class="close" data-dismiss="alert">×</button> 
+        <strong>{{ $message }}</strong>
+      </div>
+    @endif
+
+
+    </div>
    
       <div class="box-body">
 
@@ -43,6 +55,7 @@
       <th width="30">No</th>
       <th>Kode Produk</th>
       <th>Nama Produk</th>
+      <th>Stok</th>
       <th align="right">Harga</th>
       <th>Jumlah</th>
       <th>Diskon</th>
@@ -59,7 +72,7 @@
      <div id="tampil-terbilang" style="background: #3c8dbc; color: #fff; font-size: 25px; padding: 10px"></div>
   </div>
   <div class="col-md-4">
-    <form class="form form-horizontal form-penjualan" method="post" action="memberinsan/simpan">
+    <form class="form form-horizontal form-penjualan" method="post" action="cashinsan/simpan">
       {{ csrf_field() }}
       <input type="hidden" name="idpenjualan" value="{{ $idpenjualan }}">
       <input type="hidden" name="total" id="total">
@@ -117,7 +130,12 @@
           <input type="text" class="form-control" id="kembali" value="0" readonly>
         </div>
       </div>
-
+      <div class="form-group">
+        <label for="donasi" class="col-md-4 control-label">Donasi</label>
+        <div class="col-md-8">
+          <input type="text" class="form-control" id="donasi" name="donasi" value="0">
+        </div>
+      </div>
     </form>
   </div>
 
@@ -143,6 +161,8 @@ $(function(){
      "dom" : 'Brt',
      "bSort" : false,
      "processing" : true,
+"scrollY" : "500px",
+"paging": false,
      "ajax" : {
        "url" : "{{ route('cashinsan.data', $idpenjualan) }}",
        "type" : "GET"
@@ -241,7 +261,7 @@ function selectMember(kode){
 function deleteItem(id){
    if(confirm("Apakah yakin data akan dihapus?")){
      $.ajax({
-       url : "memberinsan/"+id,
+       url : "cashinsan/"+id,
        type : "POST",
        data : {'_method' : 'DELETE', '_token' : $('meta[name=csrf-token]').attr('content')},
        success : function(data){
@@ -261,7 +281,7 @@ function loadForm(diskon=0, diterima=0){
   $('#totalitem').val($('.totalitem').text());
 
   $.ajax({
-       url : "memberinsan/loadform/"+diskon+"/"+$('#total').val()+"/"+diterima,
+       url : "cashinsan/loadform/"+diskon+"/"+$('#total').val()+"/"+diterima,
        type : "GET",
        dataType : 'JSON',
        success : function(data){
@@ -286,3 +306,4 @@ function loadForm(diskon=0, diterima=0){
 </script>
 
 @endsection
+

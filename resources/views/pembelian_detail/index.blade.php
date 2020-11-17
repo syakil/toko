@@ -115,6 +115,8 @@ $(function(){
      "dom" : 'Brt',
      "bSort" : false,
      "processing" : true,
+"scrollY" : "500px",
+"paging": false,
      "ajax" : {
        "url" : "{{ route('pembelian_detail.data', $idpembelian) }}",
        "type" : "GET"
@@ -158,6 +160,7 @@ function addItem(){
   });
 }
 function selectItem(kode){
+  console.log(kode)
   $('#kode').val(kode);
   $('#modal-produk').modal('hide');
   addItem();
@@ -166,6 +169,24 @@ function changeCount(id){
      $.ajax({
         url : "pembelian_detail/"+id,
         type : "POST",
+        data : $('.form-keranjang').serialize(),
+        success : function(data){
+          $('#kode').focus();
+          table.ajax.reload(function(){
+            loadForm($('#diskon').val());
+          });             
+        },
+        error : function(){
+          alert("Tidak dapat menyimpan data!");
+        }   
+     });
+}
+function changeHarga(id){
+  var url = "{{route('pembelian_detail.update_harga',':id')}}";
+  url = url.replace(':id',id);
+     $.ajax({
+        url : url,
+        type : "GET",
         data : $('.form-keranjang').serialize(),
         success : function(data){
           $('#kode').focus();

@@ -23,7 +23,7 @@ class SupplierController extends Controller
        $row = array();
        $row[] = $no;
        $row[] = $list->nama;
-       $row[] = $list->alamat;
+       $row[] = $list->alamat_supplier;
        $row[] = $list->telpon;
        $row[] = '<div class="btn-group">
                <a onclick="editForm('.$list->id_supplier.')" class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></a>
@@ -40,7 +40,7 @@ class SupplierController extends Controller
 
       $supplier = new Supplier;
       $supplier->nama   = $request['nama'];
-      $supplier->alamat = $request['alamat'];
+      $supplier->alamat_supplier = $request['alamat'];
       $supplier->telepon = $request['telepon'];
       $supplier->save();
 
@@ -56,7 +56,7 @@ class SupplierController extends Controller
    {
       $supplier = Supplier::find($id);
       $supplier->nama = $request['nama'];
-      $supplier->alamat = $request['alamat'];
+      $supplier->alamat_supplier = $request['alamat'];
       $supplier->telepon = $request['telepon'];
       $supplier->update();
    }

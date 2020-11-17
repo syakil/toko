@@ -25,8 +25,10 @@ class PembelianController extends Controller
    {
    
       $pembelian = PembelianTemporary::leftJoin('supplier', 'supplier.id_supplier', '=', 'pembelian_temporary.id_supplier')
-      
-     ->orderBy('pembelian_temporary.id_pembelian', 'desc')
+->where('status',null)
+->where('kode_gudang',Auth::user()->unit)
+->select('pembelian_temporary.*','supplier.nama')
+     ->orderBy('pembelian_temporary.id_pembelian','desc')
      ->get();
      $no = 0;
      $data = array();
@@ -34,7 +36,8 @@ class PembelianController extends Controller
        $no ++;
        $row = array();
        $row[] = $no;
-       $row[] = tanggal_indonesia(substr($list->created_at, 0, 10), false);
+       $row[] = $list->id_pembelian;
+       $row[] = tanggal_indonesia($list->created_at);
        $row[] = $list->nama;
        $row[] = $list->total_item;
        $row[] = "Rp. ".format_uang($list->total_harga);
@@ -42,7 +45,7 @@ class PembelianController extends Controller
        $row[] = "Rp. ".format_uang($list->bayar);
        $row[] = '<div class="btn-group">
                <a onclick="showDetail('.$list->id_pembelian.')" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i></a>
-               <a href="/toko-master/pembelian/'.$list->id_pembelian.'/poPDF" class="btn btn-print btn-sm" target="_blank"><i class="fa fa-print"></i></a>
+               <a href="/toko/pembelian/'.$list->id_pembelian.'/poPDF" class="btn btn-print btn-sm" target="_blank"><i class="fa fa-print"></i></a>
               </div>';
        $data[] = $row;
      }
@@ -54,22 +57,35 @@ class PembelianController extends Controller
    public function show($id)
    {
    
-     $detail = PembelianTemporaryDetail::leftJoin('produk', 'produk.kode_produk', '=', 'pembelian_temporary_detail.kode_produk')
+     $detail = PembelianTemporaryDetail::
+select('pembelian_temporary_detail.*','produk.nama_produk')
+->leftJoin('produk', 'produk.kode_produk', '=', 'pembelian_temporary_detail.kode_produk')
         ->where('id_pembelian', '=', $id)
         ->where('unit',Auth::user()->unit)
+        ->where('status',null)
         ->get();
-     $no = 0;
+    
+        $no = 0;
      $data = array();
-     foreach($detail as $list){
-       $no ++;
-       $row = array();
-       $row[] = $no;
-       $row[] = $list->kode_produk;
-       $row[] = $list->nama_produk;
-       $row[] = "Rp. ".format_uang($list->harga_beli);
-       $row[] = $list->jumlah;
-       $row[] = $list->jumlah_terima;
-       $row[] = $list->status_jurnal;
+     foreach($detail as $list){ 
+      $no ++;
+      $row = array();
+      $row[] = '<input type="checkbox" name="id_detail[]" id="id_detail" value="'.$list->id_pembelian_detail.'">';
+      $row[] = $no;
+      $row[] = $list->kode_produk;
+      $row[] = $list->nama_produk;
+      $row[] = "Rp. ".format_uang($list->harga_beli);
+      $row[] = $list->jumlah;
+      $row[] = $list->jumlah_terima;
+         
+       if ($list->jumlah_terima == 0) {
+         $row[] = '<span class="label label-warning">Belum Diterima</span>';
+       }elseif($list->jumlah > $list->jumlah_terima){
+          $row[] = '<span class="label label-danger">Kurang</span>';
+       }else {
+         $row[] = '<span class="label label-success">Lengkap</span>';
+       }
+
        $row[] = "Rp. ".format_uang($list->harga_beli * $list->jumlah);
        $data[] = $row;
      }
@@ -77,7 +93,6 @@ class PembelianController extends Controller
      $output = array("data" => $data);
      return response()->json($output);
    }
-
 
 
 
@@ -111,7 +126,7 @@ class PembelianController extends Controller
       $pembelian->bayar = 0;      
       $pembelian->jatuh_tempo = date('Y-m-d');
       $pembelian->kode_gudang = 0;    
-      $pembelian->tipe_bayar = 2;    
+      $pembelian->tipe_bayar = 0;    
       $pembelian->id_user = Auth::user()->id;
       $pembelian->kode_gudang = Auth::user()->unit;
           

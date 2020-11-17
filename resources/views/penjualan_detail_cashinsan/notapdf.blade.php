@@ -3,14 +3,19 @@
 <head>
    <title>Nota PDF</title>
    <style type="text/css">
-      table td{font: arial 12px;}
+      table td{font-family: "Courier New", Courier, monospace ;
+         font-size:29px;
+      }
+      
       table.data td,
       table.data th{
-         border: 1px solid #ccc;
+         border: 0px ;
          padding: 5px;
       }
       table.data th{
          text-align: center;
+         table th{font-family: "Courier New", Courier, monospace ;
+         font-size:29px;
       }
       table.data{ border-collapse: collapse }
    </style>
@@ -20,7 +25,7 @@
 <table width="100%">
   <tr>
      <td rowspan="3" width="60%"><img src="../public/images/{{$setting->logo}}" width="150"><br>
-     {{ $setting->alamat }}<br><br>
+     {{ $toko->alamat }}<br><br>
      </td>
      <td>Tanggal</td>
      <td>: {{ tanggal_indonesia(date('Y-m-d')) }}</td>
@@ -29,15 +34,20 @@
      <td>Kode Member</td>
      <td>: {{ $penjualan->kode_member }}</td>
   </tr>
+
+<tr>
+     <td>Kode Struk</td>
+     <td>: {{ $penjualan->id_penjualan }}</td>
+  </tr>
 </table>
          
 <table width="100%" class="data">
 <thead>
-   <tr>
+  <tr>
     <th>No</th>
-    <th>Kode Produk</th>
-    <th>Nama Produk</th>
-    <th>Harga Satuan</th>
+    <th>Kode </th>
+    <th>Nama </th>
+    <th>Harga </th>
     <th>Jumlah</th>
     <th>Diskon</th>
     <th>Subtotal</th>
@@ -48,11 +58,11 @@
       
     <tr>
        <td>{{ ++$no }}</td>
-       <td>{{ $data->kode_produk }}</td>
+       <td>{{ substr($data->kode_produk,8) }}</td>
        <td>{{ $data->nama_produk }}</td>
        <td align="right">{{ format_uang($data->harga_jual) }}</td>
        <td>{{ $data->jumlah }}</td>
-       <td align="right">{{ format_uang($data->diskon) }}%</td>
+       <td align="right">{{ format_uang($data->diskon) }}</td>
        <td align="right">{{ format_uang($data->sub_total) }}</td>
     </tr>
     @endforeach

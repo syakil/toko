@@ -2,7 +2,8 @@
 
 @section('header')
 
-    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+<link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+<link href="//cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css" rel="stylesheet"/>
 @endsection
 
 @section('title')
@@ -23,10 +24,11 @@
             <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
                 Ubah Margin
             </button>
-
+            <a href="{{ route('pricing.tambah') }}" class="btn btn-warning">Tambah Produk</a>
             </div>
                 <div class="box-body">
-                <table class="table table-striped tabel-supplier" id="tables">
+                <div class="table-responsive">
+                <table class="table table-striped tabel-pricing">
                     <thead>
                         <tr>
                         <th>Nomor</th>
@@ -41,21 +43,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($produk as $data)
-                        <tr>
-                        <td>{{ $no++ }}</td>
-                        <td>{{ $data->kode_produk }}</td>
-                        <td>{{ $data->nama_produk }}</td>
-                        <td>{{ $data->harga_beli }}</td>
-                        <td>{{ round($data->harga_beli + ($data->harga_beli*$data->margin/100)) }}</th>
-                        <td>{{ $data->harga_jual }}</td>
-                        <td>{{ $data->harga_jual_insan}}</td>
-                        <td>{{ $data->keterangan }}</td>
-                        <td><a href="{{ route('pricing.edit',$data->kode_produk)}}"class="btn btn-sm btn-warning"><i class="fa fa-pencil"></i></a></td>
-                        </tr>
-                        @endforeach
+                        
                     </tbody>
                 </table>
+                </div>
                 </div>
         </div>
     </div>
@@ -105,37 +96,35 @@
 
 @section('script')
 
-<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-        $('.edit').editable();
-    });
-    </script>
-    <script>
-    $(document).ready(function(){
-    $('#tables').DataTable()
-    });
-    </script>
-    <script>
-    // $.fn.editable.defaults.mode = 'inline';
-    $(function(){
-      $('.tanggal').editable({
-        format: 'YYYY-MM-DD',    
-        viewformat: 'YYYY-MM-DD',    
-        template: 'D / MMMM / YYYY',    
-        combodate: {
-                minYear: 2018,
-                maxYear: 2030,
-                minuteStep: 1
-                }
-        });
-      });
-    </script>
 
-<script src="https://momentjs.com/downloads/moment-with-locales.js"></script>
 
-    <script>
-    $.fn.editable.defaults.mode = 'inline';
-    </script>
+<script type="text/javascript">
+var table, save_method, table1;
+$(function(){
+   table = $('.tabel-pricing').DataTable({
+     
+     "serverside" : true,
+     "dom": 'Bfrtip',
+        buttons: [
+            'excel'
+        ],
+     ajax : {
+       url : "{{ route('pricing.data') }}",
+       type : "GET"
+     }
+   });
+   $('div.dataTables_filter input').focus(); 
+});
+</script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap4.min.js"></script>
 
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.print.min.js"></script> 
 @endsection
+

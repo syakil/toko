@@ -5,123 +5,432 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Kasa;
 use App\TabelTransaksi;
+use App\Member;
+use Redirect;
 use PDF;
 use Auth;
+use App\SaldoToko;
+use App\Pengeluaran;
+use App\Setting;
+use App\Penjualan;
+use App\PembelianTemporary;
+use App\PembelianTemporaryDetail;
+use App\Produk;
+use App\ProdukDetail;
+use DB;
+use Ramsey\Uuid\Uuid;
+use App\TunggakanToko;
+use App\Branch;
+use App\Musawamah;
+use App\PenjualanDetail;
 
-class KasaController extends Controller
-{
-   public function index()
-   {
-      $now = \Carbon\Carbon::now();
-      $now=$now->format('Y-m-d');
-      //dd($now);
-      $pendapatan= TabelTransaksi::groupBy('kode_rekening')
-   ->select('kode_rekening', \DB::raw('sum(debet-kredit) as pendapatan'))
-   ->where('tanggal_transaksi', '=', $now)
-   ->where('kode_rekening', '=', '1120000')
-   ->first();
+class KasaController extends Controller{
+
+   public function index(){
    
+      $param_tgl = \App\ParamTgl::where('nama_param_tgl','tanggal_transaksi')->where('unit',Auth::user()->id)->first();
+      $tanggal = $param_tgl->param_tgl;
 
-      return view('kasa.index',compact('pendapatan')); 
+      $penjualan_cash = TabelTransaksi::
+                  select('kode_rekening', \DB::raw('sum(debet) as cash'))
+                  ->where('tanggal_transaksi', '=', $tanggal)
+                  ->where('unit', '=', Auth::user()->unit)
+                  ->whereIn('keterangan_transaksi',['Penjualan','Musawamah','Setoran Angsuran Musawamah'])
+                  ->where('kode_rekening','1120000' )
+                  ->first();
+      $cash = $penjualan_cash->cash;
+      $penjualan_musawamah = TabelTransaksi::
+                  select('kode_rekening', \DB::raw('sum(debet-kredit) as musawamah'))
+                  ->where('tanggal_transaksi', '=', $tanggal)
+//                  ->where('kode_rekening','1412000')
+                  ->where('keterangan_transaksi','Musawamah')
+                  ->where('unit', '=', Auth::user()->unit)
+                  ->first();
+      $musawamah = $penjualan_musawamah->musawamah;
+
+      return view('kasa.index',compact('cash','musawamah')); 
+   
    }
 
-   public function listData()
-   {
+   public function listData(){
    
-     $kasa = Kasa::orderBy('id_kasa', 'desc')->get();
-     $no = 0;
-     $data = array();
-     foreach($kasa as $list){
-       $no ++;
-       $row = array();
-       $row[] = "<input type='checkbox' name='id[]'' value='".$list->id_kasa."'>";
-       $row[] = $no;
-       $row[] = $list->tgl;
-       $row[] = $list->kode_kasir;
-       $row[] = $list->seratus_ribu;
-       $row[] = $list->limapuluh_ribu;
-       $row[] = $list->duapuluh;
-       $row[] = $list->sepuluh;
-       $row[] = $list->limaribu;
-       $row[] = $list->duaribu;
-       $row[] = $list->seribu;
-       $row[] = $list->seratus;
-       $row[] = $list->lima_puluh;
-       $row[] = $list->jumlah;
-       $row[] = '<div class="btn-group">
-               <a onclick="editForm('.$list->id.')" class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></a>
-               <a onclick="deleteData('.$list->id.')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a></div>';
-       $data[] = $row;
-     }
+      $kasa = Kasa::orderBy('id_kasa', 'desc')->where('kode_toko', '=' , Auth::user()->unit)
+                  ->get();
+      $no = 0;
+      $data = array();
+      foreach($kasa as $list){
 
-     $output = array("data" => $data);
-     return response()->json($output);
+         $no ++;
+         $row = array();
+         $row[] = "<input type='checkbox' name='id[]'' value='".$list->id_kasa."'>";
+         $row[] = $no;
+         $row[] = $list->tgl;
+         $row[] = $list->kode_kasir;
+         $row[] = $list->seratus_ribu;
+         $row[] = $list->limapuluh_ribu;
+         $row[] = $list->duapuluh;
+         $row[] = $list->sepuluh;
+         $row[] = $list->limaribu;
+         $row[] = $list->duaribu;
+         $row[] = $list->seribu;
+         $row[] = $list->seratus;
+         $row[] = number_format($list->jumlah);
+         $row[] = number_format($list->cash);
+         $row[] = number_format($list->musawamah);
+         $row[] = number_format($list->total);
+         $row[] = number_format($list->selisih);
+         $data[] = $row;
+      }
+
+      $output = array("data" => $data);
+      return response()->json($output);
    }
 
-   public function store(Request $request)
-   {
-     if($request['id_kasa']==$request['pendapatan']){
-      $jml = Kasa::where('id_kasa', '=', $request['id_kasa'])->count();
-     if($jml < 1){
+   Public function eod(){
+
+      $branch = Branch::where('kode_gudang',Auth::user()->unit)->get();
+      $kode_toko = array();
+
+
+      foreach ($branch as $data ) {
+         $kode_toko[] = $data->kode_toko;
+      }
+
+
+      $produk = Produk::where("unit",Auth::user()->unit)->get();
+
+      foreach ($produk as $list ) {
+
+         $produk_detail = ProdukDetail::where("kode_produk",$list->kode_produk)->where("unit",Auth::user()->unit)->whereRaw("stok_detail > 0")->where('status',null)->orderBy("no_faktur","DESC")->first();
+         if ($produk_detail) {
+            
+            $produk_ubah = Produk::where("kode_produk",$list->kode_produk)->whereIn("unit",$kode_toko)->get();
+            foreach ($produk_ubah as $ubah) {
+
+               $kode_produk = $ubah->kode_produk;
+               $harga_lama = $ubah->harga_jual * $ubah->stok;
+               $harga_baru = $produk_detail->harga_jual_umum * $ubah->stok;
+               $selisih = abs($harga_baru - $harga_lama);
+               $unit = $ubah->unit;
+
+               $kode = Uuid::uuid4()->getHex();
+               $kode_t = substr($kode,25);
+               $kode_t ="EOD/-".$unit.$kode_t;
+               $now = date('Y-m-d');
+
+               if ($unit != Auth::user()->unit) {   
+                  if ($harga_baru > $harga_lama) {
+                     
+                     $jurnal = new TabelTransaksi;
+                     $jurnal->unit =  $unit; 
+                     $jurnal->kode_transaksi = $kode_t;
+                     $jurnal->kode_rekening = 1483000;
+                     $jurnal->tanggal_transaksi  = $now;
+                     $jurnal->jenis_transaksi  = "Jurnal System";
+                     $jurnal->keterangan_transaksi = "Kenaikan Harga ". $kode_produk;
+                     $jurnal->debet = $selisih;
+                     $jurnal->kredit = 0;
+                     $jurnal->tanggal_posting = "";
+                     $jurnal->keterangan_posting = "0";
+                     $jurnal->id_admin = $unit; 
+                     $jurnal->save();
+                     
+                     $jurnal = new TabelTransaksi;
+                     $jurnal->unit =  $unit; 
+                     $jurnal->kode_transaksi = $kode_t;
+                     $jurnal->kode_rekening = 1482000;
+                     $jurnal->tanggal_transaksi  = $now;
+                     $jurnal->jenis_transaksi  = "Jurnal System";
+                     $jurnal->keterangan_transaksi =  "Kenaikan Harga ". $kode_produk;
+                     $jurnal->debet = 0;
+                     $jurnal->kredit = $selisih;
+                     $jurnal->tanggal_posting = "";
+                     $jurnal->keterangan_posting = "0";
+                     $jurnal->id_admin = $unit; 
+                     $jurnal->save();
+
+                  }elseif ($harga_baru < $harga_lama){
+                     
+                     $jurnal = new TabelTransaksi;
+                     $jurnal->unit =  $unit; 
+                     $jurnal->kode_transaksi = $kode_t;
+                     $jurnal->kode_rekening = 1482000;
+                     $jurnal->tanggal_transaksi  = $now;
+                     $jurnal->jenis_transaksi  = "Jurnal System";
+                     $jurnal->keterangan_transaksi =  "Penurunan Harga ". $kode_produk;
+                     $jurnal->debet = $selisih;
+                     $jurnal->kredit = 0;
+                     $jurnal->tanggal_posting = "";
+                     $jurnal->keterangan_posting = "0";
+                     $jurnal->id_admin = $unit; 
+                     $jurnal->save();
+                     
+                     $jurnal = new TabelTransaksi;
+                     $jurnal->unit =  $unit; 
+                     $jurnal->kode_transaksi = $kode_t;
+                     $jurnal->kode_rekening = 1483000;
+                     $jurnal->tanggal_transaksi  = $now;
+                     $jurnal->jenis_transaksi  = "Jurnal System";
+                     $jurnal->keterangan_transaksi = "Penurunan Harga ". $kode_produk;
+                     $jurnal->debet = 0;
+                     $jurnal->kredit = $selisih;
+                     $jurnal->tanggal_posting = "";
+                     $jurnal->keterangan_posting = "0";
+                     $jurnal->id_admin = $unit; 
+                     $jurnal->save();
+                  }
+               }
+
+               $ubah->harga_beli = $produk_detail->harga_beli;
+               $ubah->harga_jual = $produk_detail->harga_jual_umum;
+               $ubah->harga_jual_member_insan = $produk_detail->harga_jual_insan;
+               $ubah->harga_jual_insan = $produk_detail->harga_jual_insan;
+               $ubah->harga_jual_pabrik = $produk_detail->harga_jual_umum;
+
+               $ubah->update();
+            }
+         }
+
+      }
+
+      return back()->with(['successs' => 'Eod Berhasil']);
+
+   }
+
+
+   public function store(Request $request){
+
+      $param_tgl = \App\ParamTgl::where("nama_param_tgl","tanggal_transaksi")->where('unit',Auth::user()->id)->first();   
+      $tanggal = $param_tgl->param_tgl;
+      $tgl_sekarang = new \Carbon\Carbon($tanggal);
+      $tgl_esok = $tgl_sekarang->addDays(1);
+      
+      $daftar_hari = array(
+         "Sunday" => "Minggu",
+         "Monday" => "Senin",
+         "Tuesday" => "Selasa",
+         "Wednesday" => "Rabu",
+         "Thursday" => "Kamis",
+         "Friday" => "Jumat",
+         "Saturday" => "Sabtu"
+      );
+
+      $namahari = date('l', strtotime($tgl_esok->toDateString()));
+      $hari = $daftar_hari[$namahari];
+      $unit = Auth::user()->unit;
+      
+
+      $cash = TabelTransaksi::where("unit",auth::user()->unit)->where("kode_rekening","1120000")->where("tanggal_transaksi",$tanggal)->where("id_admin",Auth::user()->id)->sum("debet");    
+      $musawamah = TabelTransaksi::where("unit",auth::user()->unit)->where("keterangan_transaksi","musawamah")->where("kode_rekening","1482000")->where("tanggal_transaksi",$tanggal)->where("id_admin",Auth::user()->id)->sum("kredit");
+
+      $jumlah_cash = $request['jumlah'];
+      $total_belanja = $cash+$musawamah;
+      $selisih = abs($cash - $jumlah_cash);
+
       $kasa = new Kasa;
-      $kasa->seratus_ribu = $request['seratus_ribu'];
-      $kasa->limapuluh_ribu  = $request['limapuluh_ribu'];
-      $kasa->duapuluh = $request['duapuluh'];
-      $kasa->sepuluh = $request['sepuluh'];
-      $kasa->limaribu = $request['limaribu'];
-      $kasa->duaribu = $request['duaribu'];
-      $kasa->seribu = $request['seribu'];
-      $kasa->limaratus = $request['limaratus'];
-      $kasa->seratus = $request['seratus'];
-      $kasa->lima_puluh = $request['lima_puluh'];
-      $kasa->jumlah = $request['jumlah'];
-      $kasa->tgl = date('y-m-d');
+      $kasa->seratus_ribu = $request["seratus_ribu"];
+      $kasa->limapuluh_ribu  = $request["limapuluh_ribu"];
+      $kasa->duapuluh = $request["duapuluh"];
+      $kasa->sepuluh = $request["sepuluh"];
+      $kasa->limaribu = $request["limaribu"];
+      $kasa->duaribu = $request["duaribu"];
+      $kasa->seribu = $request["seribu"];
+      $kasa->limaratus = $request["limaratus"];
+      $kasa->seratus = $request["seratus"];
+      $kasa->jumlah = $request["jumlah"];
+      $kasa->cash =$cash;
+      $kasa->total = $total_belanja;
+      $kasa->selisih = $selisih;
+      $kasa->musawamah = $musawamah;
+      $kasa->tgl =$tanggal;
       $kasa->kode_kasir = Auth::user()->id;
       $kasa->kode_toko = Auth::user()->unit;
-
       $kasa->save();
-      echo json_encode(array('msg'=>'success'));
-     }else{
-      echo json_encode(array('msg'=>'error'));
-     }
-   }else{
-      echo json_encode(array('msg'=>'tidaksama'));
-   }
 
-   }
+            
+      $pendapatan = TabelTransaksi::groupBy('kode_rekening')
+                                 ->select("kode_rekening", \DB::raw("sum(debet) as debet"))
+                                 ->where("tanggal_transaksi", "=", $tanggal)
+                                 ->where("kode_rekening", "=", "1120000")
+                                 ->where("unit", "=", Auth::user()->unit)
+                                 ->first();
 
-   public function edit($id)
-   {
-     $member = Member::find($id);
-     echo json_encode($member);
-   }
+            
+      $pengeluaran = TabelTransaksi::groupBy("kode_rekening")
+                                 ->select("kode_rekening", \DB::raw("sum(kredit) as kredit"))
+                                 ->where("tanggal_transaksi", "=", $tanggal)
+                                 ->where("kode_rekening", "=", "1120000")
+                                 ->where("unit", "=", Auth::user()->unit)
+                                 ->first();
 
-   public function update(Request $request, $id)
-   {
-      $member = Member::find($id);
-      $member->nama = $request['nama'];
-      $member->alamat = $request['alamat'];
-      $member->telpon = $request['telpon'];
-      $member->update();
-      echo json_encode(array('msg'=>'success'));
-   }
+      $saldo_id = SaldoToko::where("tanggal",$tanggal)
+                           ->where("unit",Auth::user()->unit)
+                           ->first();
+           
+      $saldo_toko = SaldoToko::where("id_saldo",$saldo_id->id_saldo)->first();
+      $saldo_akhir = $pengeluaran->debet + $saldo_toko->saldo_akhir - $pengeluaran->kredit;
 
-   public function destroy($id)
-   {
-      $member = Member::find($id);
-      $member->delete();
-   }
+      $saldo_toko->pemasukan = $pendapatan->debet;
+      $saldo_toko->pengeluaran = $pengeluaran->kredir;
+      $saldo_toko->saldo_akhir = $saldo_akhir;
+      $saldo_toko->update();
 
-    public function printCard(Request $request)
-   {
-      $datamember = array();
-      foreach($request['id'] as $id){
-         $member = Member::find($id);
-         $datamember[] = $member;
+      $now = new \Carbon\Carbon($tanggal);
+      $saldo_awal = new SaldoToko;
+      $saldo_awal->tanggal = $now->addDays(1);
+            
+      $saldo_awal->saldo_awal = $saldo_toko->saldo_akhir;
+      $saldo_awal->unit = Auth::user()->unit;
+      $saldo_awal->save();
+
+
+      $get_tunggakan = DB::table("tunggakan_toko")->where("tgl_tunggak",$tgl_esok)->where("KREDIT",">",0)->where("unit",$unit)->get();
+
+      if($get_tunggakan){
+         foreach ($get_tunggakan as $data) {
+            $member_tunggak = Musawamah::where('id_member',$data->NOREK)->first();
+            $member_tunggak->bulat -= $member_tunggak->angsuran;
+            $member_tunggak->update();
+         }
       }
+
+      $delete_tunggakan = DB::table("tunggakan_toko")->where("tgl_tunggak",$tgl_esok)->where("KREDIT",">",0)->where("unit",$unit)->delete();
+
+      // tunggakan
+      $member_tunggakan = DB::table("musawamah")->where("unit",$unit)->where("os",">",0)->where("hari",$hari)->get();
+
+      foreach ($member_tunggakan as $data){
+         
+         $kode_kelompok = $data->code_kel;
+         $angsuran = $data->angsuran;
+         $nama = $data->Cust_Short_name;
+         $cao = $data->cao;
+         $id = $data->id_member;
+
+         $wakalah = new \Carbon\Carbon($data->tgl_wakalah);
+         $selisih = $wakalah->diffInDays($tgl_esok->addDays(14));
+
+         if ($selisih >= 14) {
+         
+            $tunggakan = new TunggakanToko;
+            $tunggakan->tgl_tunggak = $tgl_esok;
+            $tunggakan->NOREK = $id;
+            $tunggakan->unit = $unit;
+            $tunggakan->CIF = $id;
+            $tunggakan->CODE_KEL = $kode_kelompok;
+            $tunggakan->DEBIT = 0;
+            $tunggakan->type = "01";
+            $tunggakan->KREDIT = $angsuran;
+            $tunggakan->USERID = $unit;
+            $tunggakan->KET = "Tunggakan" . " " . $id . " an/ " . $nama;
+            $tunggakan->cao = $cao;
+            $tunggakan->blok = 1;
+            $tunggakan->save();
+            
+            $tunggakan_data = Musawamah::where("id_member",$data->id_member)->first();
+            $tunggakan_data->bulat += $angsuran;
+            $tunggakan_data->update();
+
+            
+            if ($tunggakan_data->bulat > $tunggakan_data->os) {
+               $tunggakan_data->bulat = $tunggakan_data->os;
+               $tunggakan_data->update();
+           }
+           
+
+            $member_status = Member::where('kode_member',$data->id_member)->first();
+            // status member di blokir
+            $member_status->status_member ="Blok";
+            $member_status->update();            
+         }
+
+      }
+               
+            
+      return redirect()->action("KasaController@printKasa");
       
-      $pdf = PDF::loadView('member.card', compact('datamember'));
-      $pdf->setPaper(array(0, 0, 566.93, 850.39), 'potrait');     
+   }
+
+   public function edit($id){
+      $member = Member::find($id);
+      echo json_encode($member);
+   }
+           
+   public function destroy($id){
+
+      $member = Kasa::find($id);
+      $member->delete();
+   
+   }
+
+   public function show(){
+     
+      $param_tgl = \App\ParamTgl::where("nama_param_tgl","tanggal_transaksi")->where("unit",Auth::user()->id)->first();
+      $tanggal = $param_tgl->param_tgl;
+
+      $saldo_id = SaldoToko::where("tanggal",$tanggal)
+                                    ->where("unit",Auth::user()->unit)
+                                    ->first();
+
+      $saldo_toko = SaldoToko::where("id_saldo",$saldo_id->id_saldo)->first();
+   
+
+      $setting=Setting::find(1);
+      $no=0;
+
+      $cash = TabelTransaksi::where('unit',auth::user()->unit)->where("kode_rekening","1120000")->where("tanggal_transaksi",$tanggal)->where("id_admin",Auth::user()->id)->sum("debet");    
+      $musawamah = TabelTransaksi::where("unit",auth::user()->unit)->where("kode_rekening","1482000")->where("tanggal_transaksi",$tanggal)->where("id_admin",Auth::user()->id)->sum("kredit");
+  
+      $pdf = PDF::loadView("kasa.printpembayaran", compact("saldo_id","saldo_toko","no","setting","cash","musawamah"));
+      $pdf->setPaper(array(0,0,700,600), "potrait");      
       return $pdf->stream();
    }
+
+   
+   public function printKasa(){
+     
+      $param_tgl = \App\ParamTgl::where("nama_param_tgl","tanggal_transaksi")->where("unit",Auth::user()->id)->first();
+      $tanggal = $param_tgl->param_tgl;
+
+      $saldo_id = SaldoToko::where("tanggal",$tanggal)
+                           ->where("unit",Auth::user()->unit)
+                           ->first();
+
+      $saldo_toko = SaldoToko::where("id_saldo",$saldo_id->id_saldo)->first();
+   
+
+      $setting=Setting::find(1);
+      $no=0;
+
+      $penjualan_cash = TabelTransaksi::groupBy("kode_rekening")
+                  ->select("kode_rekening", \DB::raw("sum(debet) as cash"))
+                  ->where("tanggal_transaksi", "=", $tanggal)
+                  ->where("kode_rekening", "=", "1120000")
+                  ->where("unit", "=", Auth::user()->unit)
+                  ->whereIn("keterangan_transaksi",["musawamah","penjualan","setoran angsuran musawamah"] )
+                  ->first();
+      $cash = $penjualan_cash->cash;
+      $penjualan_musawamah = TabelTransaksi::groupBy("kode_rekening")
+                  ->select("kode_rekening", \DB::raw("sum(kredit) as musawamah"))
+                  ->where("tanggal_transaksi", "=", $tanggal)
+                  ->where("kode_rekening", "=", "1482000")
+                  ->whereIn("keterangan_transaksi",["musawamah","penjualan","setoran angsuran musawamah"] )
+                  ->where("unit", "=", Auth::user()->unit)        
+                  ->whereIn("keterangan_transaksi",["musawamah","penjualan","setoran angsuran musawamah"] )
+          
+                  ->first();
+      $musawamah = $penjualan_musawamah->musawamah;
+      $pdf = PDF::loadView('kasa.printpembayaran', compact('saldo_id','saldo_toko','no','setting','cash','musawamah'));
+      $pdf->setPaper(array(0,0,700,600), "potrait");      
+         return $pdf->stream();
+   }
+
 }
+
+
+
+
+   
+
+
+

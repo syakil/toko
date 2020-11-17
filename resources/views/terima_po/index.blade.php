@@ -52,6 +52,7 @@ $(function(){
    table = $('.tabel-pembelian').DataTable({
      "processing" : true,
      "serverside" : true,
+     "responsive" : true,
      "ajax" : {
        "url" : "{{ route('terima_po.data') }}",
        "type" : "GET"

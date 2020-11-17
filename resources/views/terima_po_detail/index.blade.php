@@ -117,9 +117,11 @@ var table;
 $(function(){
   $('.tabel-produk').DataTable();
   table = $('.tabel-pembelian').DataTable({
-     "dom" : 'Brt',
-     "bSort" : false,
-     "processing" : true,
+      "dom" : 'Brt',
+      "bSort" : false,
+      "processing" : true,
+      "scrollY" : "500px",
+      "paging" : false,
      "ajax" : {
        "url" : "{{ route('terima_po_detail.data', $idpembelian) }}",
        "type" : "GET"

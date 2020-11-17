@@ -17,7 +17,21 @@
 <div class="row">
   <div class="col-xs-12">
     <div class="box">
-   
+    <div class="box-header">
+    
+    <!-- pesan error -->
+    @if ($message = Session::get('error'))
+      <div class="alert alert-danger alert-block">
+        <button type="button" class="close" data-dismiss="alert">×</button> 
+        <strong>{{ $message }}</strong>
+      </div>
+    @endif
+
+    
+
+
+
+    </div>
       <div class="box-body">
     
      
@@ -189,6 +203,8 @@ $(function(){
      "dom" : 'Brt',
      "bSort" : false,
      "processing" : true,
+"scrollY" : "500px",
+"paging": false,
      "ajax" : {
        "url" : "{{ route('memberinsan.data', $idpenjualan) }}",
        "type" : "GET"
@@ -315,7 +331,7 @@ function loadForm(diskon=0, diterima=0){
          $('#totalrp').val("Rp. "+data.totalrp);
          $('#bayarrp').val("Rp. "+data.bayarrp);
          $('#bayar').val(data.bayar);
-         $('#pla').val(data.pla);  
+         $('#pla').val("Rp. "+data.pla);  
          $('#os').val(data.os);  
         
          $('#musawamah').val(data.musawamah);
@@ -345,3 +361,4 @@ function loadForm(diskon=0, diterima=0){
 
 
 @endsection
+

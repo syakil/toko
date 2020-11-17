@@ -12,6 +12,7 @@ use App\Produk;
 use Illuminate\Support\Facades\DB;
 use PDF;
 use Auth;
+use App\Branch;
 
 class TerimaTokoController extends Controller
 {
@@ -19,11 +20,15 @@ class TerimaTokoController extends Controller
 
         $terima = Kirim::where('id_supplier',Auth::user()->unit)
                         ->where('status_kirim','transfer')
-                        ->where('status',null)
+                        ->where('status',1)
                         ->get();
         $no = 1;
         return view ('terima_toko.index',['terima'=>$terima,'no'=>$no]);
     
+    }
+
+    public function listDetail(){
+        
     }
 
     public function detail($id){
@@ -57,24 +62,30 @@ class TerimaTokoController extends Controller
         foreach($produk_detail as $detail){
 
             // harga sub total kirim_barang_detail
-            $sub_total = $detail->harga_jual * $request->value;
-            $produk_sub_total = KirimDetail::where('id_pembelian_detail',$id);
-            $produk_sub_total->update(['sub_total_terima'=>$sub_total]);
+            $sub_total = $detail->harga_beli * $request->value;
+            $sub_total_margin = $detail->harga_jual * $request->value;
+            $produk_sub_total = KirimDetail::where('id_pembelian_detail',$id)->first();
+            $produk_sub_total->sub_total_terima = $sub_total;
+            $produk_sub_total->sub_total_margin_terima = $sub_total_margin;
+            $produk_sub_total->update();
 
         }
 
         
-        $total_terima = KirimDetail::where('id_pembelian',$kirim_detail->id_pembelian)->sum('sub_total_terima');
+        $total_harga_terima = KirimDetail::where('id_pembelian',$kirim_detail->id_pembelian)->sum('sub_total_terima');
+        $total_terima = KirimDetail::where('id_pembelian',$kirim_detail->id_pembelian)->sum('jumlah_terima');
+        $total_margin_terima = KirimDetail::where('id_pembelian',$kirim_detail->id_pembelian)->sum('sub_total_margin_terima');
 
         $kirim = Kirim::where('id_pembelian',$kirim_detail->id_pembelian)->first();
-        $kirim->total_harga_terima = $total_terima;
+        $kirim->total_harga_terima = $total_harga_terima;
+        $kirim->total_terima = $total_terima;
+        $kirim->total_margin_terima = $total_margin_terima;
         $kirim->update();
 
     }
 
     
     public function update_expired_date(Request $request,$id){
-
 
         $detail = KirimDetail::where('id_pembelian_detail',$id);
         $detail->update(['expired_date'=>$request->value]);
@@ -84,207 +95,290 @@ class TerimaTokoController extends Controller
     public function create_jurnal(Request $request){
         // menampung id_pembelian yang di checklist
         $data = $request->check;
-        // dd($data);
+        
+        // update_stok
         foreach($data as $id){
             
-            // insert produk dari kirim_barang_detail ke produk detail
-            $produk = DB::table('kirim_barang_detail','produk')
-                        ->select('kirim_barang_detail.*','produk.kode_produk','produk.nama_produk','produk.id_kategori','produk.unit')
-                        ->leftJoin('produk','kirim_barang_detail.kode_produk','=','produk.kode_produk')
-                        ->where('unit',Auth::user()->unit)
+            // update_stok
+            $produk = DB::table('kirim_barang_detail')
                         ->where('id_pembelian',$id)
                         ->get();
             
             foreach ($produk as $p ) {
+
                 $produk_main = Produk::where('kode_produk',$p->kode_produk)
                                     ->where('unit',Auth::user()->unit)
                                     ->first();
-                $new_stok = $produk_main->stok + $p->jumlah_terima;
-                $produk_main->update(['stok'=>$new_stok]);
-                
-                $insert_produk = new ProdukDetail;
-                $insert_produk->kode_produk = $p->kode_produk;
-                $insert_produk->id_kategori = $p->id_kategori;
-                $insert_produk->nama_produk = $p->nama_produk;
-                $insert_produk->stok_detail = $p->jumlah_terima;
-                $insert_produk->harga_beli = $produk_main->harga_beli;
-                $insert_produk->expired_date = $p->expired_date;
-                $insert_produk->unit = Auth::user()->unit;
-                $insert_produk->save();
+
+                $produk_main->stok = $produk_main->stok + $p->jumlah_terima;
+                $produk_main->update();
+
+                $produk_detail = new ProdukDetail;
+                $produk_detail->kode_produk = $p->kode_produk;
+                $produk_detail->nama_produk = $produk_main->nama_produk;
+                $produk_detail->stok_detail = $p->jumlah_terima;
+                $produk_detail->harga_beli = $p->harga_beli;
+                $produk_detail->harga_jual_umum = $p->harga_jual;
+                $produk_detail->harga_jual_insan = $p->harga_jual;
+                $produk_detail->tanggal_masuk = date('Y-m-d');
+                $produk_detail->unit = Auth::user()->unit;
+                $produk_detail->status = null;
+                $produk_detail->expired_date = $p->expired_date;
+                $produk_detail->no_faktur = $p->no_faktur;
+                $produk_detail->save();
 
             }
 
-            // insert ke jurnal
-            $jurnal_field = Kirim::where('id_pembelian',$id)->first();
-
-            $jurnal = new TabelTransaksi;
-            $jurnal->unit =  Auth::user()->unit; 
-            $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
-            $jurnal->kode_rekening = 1482000;
-            $jurnal->tanggal_transaksi  = date('Y-m-d');
-            $jurnal->jenis_transaksi  = 'Jurnal System';
-            $jurnal->keterangan_transaksi = 'TerimaToko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-            $jurnal->debet = $jurnal_field->total_harga_terima;
-            $jurnal->kredit = 0;
-            $jurnal->tanggal_posting = '';
-            $jurnal->keterangan_posting = '0';
-            $jurnal->id_admin = Auth::user()->id; 
-            $jurnal->save();
+        }
             
-            $jurnal = new TabelTransaksi;
-            $jurnal->unit =  Auth::user()->unit; 
-            $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
-            $jurnal->kode_rekening = 2500000;
-            $jurnal->tanggal_transaksi  = date('Y-m-d');
-            $jurnal->jenis_transaksi  = 'Jurnal System';
-            $jurnal->keterangan_transaksi = 'TerimaToko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-            $jurnal->debet =0;
-            $jurnal->kredit =$jurnal_field->total_harga_terima;
-            $jurnal->tanggal_posting = '';
-            $jurnal->keterangan_posting = '0';
-            $jurnal->id_admin = Auth::user()->id; 
-            $jurnal->save();
+        // insert_jurnal
 
-            // Acc Kp
-            $jurnal = new TabelTransaksi;
-            $jurnal->unit =  'KP'; 
-            $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
-            $jurnal->kode_rekening = 1831000;
-            $jurnal->tanggal_transaksi  = date('Y-m-d');
-            $jurnal->jenis_transaksi  = 'Jurnal System';
-            $jurnal->keterangan_transaksi = 'TerimaToko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-            $jurnal->debet =$jurnal_field->total_harga_terima;
-            $jurnal->kredit = 0;
-            $jurnal->tanggal_posting = '';
-            $jurnal->keterangan_posting = '0';
-            $jurnal->id_admin = Auth::user()->id; 
-            $jurnal->save();
+        foreach($data as $id){
+
+
+            //$param_tgl = \App\ParamTgl::where('nama_param_tgl','tanggal_transaksi')->where('unit',Auth::user()->id)->first();
+            //$tanggal = $param_tgl->param_tgl;
             
-            $jurnal = new TabelTransaksi;
-            $jurnal->unit =  'KP'; 
-            $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
-            $jurnal->kode_rekening = 1830000;
-            $jurnal->tanggal_transaksi  = date('Y-m-d');
-            $jurnal->jenis_transaksi  = 'Jurnal System';
-            $jurnal->keterangan_transaksi = 'TerimaToko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-            $jurnal->debet =0;
-            $jurnal->kredit =$jurnal_field->total_harga_terima;
-            $jurnal->tanggal_posting = '';
-            $jurnal->keterangan_posting = '0';
-            $jurnal->id_admin = Auth::user()->id; 
-            $jurnal->save();
+            $data_jurnal = Kirim::where('id_pembelian',$id)->first();
+            $tanggal = date('Y-m-d',strtotime($data_jurnal->created_at));
 
+            $pengirim = Branch::where('kode_toko',$data_jurnal->kode_gudang)->first();
+            $penerima = Branch::where('kode_toko',$data_jurnal->id_supplier)->first();
+
+            
+            $kode_penerima = $penerima->kode_toko;
+            $nama_penerima = $penerima->nama_toko;
+            $aktiva_penerima = $penerima->aktiva;
+            
+            $kode_pengirim = $pengirim->kode_toko;
+            $nama_pengirim = $pengirim->nama_toko;
+            $aktiva_pengirim = $pengirim->aktiva;
+
+            $harga_beli = $data_jurnal->total_harga_terima;
+            $harga_jual = $data_jurnal->total_margin_terima;
+
+            $harga_terima = $data_jurnal->total_harga_terima;
+            $harga_kirim = $data_jurnal->total_harga;
+
+            $margin = $harga_jual - $harga_beli;
+
+            $selisih = $harga_kirim - $harga_terima;
+
+            $terima = $data_jurnal->total_terima;
+            $kirim = $data_jurnal->total_item;
+            
+            $unit_kp = '1010';
             // jika yang diterima toko selisih dengan yang dikirim
-            if ($jurnal_field->total_item != $jurnal_field->total_terima) {
+            if ($kirim != $terima) {               
 
+                // toko
+                // Persediaan Musawamah/Barang Dagang
                 $jurnal = new TabelTransaksi;
-                $jurnal->unit =  Auth::user()->unit; 
-                $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
+                $jurnal->unit =  $kode_penerima; 
+                $jurnal->kode_transaksi = $id;
                 $jurnal->kode_rekening = 1482000;
-                $jurnal->tanggal_transaksi  = date('Y-m-d');
+                $jurnal->tanggal_transaksi  = $tanggal;
                 $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'TerimaToko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-                $jurnal->debet = $jurnal_field->total_harga_terima;
+                $jurnal->keterangan_transaksi = 'Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = $harga_jual;
                 $jurnal->kredit = 0;
                 $jurnal->tanggal_posting = '';
                 $jurnal->keterangan_posting = '0';
                 $jurnal->id_admin = Auth::user()->id; 
                 $jurnal->save();
                 
+                // RAK PASIVA - KP
                 $jurnal = new TabelTransaksi;
-                $jurnal->unit =  Auth::user()->unit; 
-                $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
+                $jurnal->unit =  $kode_penerima; 
+                $jurnal->kode_transaksi = $id;
                 $jurnal->kode_rekening = 2500000;
-                $jurnal->tanggal_transaksi  = date('Y-m-d');
+                $jurnal->tanggal_transaksi  = $tanggal;
                 $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'TerimaToko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-                $jurnal->debet =0;
-                $jurnal->kredit = $jurnal_field->total_harga_terima;;
+                $jurnal->keterangan_transaksi = 'Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = 0;
+                $jurnal->kredit = $harga_beli;
                 $jurnal->tanggal_posting = '';
                 $jurnal->keterangan_posting = '0';
                 $jurnal->id_admin = Auth::user()->id; 
                 $jurnal->save();
                 
-
-
+                // PMYD-PYD Musawamah
                 $jurnal = new TabelTransaksi;
-                $jurnal->unit =  $jurnal_field->kode_gudang; 
-                $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
-                $jurnal->kode_rekening = 1969000;
-                $jurnal->tanggal_transaksi  = date('Y-m-d');
+                $jurnal->unit =  $kode_penerima; 
+                $jurnal->kode_transaksi = $id;
+                $jurnal->kode_rekening = 1483000;
+                $jurnal->tanggal_transaksi  = $tanggal;
                 $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Selisih Terima Toko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-                $jurnal->debet = $jurnal_field->total_harga - $jurnal_field->total_harga_terima;
-                $jurnal->kredit = 0;
+                $jurnal->keterangan_transaksi = 'Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = 0;
+                $jurnal->kredit = $margin;
                 $jurnal->tanggal_posting = '';
                 $jurnal->keterangan_posting = '0';
                 $jurnal->id_admin = Auth::user()->id; 
                 $jurnal->save();
                 
+                // gudang
+                // Persediaan Musawamah/Barang Dagang
                 $jurnal = new TabelTransaksi;
-                $jurnal->unit =  $jurnal_field->kode_gudang; 
-                $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
+                $jurnal->unit =  $kode_pengirim; 
+                $jurnal->kode_transaksi = $id;
+                $jurnal->kode_rekening = 1482000;
+                $jurnal->tanggal_transaksi  = $tanggal;
+                $jurnal->jenis_transaksi  = 'Jurnal System';
+                $jurnal->keterangan_transaksi = 'Selisih Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = abs($selisih);
+                $jurnal->kredit =0;
+                $jurnal->tanggal_posting = '';
+                $jurnal->keterangan_posting = '0';
+                $jurnal->id_admin = Auth::user()->id; 
+                $jurnal->save();
+
+                // RAK PASIVA - KP
+                $jurnal = new TabelTransaksi;
+                $jurnal->unit =  $kode_pengirim; 
+                $jurnal->kode_transaksi = $id;
                 $jurnal->kode_rekening = 2500000;
-                $jurnal->tanggal_transaksi  = date('Y-m-d');
+                $jurnal->tanggal_transaksi  = $tanggal;
                 $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Selisih Terima Toko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-                $jurnal->debet =0;
-                $jurnal->kredit = $jurnal_field->total_harga - $jurnal_field->total_harga_terima;
-                $jurnal->tanggal_posting = '';
-                $jurnal->keterangan_posting = '0';
-                $jurnal->id_admin = Auth::user()->id; 
-                $jurnal->save();
-                
-                // junal manaual posting
-                $jurnal = new TabelTransaksi;
-                $jurnal->unit =  'KP'; 
-                $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
-                $jurnal->kode_rekening = 1831000;
-                $jurnal->tanggal_transaksi  = date('Y-m-d');
-                $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Selisih Terima Toko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-                $jurnal->debet = $jurnal_field->total_harga_terima;
-                $jurnal->kredit = 0;
+                $jurnal->keterangan_transaksi = 'Selisih Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = 0;
+                $jurnal->kredit = abs($selisih);
                 $jurnal->tanggal_posting = '';
                 $jurnal->keterangan_posting = '0';
                 $jurnal->id_admin = Auth::user()->id; 
                 $jurnal->save();
             
-                
+                //KP
+                // RAK - AKTIVA UNIT PENERIMA
                 $jurnal = new TabelTransaksi;
-                $jurnal->unit =  'KP'; 
-                $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
-                $jurnal->kode_rekening = 1830000;
-                $jurnal->tanggal_transaksi  = date('Y-m-d');
+                $jurnal->unit =  $unit_kp; 
+                $jurnal->kode_transaksi = $id;
+                $jurnal->kode_rekening = $aktiva_penerima;
+                $jurnal->tanggal_transaksi  = $tanggal;
                 $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Terima Toko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-                $jurnal->debet = 0;
-                $jurnal->kredit = $jurnal_field->total_harga_terima;
-                $jurnal->tanggal_posting = '';
-                $jurnal->keterangan_posting = '0';
-                $jurnal->id_admin = Auth::user()->id; 
-                $jurnal->save();
-
-                $jurnal = new TabelTransaksi;
-                $jurnal->unit =  'KP'; 
-                $jurnal->kode_transaksi = $jurnal_field->id_pembelian;
-                $jurnal->kode_rekening = 1830000;
-                $jurnal->tanggal_transaksi  = date('Y-m-d');
-                $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Selisih TerimaToko' . ' ' . $jurnal_field->id_pembelian . ' ' . $jurnal_field->nama_toko;
-                $jurnal->debet = $jurnal_field->total_harga;
+                $jurnal->keterangan_transaksi = 'Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = $harga_terima;
                 $jurnal->kredit = 0;
                 $jurnal->tanggal_posting = '';
                 $jurnal->keterangan_posting = '0';
                 $jurnal->id_admin = Auth::user()->id; 
                 $jurnal->save();
-
                 
+                // RAK - AKTIVA UNIT PENGIRIM
+                $jurnal = new TabelTransaksi;
+                $jurnal->unit =  $unit_kp; 
+                $jurnal->kode_transaksi = $id;
+                $jurnal->kode_rekening = $aktiva_pengirim;
+                $jurnal->tanggal_transaksi  = $tanggal;
+                $jurnal->jenis_transaksi  = 'Jurnal System';
+                $jurnal->keterangan_transaksi = 'Selisih Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = abs($selisih);
+                $jurnal->kredit = 0;
+                $jurnal->tanggal_posting = '';
+                $jurnal->keterangan_posting = '0';
+                $jurnal->id_admin = Auth::user()->id; 
+                $jurnal->save();
+                
+                // RAK - AKTIVA UNIT PENGIRIM
+                $jurnal = new TabelTransaksi;
+                $jurnal->unit =  $unit_kp; 
+                $jurnal->kode_transaksi = $id;
+                $jurnal->kode_rekening = $aktiva_pengirim;
+                $jurnal->tanggal_transaksi  = $tanggal;
+                $jurnal->jenis_transaksi  = 'Jurnal System';
+                $jurnal->keterangan_transaksi = 'Kirim Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = 0;
+                $jurnal->kredit = $harga_kirim;
+                $jurnal->tanggal_posting = '';
+                $jurnal->keterangan_posting = '0';
+                $jurnal->id_admin = Auth::user()->id; 
+                $jurnal->save();
+                
+            }else {
+
+                // toko
+                // Persediaan Musawamah/Barang Dagang
+                $jurnal = new TabelTransaksi;
+                $jurnal->unit =  $kode_penerima; 
+                $jurnal->kode_transaksi = $id;
+                $jurnal->kode_rekening = 1482000;
+                $jurnal->tanggal_transaksi  = $tanggal;
+                $jurnal->jenis_transaksi  = 'Jurnal System';
+                $jurnal->keterangan_transaksi = 'Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = $harga_jual;
+                $jurnal->kredit = 0;
+                $jurnal->tanggal_posting = '';
+                $jurnal->keterangan_posting = '0';
+                $jurnal->id_admin = Auth::user()->id; 
+                $jurnal->save();
+                
+                // RAK PASIVA - KP
+                $jurnal = new TabelTransaksi;
+                $jurnal->unit =  $kode_penerima; 
+                $jurnal->kode_transaksi = $id;
+                $jurnal->kode_rekening = 2500000;
+                $jurnal->tanggal_transaksi  = $tanggal;
+                $jurnal->jenis_transaksi  = 'Jurnal System';
+                $jurnal->keterangan_transaksi = 'Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = 0;
+                $jurnal->kredit = $harga_beli;
+                $jurnal->tanggal_posting = '';
+                $jurnal->keterangan_posting = '0';
+                $jurnal->id_admin = Auth::user()->id; 
+                $jurnal->save();
+                
+                // PMYD-PYD Musawamah
+                $jurnal = new TabelTransaksi;
+                $jurnal->unit =  $kode_penerima; 
+                $jurnal->kode_transaksi = $id;
+                $jurnal->kode_rekening = 1483000;
+                $jurnal->tanggal_transaksi  = $tanggal;
+                $jurnal->jenis_transaksi  = 'Jurnal System';
+                $jurnal->keterangan_transaksi = 'Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = 0;
+                $jurnal->kredit = $margin;
+                $jurnal->tanggal_posting = '';
+                $jurnal->keterangan_posting = '0';
+                $jurnal->id_admin = Auth::user()->id; 
+                $jurnal->save();
+                
+                // KP
+                // RAK Aktiva Penerima
+                $jurnal = new TabelTransaksi;
+                $jurnal->unit =  $unit_kp; 
+                $jurnal->kode_transaksi = $id;
+                $jurnal->kode_rekening = $aktiva_penerima;
+                $jurnal->tanggal_transaksi  = $tanggal;
+                $jurnal->jenis_transaksi  = 'Jurnal System';
+                $jurnal->keterangan_transaksi = 'Terima Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = $harga_beli;
+                $jurnal->kredit = 0;
+                $jurnal->tanggal_posting = '';
+                $jurnal->keterangan_posting = '0';
+                $jurnal->id_admin = Auth::user()->id; 
+                $jurnal->save();
+                
+                // RAK Aktuiva Pengirim
+                $jurnal = new TabelTransaksi;
+                $jurnal->unit =  $unit_kp; 
+                $jurnal->kode_transaksi = $id;
+                $jurnal->kode_rekening = $aktiva_pengirim;
+                $jurnal->tanggal_transaksi  = $tanggal;
+                $jurnal->jenis_transaksi  = 'Jurnal System';
+                $jurnal->keterangan_transaksi = 'Kirim Toko' . ' ' . $id . ' ' . $nama_penerima;
+                $jurnal->debet = 0;
+                $jurnal->kredit = $harga_beli;
+                $jurnal->tanggal_posting = '';
+                $jurnal->keterangan_posting = '0';
+                $jurnal->id_admin = Auth::user()->id; 
+                $jurnal->save();
             }
 
-            $kirim_status = Kirim::where('id_pembelian',$id)->update(['status'=>1]);
+            $kirim_status = Kirim::where('id_pembelian',$id)->update(['status'=>2]);
         } 
             
         return redirect('terima_toko/index');
     }
 }
+
+

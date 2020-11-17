@@ -7,52 +7,66 @@ use App\Produk;
 use App\ProdukDetail;
 use App\ProdukTemporary;
 use App\ProdukDetailTemporary;
+use App\ProdukSo;
+use App\ParamTgl;
 
 class ApprovalKpController extends Controller
 {
     public function index(){
-        $produk = ProdukDetailTemporary::where('produk_detail_temporary.unit', '=','WH01')
+$unit = '3000';
+        $produk = ProdukSo::where('produk_so.unit', $unit)
+                        ->where('produk_so.keterangan','!=','dihapus')
+                        ->where('produk.unit',$unit)
+                        ->where('approval',null)
+                        ->leftJoin('produk','produk.kode_produk','produk_so.kode_produk')
+                        ->leftJoin('branch','branch.kode_toko','produk_so.unit')
+                        ->select(\DB::raw('SUM(stok_opname) as so,produk_so.*,branch.nama_toko,produk.kode_produk,produk.nama_produk'))
+                        ->groupBy('produk_so.kode_produk')
+                        ->groupBy('produk_so.tanggal_so')
+                        ->groupBy('produk_so.unit')
                         ->get();
+
         $no=1;
         return view('approve_kp/index',['produk'=>$produk,'no'=>$no]);
     }
 
+    
     public function store(Request $request){
+
+        
         $data = $request->kode;
-        // dd($data);
-        foreach ($data as $kode ) {
-            $produk_detail = ProdukDetailTemporary::where('id_produk_detail',$kode)->get();
-            // dd($produk_detail);
+        $param_tgl = ParamTgl::where('nama_param_tgl','STOK_OPNAME')->first();
+        $now = $param_tgl->param_tgl;
+
+        foreach ($data as $id ) {
+            $data_produk = ProdukSo::find($id);
+            $get_produk_so = ProdukSo::where('kode_produk',$data_produk->kode_produk)->where('unit',$data_produk->unit)->where('tanggal_so',$now)->get();
+  
+            $master_produk = Produk::where('kode_produk',$data_produk->kode_produk)->where('unit',$data_produk->unit)->first();
+            $sum_detail = ProdukDetail::where('kode_produk',$data_produk->kode_produk)->where('unit',$data_produk->unit)->sum('stok_detail');
             
-            foreach ($produk_detail as $prod ) {
-                
-            // dd($prod->nama_produk);
-                
-                $produk_update = new ProdukDetail;
-                $produk_update->kode_produk = $prod->kode_produk;
-                $produk_update->id_kategori = $prod->id_kategori;
-                $produk_update->nama_produk = $prod->nama_produk;
-                $produk_update->stok_detail = $prod->stok_detail;
-                $produk_update->isi_pack_detail = $prod->isi_pack_detail;
-                $produk_update->satuan = $prod->satuan;
-                $produk_update->harga_beli = $prod->harga_beli;
-                $produk_update->expired_date = $prod->expired_date;
-                $produk_update->unit = $prod->unit;
-                // $prod_update->status = $prod->status;
-                $produk_update->save();
+            $master_produk->stok = $sum_detail;
+            $master_produk->update();
 
-                $stok_produk_detail = ProdukDetail::where('kode_produk',$prod->kode_produk)
-                                                ->where('unit',$prod->unit)
-                                                ->sum('stok_detail');
-                $stok_inti = Produk::where('kode_produk',$prod->kode_produk)
-                                    ->where('unit',$prod->unit)
-                                    ->first();
-                $stok_inti->stok = $stok_produk_detail;
-                $stok_inti->update();
+            foreach ($get_produk_so as $produk_so ) {
+                
+                $produk_so->approval = 'A';
+                $produk_so->update();
 
-                $prod->delete();
             }
+
+            $get_produk_detail = ProdukDetail::where('kode_produk',$data_produk->kode_produk)->where('unit',$data_produk->unit)->get();
+            foreach ($get_produk_detail as $produk_detail ) {
+                
+                $produk_detail->status = null;
+                $produk_detail->update();
+
+            }
+            
         }
+
+
         return back();
     }
+
 }

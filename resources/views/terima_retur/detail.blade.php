@@ -26,7 +26,7 @@
       <div class="box-body">
       <form action="{{ route('retur.input_stok') }}" method="post">
       {{ csrf_field() }}
-            <table class="table table-striped" id="tables">
+            <table class="table table-striped table-detail">
                 <thead>
                     <tr>
                         <th width='1%'>No.</th>
@@ -41,7 +41,7 @@
                 <tbody>
                     @foreach ($pembelian as $p)
                     <tr>
-                    <<input type="hidden" name="check[]" value="{{$p->id_pembelian_detail}}">
+                    <input type="hidden" name="check[]" value="{{$p->id_pembelian_detail}}">
                         <td>{{$nomer++}}</td>
                         <td>{{$p->kode_produk}}</td>
                         <td>{{$p->nama_produk}}</td>
@@ -52,7 +52,7 @@
                     @endforeach
                 </tbody>
             </table>
-            <button type="submit" class="btn btn-danger pull-right"> <i class="fa fa-send"></i> Proses</button>
+            <!-- <button type="submit" class="btn btn-danger pull-right"> <i class="fa fa-send"></i> Proses</button> -->
             </form>
             </div>
     </div>
@@ -66,13 +66,23 @@
     <script type="text/javascript">
         $(document).ready(function() {
         $('.edit').editable();
-    });
+    }); 
     </script>
+    
+
     <script>
-    $(document).ready(function(){
-    $('#tables').DataTable()
-    });
+    var table;
+    $(function(){
+        $('.tables').DataTable();
+        table = $('.table-detail').DataTable({
+            "scrollY" : "500px",
+            "paging" : false
+        })
+    })
     </script>
+
+
+
     <script>
     // $.fn.editable.defaults.mode = 'inline';
     $(function(){
