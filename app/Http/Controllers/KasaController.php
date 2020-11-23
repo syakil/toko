@@ -373,7 +373,7 @@ class KasaController extends Controller{
       }catch(\Exception $e){
          
          DB::rollback();
-         return redirect()->action("KasaController@index")->with(['error' => $e->getmessage()]);
+         return redirect()->route("kasa.index")->with(['error' => $e->getmessage()]);
 
       }
                
