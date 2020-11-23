@@ -135,7 +135,7 @@ class WriteOffController extends Controller
         
             if ($request->hasFile('file')) {
                     
-                $extension = array('png','jpg','jpeg','pdf');
+                $extension = array('pdf');
                 $file_upload = $request->file('file');
                 $ext = $file_upload->getClientOriginalExtension();
                 $size = $file_upload->getSize();
@@ -143,7 +143,7 @@ class WriteOffController extends Controller
 
                 if (!in_array($ext,$extension)) {
 
-                    return back()->with(['error' => 'Extention Harus png,jpg,jpeg,pdf !']);    
+                    return back()->with(['error' => 'Extention Harus pdf !']);    
 
                 }elseif ($size > 2000000) {
                     
@@ -213,7 +213,9 @@ class WriteOffController extends Controller
             }
             
             DB::commit();
+
         }catch(\Exception $e) {
+
             DB::rollback();
             return back()->with(['error' => $e->getmessage()]);
         
@@ -238,6 +240,7 @@ class WriteOffController extends Controller
         $data = array();
 
         foreach($produk as $list){
+
             $no ++;
             $row = array();
             $row[] = $no;
@@ -249,6 +252,7 @@ class WriteOffController extends Controller
             $row[] = "Rp. ".format_uang($list->harga_beli * $list->stok);
             
             switch ($list->param_status) {
+
                 case '1':
                     $row[]="<span class='label label-info'>Request</span>";
                     $row[] = '<div class="btn-group">
@@ -267,6 +271,7 @@ class WriteOffController extends Controller
                                 <a class='btn btn-primary btn-sm'onclick='showDetail(".$list->id_produk_wo.")'><i class='fa fa-eye'></i></a>
                             </div>";
                     break;
+            
             }
            
             $data[] = $row;
@@ -280,6 +285,7 @@ class WriteOffController extends Controller
 
     public function proses($id){
 
+        DB::beginTransaction();
         try {
             
             $tanggal = date('Y-m-d');
@@ -325,9 +331,10 @@ class WriteOffController extends Controller
             $jurnal->id_admin = Auth::user()->id; 
             $jurnal->save();
             
-            
+            DB::commit();
         }catch(\Exceeption $e) {
 
+            DB::rollback();
             return back()->with(['error' => $e->getmessage()]);
         
         }
@@ -338,6 +345,7 @@ class WriteOffController extends Controller
 
     public function store(Request $request){
 
+        DB::beginTransaction();
         try {
             
             $kode_produk = $request->kode;
@@ -349,54 +357,132 @@ class WriteOffController extends Controller
             $rndm=substr($uuid,25);
             $kode_rndm="WO/-".$unit->kode_toko.$rndm;
 
-            $tanggal = date('Y-m-d');
-            // mengurangi stok
             $produk = Produk::where('kode_produk',$kode_produk)->where('unit',$unit->kode_toko)->first();
-
-            $produk_expired = ProdukDetail::where('kode_produk',$kode_produk)
-            ->where('unit',Auth::user()->unit)->where('expired_date',$expired)->first();
-
-            if ($produk_expired == null) {
-                return back()->with(['error' => 'Produk '. $produk->kode_produk .' '. $produk->nama_produk . ' Tidak Ada Expired ' . $expired]);
-            }
-            if ($produk_expired->stok_detail < $jumlah) {
-                return back()->with(['error' => 'Stock detail '. $produk->kode_produk .' '. $produk->nama_produk . ' Kurang']);
-            }
             
             if ($produk < $jumlah) {
+
                 return back()->with(['error' => 'Stock '. $produk->kode_produk .' '. $produk->nama_produk . ' Kurang']);
+            
             }else {
                 
-                $produk_expired->stok_detail -= $jumlah;
-                $produk_expired->update();
-
                 $produk->stok -= $jumlah;
                 $produk->update();
 
             }
-
-            $nominal = $jumlah * $produk_expired->harga_beli;
-
-            $produk_w0 = new ProdukWriteOff;
-            $produk_w0->kode_produk = $produk->kode_produk;
-            $produk_w0->kode_transaksi = $kode_rndm;
-            $produk_w0->nama_produk = $produk->nama_produk;
-            $produk_w0->harga_beli = $produk_expired->harga_beli;
-            $produk_w0->harga_jual = $produk_expired->harga_jual_umum;
-            $produk_w0->stok = $jumlah;
-            $produk_w0->tanggal_wo = '';
-            $produk_w0->tanggal_input = date('Y-m-d');
-            $produk_w0->param_status= 1;
-            $produk_w0->tanggal_expired = $expired;
-            $produk_w0->unit = $unit->kode_toko;
-            $produk_w0->harga_jual_member_insan = $produk_expired->harga_jual_insan;
-            $produk_w0->harga_jual_insan = $produk_expired->harga_jual_insan;
-            $produk_w0->harga_jual_pabrik = $produk_expired->harga_jual_insan;
-            $produk_w0->save();
-
+        
+            // mengaambil stok di produk_detail berdasar barcode dan harga beli lebih rendah (stok yang tesedria) yang terdapat di penjualan_detail_temporary
+            produk:
+            $produk_detail = ProdukDetail::where('kode_produk',$kode_produk)
+            ->where('unit',Auth::user()->unit)
+            ->orderBy('tanggal_masuk','ASC')
+            ->where('stok_detail','>','0')
+            ->first();
             
+            // buat variable stok toko dari column stok_detail dari table produk_detail
+            $stok_toko = $produk_detail->stok_detail;
+        
+            // jika qty wo == jumlah stok yang tersedia ditoko
+            if ($jumlah == $stok_toko) {     
+                        
+                $uuid=Uuid::uuid4()->getHex();
+                $rndm=substr($uuid,25);
+                $kode_rndm="WO/-".$unit->kode_toko.$rndm;
+
+                $produk_w0 = new ProdukWriteOff;
+                $produk_w0->kode_produk = $produk_detail->kode_produk;
+                $produk_w0->kode_transaksi = $kode_rndm;
+                $produk_w0->nama_produk = $produk->nama_produk;
+                $produk_w0->harga_beli = $produk_detail->harga_beli;
+                $produk_w0->harga_jual = $produk_detail->harga_jual_umum;
+                $produk_w0->stok = $jumlah;
+                $produk_w0->tanggal_wo = '';
+                $produk_w0->tanggal_input = date('Y-m-d');
+                $produk_w0->param_status= 1;
+                $produk_w0->tanggal_expired = $expired;
+                $produk_w0->unit = $produk_detail->unit;
+                $produk_w0->harga_jual_member_insan = $produk_detail->harga_jual_insan;
+                $produk_w0->harga_jual_insan = $produk_detail->harga_jual_insan;
+                $produk_w0->harga_jual_pabrik = $produk_detail->harga_jual_insan;
+                $produk_w0->save();                
+                
+                $produk_detail->update(['stok_detail'=>0]);
+            
+            // jika selisih qty wo dengan jumlah stok yang tersedia
+            }else {
+                
+                // mengurangi qty wo dengan stok toko berdasarkan stok_detail(table produk_detail)
+                $sisa = $jumlah - $stok_toko;
+    
+                // jika hasilnya lebih dari nol atau tidak minus, stok_detail tsb tidak memenuhi qty penjualan dan harus ambil lagi record pada produk detail~
+                // ~ yang stok nya lebih dari nol
+                if ($sisa >= 0) {
+                        
+                    $uuid=Uuid::uuid4()->getHex();
+                    $rndm=substr($uuid,25);
+                    $kode_rndm="WO/-".$unit->kode_toko.$rndm;
+                        
+                    $produk_w0 = new ProdukWriteOff;
+                    $produk_w0->kode_produk = $produk_detail->kode_produk;
+                    $produk_w0->kode_transaksi = $kode_rndm;
+                    $produk_w0->nama_produk = $produk->nama_produk;
+                    $produk_w0->harga_beli = $produk_detail->harga_beli;
+                    $produk_w0->harga_jual = $produk_detail->harga_jual_umum;
+                    $produk_w0->stok = $stok_toko;
+                    $produk_w0->tanggal_wo = '';
+                    $produk_w0->tanggal_input = date('Y-m-d');
+                    $produk_w0->param_status= 1;
+                    $produk_w0->tanggal_expired = $expired;
+                    $produk_w0->unit = $produk_detail->unit;
+                    $produk_w0->harga_jual_member_insan = $produk_detail->harga_jual_insan;
+                    $produk_w0->harga_jual_insan = $produk_detail->harga_jual_insan;
+                    $produk_w0->harga_jual_pabrik = $produk_detail->harga_jual_insan;
+                    $produk_w0->save();                
+                    
+                    $produk_detail->update(['stok_detail'=>0]);
+        
+                    // sisa qty wo yang dikurangi stok toko
+                    $jumlah = $sisa;
+    
+                    // mengulangi looping untuk mencari harga yang paling rendah
+                    goto produk;
+                    
+                // jika pengurangan qty wo dengan stok toko hasilnya kurang dari 0 atau minus (= stok toko lebih besar dari qty wo)
+                }else if($sisa< 0){
+
+                    
+                    $uuid=Uuid::uuid4()->getHex();
+                    $rndm=substr($uuid,25);
+                    $kode_rndm="WO/-".$unit->kode_toko.$rndm;
+
+                    $produk_w0 = new ProdukWriteOff;
+                    $produk_w0->kode_produk = $produk_detail->kode_produk;
+                    $produk_w0->kode_transaksi = $kode_rndm;
+                    $produk_w0->nama_produk = $produk->nama_produk;
+                    $produk_w0->harga_beli = $produk_detail->harga_beli;
+                    $produk_w0->harga_jual = $produk_detail->harga_jual_umum;
+                    $produk_w0->stok = $jumlah;
+                    $produk_w0->tanggal_wo = '';
+                    $produk_w0->tanggal_input = date('Y-m-d');
+                    $produk_w0->param_status= 1;
+                    $produk_w0->tanggal_expired = $expired;
+                    $produk_w0->unit = $produk_detail->unit;
+                    $produk_w0->harga_jual_member_insan = $produk_detail->harga_jual_insan;
+                    $produk_w0->harga_jual_insan = $produk_detail->harga_jual_insan;
+                    $produk_w0->harga_jual_pabrik = $produk_detail->harga_jual_insan;
+                    $produk_w0->save();                
+                    
+                    // update stok_detail berdasar sisa pengurangan qty penjualan dengan stok toko hasilnya kurang dari 0 atau minus
+                    $produk_detail->update(['stok_detail'=>abs($sisa)]);
+                    
+                }
+            }
+
+
+            DB::commit();
+        
         }catch(\Exception $e){
          
+            DB::rollback();
             return back()->with(['error' => $e->getmessage()]);
 
         }
