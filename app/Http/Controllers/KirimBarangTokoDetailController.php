@@ -7,7 +7,7 @@ use App\Supplier;
 use Auth;
 use App\Produk;
 use App\ProdukDetail;
-use App\KirimDetail;
+use App\KirimDetailTemporary;
 use App\Branch;
 use DB;
 
@@ -38,10 +38,10 @@ class KirimBarangTokoDetailController extends Controller
    public function listData($id)
    {
    
-     $detail = KirimDetail::leftJoin('produk', 'produk.kode_produk', '=', 'kirim_barang_detail.kode_produk')
+     $detail = KirimDetailTemporary::leftJoin('produk', 'produk.kode_produk', '=', 'kirim_barang_detail_temporary.kode_produk')
          ->where('id_pembelian', '=', $id)
          ->where('unit', '=', Auth::user()->unit)
-         ->select('kirim_barang_detail.*','produk.kode_produk','produk.nama_produk','produk.stok')
+         ->select('kirim_barang_detail_temporary.*','produk.kode_produk','produk.nama_produk','produk.stok')
          ->orderBy('updated_at','desc')        
          ->get();
          $no = 0;
@@ -79,7 +79,7 @@ class KirimBarangTokoDetailController extends Controller
       
       $kode_produk = $request['kode'];
       
-      $kirimDetail = KirimDetail::where('id_pembelian',$request['idpembelian'])->where('kode_produk','like','%'.$kode_produk)->first();
+      $kirimDetail = KirimDetailTemporary::where('id_pembelian',$request['idpembelian'])->where('kode_produk','like','%'.$kode_produk)->first();
       
       if ($kirimDetail) {
 
@@ -106,7 +106,7 @@ class KirimBarangTokoDetailController extends Controller
       }else{
 
          
-         $detail = new KirimDetail;
+         $detail = new KirimDetailTemporary;
          $detail->id_pembelian = $request['idpembelian'];
          $detail->kode_produk = $produk->kode_produk;
          $detail->harga_jual = $produk->harga_jual_member_insan;
@@ -123,7 +123,7 @@ class KirimBarangTokoDetailController extends Controller
       
       }
 
-      $total = KirimDetail::where('id_pembelian',$request['idpembelian'])->sum('jumlah');
+      $total = KirimDetailTemporary::where('id_pembelian',$request['idpembelian'])->sum('jumlah');
       
       $data = array(
          "tota" => $total,
@@ -133,7 +133,7 @@ class KirimBarangTokoDetailController extends Controller
 
    public function update(Request $request, $id)
    {
-      $detail = KirimDetail::find($id);
+      $detail = KirimDetailTemporary::find($id);
       
       $unit = Auth::user()->unit;
 
@@ -215,7 +215,7 @@ class KirimBarangTokoDetailController extends Controller
 
       $expired = '20' . $tahun . '-' . $bulan . '-' . $hari;
 
-      $detail = KirimDetail::find($id);
+      $detail = KirimDetailTemporary::find($id);
       $detail->expired_date = $expired;
       $detail->update();
    }
@@ -223,13 +223,13 @@ class KirimBarangTokoDetailController extends Controller
    
    public function destroy($id)
    {
-      $detail = KirimDetail::find($id);
+      $detail = KirimDetailTemporary::find($id);
       $detail->delete();
    }
 
    public function loadForm($id){
 
-      $total = KirimDetail::where('id_pembelian',$id)->sum('jumlah');
+      $total = KirimDetailTemporary::where('id_pembelian',$id)->sum('jumlah');
 
       $data = array(
          "totalitem" => format_uang($total),
