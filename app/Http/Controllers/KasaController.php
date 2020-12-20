@@ -105,7 +105,7 @@ class KasaController extends Controller{
 
          foreach ($produk as $list ) {
 
-            $produk_detail = ProdukDetail::where("kode_produk",$list->kode_produk)->where("unit",Auth::user()->unit)->whereRaw("stok_detail > 0")->where('status',2)->orderBy("no_faktur","DESC")->first();
+            $produk_detail = ProdukDetail::where("kode_produk",$list->kode_produk)->where("unit",Auth::user()->unit)->where("stok_detail", ">","0")->where('status',2)->orderBy("no_faktur","DESC")->first();
             
             if ($produk_detail) {
                
@@ -124,10 +124,8 @@ class KasaController extends Controller{
                   $kode_t ="EOD/-".$unit.$kode_t;
                   $now = date('Y-m-d');
 
-                  if ($unit != Auth::user()->unit) {   
-                     
+                  if ($unit != Auth::user()->unit) {                        
                      if ($harga_baru > $harga_lama) {
-                        
                         $jurnal = new TabelTransaksi;
                         $jurnal->unit =  $unit; 
                         $jurnal->kode_transaksi = $kode_t;
@@ -192,16 +190,26 @@ class KasaController extends Controller{
                   $ubah->harga_jual_insan = $produk_detail->harga_jual_insan;
                   $ubah->status = null;
                   $ubah->update();
+                  
+                  $data_master_produk = Produk::where("kode_produk",$list->kode_produk)->whereIn("unit",$kode_toko)->update([
+                     "harga_beli" => $produk_detail->harga_beli,
+                     "harga_jual" => $produk_detail->harga_jual_umum,
+                     "harga_jual_member_insan" => $produk_detail->harga_jual_insan,
+                     "harga_jual_insan" => $produk_detail->harga_jual_insan,
+                     "harga_jual_pabrik" => $produk_detail->harga_jual_umum,
+                     
+                  ]);
+                  // foreach ($data_master_produk as $master_produk) {  
+                  //    dd($master_produk);
+                  //    $master_produk->harga_beli = $produk_detail->harga_beli;
+                  //    $master_produk->harga_jual = $produk_detail->harga_jual_umum;
+                  //    $master_produk->harga_jual_member_insan = $produk_detail->harga_jual_insan;
+                  //    $master_produk->harga_jual_insan = $produk_detail->harga_jual_insan;
+                  //    $master_produk->harga_jual_pabrik = $produk_detail->harga_jual_umum;
+                  //    $master_produk->update();   
+                  // }
+               }               
 
-                  $master_produk =  Produk::where("kode_produk",$ubah->kode_produk)->where("unit",$ubah->unit)->first();
-                  $master_produk->harga_beli = $produk_detail->harga_beli;
-                  $master_produk->harga_jual = $produk_detail->harga_jual_umum;
-                  $master_produk->harga_jual_member_insan = $produk_detail->harga_jual_insan;
-                  $master_produk->harga_jual_insan = $produk_detail->harga_jual_insan;
-                  $master_produk->harga_jual_pabrik = $produk_detail->harga_jual_umum;
-                  $master_produk->update();
-
-               }
             }
 
          }
@@ -245,7 +253,6 @@ class KasaController extends Controller{
             "Saturday" => "Sabtu"
          );
          
-         // dd($tanggal_carbon);
          $namahari = date('l', strtotime($tanggal_esok_carbon->addDays(1)->toDateString()));
          
          if ($namahari == 'Saturday') {
@@ -261,7 +268,6 @@ class KasaController extends Controller{
             $tgl_tunggakan = $tanggal_tunggak_carbon->subDays(14)->toDateString();
          }
 
-         // dd($tgl_esok);
          
          $hari = $daftar_hari[$namahari];
          $unit = Auth::user()->unit;
