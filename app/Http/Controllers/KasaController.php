@@ -105,10 +105,12 @@ class KasaController extends Controller{
 
          foreach ($produk as $list ) {
 
-            $produk_detail = ProdukDetail::where("kode_produk",$list->kode_produk)->where("unit",Auth::user()->unit)->whereRaw("stok_detail > 0")->where('status',null)->orderBy("no_faktur","DESC")->first();
+            $produk_detail = ProdukDetail::where("kode_produk",$list->kode_produk)->where("unit",Auth::user()->unit)->whereRaw("stok_detail > 0")->where('status',2)->orderBy("no_faktur","DESC")->first();
+            
             if ($produk_detail) {
                
                $produk_ubah = ProdukDetail::where("kode_produk",$list->kode_produk)->whereIn("unit",$kode_toko)->get();
+               
                foreach ($produk_ubah as $ubah) {
 
                   $kode_produk = $ubah->kode_produk;
@@ -123,6 +125,7 @@ class KasaController extends Controller{
                   $now = date('Y-m-d');
 
                   if ($unit != Auth::user()->unit) {   
+                     
                      if ($harga_baru > $harga_lama) {
                         
                         $jurnal = new TabelTransaksi;
@@ -187,6 +190,7 @@ class KasaController extends Controller{
 
                   $ubah->harga_jual_umum = $produk_detail->harga_jual_umum;
                   $ubah->harga_jual_insan = $produk_detail->harga_jual_insan;
+                  $ubah->status = null;
                   $ubah->update();
 
                   $master_produk =  Produk::where("kode_produk",$ubah->kode_produk)->where("unit",$ubah->unit)->first();
@@ -224,8 +228,12 @@ class KasaController extends Controller{
 
          $param_tgl = \App\ParamTgl::where("nama_param_tgl","tanggal_transaksi")->where('unit',Auth::user()->id)->first();   
          $tanggal = $param_tgl->param_tgl;
-         $tgl_sekarang = new \Carbon\Carbon($tanggal);
-         $tgl_esok = $tgl_sekarang->addDays(1);
+         $tanggal_esok_carbon = new \Carbon\Carbon($param_tgl->param_tgl);
+         $cek_hari = new \Carbon\Carbon($param_tgl->param_tgl);
+         $tanggal_carbon = new \Carbon\Carbon($param_tgl->param_tgl);
+         $tanggal_tunggak_carbon = new \Carbon\Carbon($param_tgl->param_tgl);
+         
+         
          
          $daftar_hari = array(
             "Sunday" => "Minggu",
@@ -236,8 +244,25 @@ class KasaController extends Controller{
             "Friday" => "Jumat",
             "Saturday" => "Sabtu"
          );
+         
+         // dd($tanggal_carbon);
+         $namahari = date('l', strtotime($tanggal_esok_carbon->addDays(1)->toDateString()));
+         
+         if ($namahari == 'Saturday') {
+            
+            $tgl_esok = $tanggal_carbon->addDays(3);
+            $namahari = date('l', strtotime($cek_hari->addDays(3)->toDateString()));
+            $tgl_tunggakan = $tanggal_tunggak_carbon->subDays(11)->toDateString();
+            
+         }else {
+            
+            $tgl_esok = $tanggal_carbon->addDays(1);
+            $namahari = date('l', strtotime($cek_hari->addDays(1)->toDateString()));
+            $tgl_tunggakan = $tanggal_tunggak_carbon->subDays(14)->toDateString();
+         }
 
-         $namahari = date('l', strtotime($tgl_esok->toDateString()));
+         // dd($tgl_esok);
+         
          $hari = $daftar_hari[$namahari];
          $unit = Auth::user()->unit;
          
@@ -307,66 +332,95 @@ class KasaController extends Controller{
 
 
          $get_tunggakan = DB::table("tunggakan_toko")->where("tgl_tunggak",$tgl_esok)->where("KREDIT",">",0)->where("unit",$unit)->get();
-
+       
          if($get_tunggakan){
             foreach ($get_tunggakan as $data) {
                $member_tunggak = Musawamah::where('id_member',$data->NOREK)->first();
-               $member_tunggak->bulat -= $member_tunggak->angsuran;
-               $member_tunggak->update();
+               $hasil_pengurangan_tunggakan = $member_tunggak->bulat - $member_tunggak->angsuran;
+
+               if ($hasil_pengurangan_tunggakan < 0) {
+                  $member_tunggak->bulat = 0;
+                  $member_tunggak->update();   
+               }else {
+                  $member_tunggak->bulat -= $member_tunggak->angsuran;
+                  $member_tunggak->update();
+               }
             }
          }
 
          $delete_tunggakan = DB::table("tunggakan_toko")->where("tgl_tunggak",$tgl_esok)->where("KREDIT",">",0)->where("unit",$unit)->delete();
-
+// dd($delete_tunggakan);
          // tunggakan
-         $member_tunggakan = DB::table("musawamah")->where("unit",$unit)->where("os",">",0)->where("hari",$hari)->get();
-
+         $member_tunggakan = DB::table("musawamah")->where("unit",$unit)->where("os",">",0)->where("hari",$hari)->where('tgl_wakalah','<=',$tgl_tunggakan)->orderBy('tgl_wakalah','desc')->get();
+        
          foreach ($member_tunggakan as $data){
             
+            $param_tgl = \App\ParamTgl::where("nama_param_tgl","tanggal_transaksi")->where('unit',Auth::user()->id)->first();   
+            $tanggal = $param_tgl->param_tgl;
             $kode_kelompok = $data->code_kel;
             $angsuran = $data->angsuran;
             $nama = $data->Cust_Short_name;
             $cao = $data->cao;
             $id = $data->id_member;
 
-            $wakalah = new \Carbon\Carbon($data->tgl_wakalah);
-            $selisih = $wakalah->diffInDays($tgl_esok->addDays(14));
+            $tunggakan_data = Musawamah::where("id_member",$data->id_member)->first();
+            $tunggakan_selanjutnya = $tunggakan_data->bulat + $tunggakan_data->angsuran;
 
-            if ($selisih >= 14) {
-            
-               $tunggakan = new TunggakanToko;
-               $tunggakan->tgl_tunggak = $tgl_esok;
-               $tunggakan->NOREK = $id;
-               $tunggakan->unit = $unit;
-               $tunggakan->CIF = $id;
-               $tunggakan->CODE_KEL = $kode_kelompok;
-               $tunggakan->DEBIT = 0;
-               $tunggakan->type = "01";
-               $tunggakan->KREDIT = $angsuran;
-               $tunggakan->USERID = $unit;
-               $tunggakan->KET = "Tunggakan" . " " . $id . " an/ " . $nama;
-               $tunggakan->cao = $cao;
-               $tunggakan->blok = 1;
-               $tunggakan->save();
-               
-               $tunggakan_data = Musawamah::where("id_member",$data->id_member)->first();
-               $tunggakan_data->bulat += $angsuran;
-               $tunggakan_data->update();
+            if ($tunggakan_data->bulat < $tunggakan_data->os) {
 
+               if ($tunggakan_selanjutnya > $tunggakan_data->os) {
                
-               if ($tunggakan_data->bulat > $tunggakan_data->os) {
+                  $nominal_tunggakan = $tunggakan_data->os - $tunggakan_data->bulat;
+                  // dd($tunggakan_selanjutnya)
+                  $tunggakan = new TunggakanToko;
+                  $tunggakan->tgl_tunggak = $tgl_esok;
+                  $tunggakan->NOREK = $id;
+                  $tunggakan->unit = $unit;
+                  $tunggakan->CIF = $id;
+                  $tunggakan->CODE_KEL = $kode_kelompok;
+                  $tunggakan->DEBIT = 0;
+                  $tunggakan->type = "01";
+                  $tunggakan->KREDIT = $nominal_tunggakan;
+                  $tunggakan->USERID = $unit;
+                  $tunggakan->KET = "Tunggakan" . " " . $id . " an/ " . $nama;
+                  $tunggakan->cao = $cao;
+                  $tunggakan->blok = 1;
+                  $tunggakan->save();
+                  
                   $tunggakan_data->bulat = $tunggakan_data->os;
                   $tunggakan_data->update();
+               
+               }else {
+
+                  $tunggakan = new TunggakanToko;
+                  $tunggakan->tgl_tunggak = $tgl_esok;
+                  $tunggakan->NOREK = $id;
+                  $tunggakan->unit = $unit;
+                  $tunggakan->CIF = $id;
+                  $tunggakan->CODE_KEL = $kode_kelompok;
+                  $tunggakan->DEBIT = 0;
+                  $tunggakan->type = "01";
+                  $tunggakan->KREDIT = $angsuran;
+                  $tunggakan->USERID = $unit;
+                  $tunggakan->KET = "Tunggakan" . " " . $id . " an/ " . $nama;
+                  $tunggakan->cao = $cao;
+                  $tunggakan->blok = 1;
+                  $tunggakan->save();
+                  
+                  $tunggakan_data->bulat += $angsuran;
+                  $tunggakan_data->update();
+      
+      
+               }  
+      
             }
             
-
                $member_status = Member::where('kode_member',$data->id_member)->first();
-               // status member di blokir
                $member_status->status_member ="Blok";
                $member_status->update();            
-            }
-
          }
+
+         
             
          DB::commit();
       
