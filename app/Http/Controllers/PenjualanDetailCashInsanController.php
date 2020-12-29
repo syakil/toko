@@ -9,6 +9,7 @@ use App\Produk;
 use App\ProdukDetail;
 use App\Member;
 use App\Setting;
+use DB;
 use App\PenjualanDetailTemporary;
 use App\TabelTransaksi;
 use App\PenjualanDetail; 
