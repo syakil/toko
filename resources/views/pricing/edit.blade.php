@@ -15,8 +15,8 @@
     <div class="box">
       <div class="box-header">
         
-      <form action="/toko/pricing/update/{{$produk->kode_produk}}"class="form-horizontal"  data-toggle="validator" method="post">
-    {{ csrf_field() }} {{ method_field('POST') }}
+    <form action="{{route('pricing.update')}}" class="form-horizontal" method="post">
+    {{ csrf_field() }} 
         
 
 
@@ -63,7 +63,7 @@
   <div class="form-group">
     <label for="harga_beli_sebelum_pajak" class="col-md-3 control-label">Harga Beli</label>
     <div class="col-md-3">
-      <input id="harga_beli_sebelum_pajak" type="text" class="form-control" name="harga_beli_sebelum_pajak" value="{{$produk->harga_beli}}">
+      <input id="harga_beli_sebelum_pajak" type="text" class="form-control" name="harga_beli_sebelum_pajak" disabled value="{{$produk->harga_beli}}">
       <span class="help-block with-errors"></span>
     </div>
   </div>
@@ -86,7 +86,7 @@
     
     <label for="harga_beli" class="col-md-1 control-label">HPP</label>
     <div class="col-md-3">
-      <input type="text" class="form-control" id="harga_beli" name="harga_beli">
+      <input type="text" class="form-control" id="harga_beli" name="harga_beli" disabled value="{{$produk->harga_beli}}">
       <span class="help-block with-errors"></span>
     </div>
   </div>
