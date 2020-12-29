@@ -675,6 +675,34 @@ class PenjualanDetailMemberInsanController extends Controller
                         $jurnal->id_admin = Auth::user()->unit; 
                         $jurnal->save();
                            
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  Auth::user()->unit; 
+                        $jurnal->kode_transaksi = $request['idpenjualan'];
+                        $jurnal->kode_rekening = 1482000;
+                        $jurnal->tanggal_transaksi = $now;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'BOL-TI Promo 1';
+                        $jurnal->debet = $bol;
+                        $jurnal->kredit = 0;
+                        $jurnal->tanggal_posting = ' ';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->unit; 
+                        $jurnal->save();
+
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  Auth::user()->unit; 
+                        $jurnal->kode_transaksi = $request['idpenjualan'];
+                        $jurnal->kode_rekening = 1483000;
+                        $jurnal->tanggal_transaksi = $now;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'BOL-TI Promo 1';
+                        $jurnal->debet = 0;
+                        $jurnal->kredit = $bol;
+                        $jurnal->tanggal_posting = ' ';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->unit; 
+                        $jurnal->save();
+
                         // // 1482000	Persediaan Barang Dagang
                         // $jurnal = new TabelTransaksi;
                         // $jurnal->unit =  Auth::user()->unit; 
@@ -780,6 +808,35 @@ class PenjualanDetailMemberInsanController extends Controller
                         $jurnal->keterangan_posting = '0';
                         $jurnal->id_admin = Auth::user()->unit; 
                         $jurnal->save();
+
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  Auth::user()->unit; 
+                        $jurnal->kode_transaksi = $request['idpenjualan'];
+                        $jurnal->kode_rekening = 1482000;
+                        $jurnal->tanggal_transaksi = $now;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'BOL-TI Promo 1';
+                        $jurnal->debet = $bol;
+                        $jurnal->kredit = 0;
+                        $jurnal->tanggal_posting = ' ';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->unit; 
+                        $jurnal->save();
+
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  Auth::user()->unit; 
+                        $jurnal->kode_transaksi = $request['idpenjualan'];
+                        $jurnal->kode_rekening = 1483000;
+                        $jurnal->tanggal_transaksi = $now;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'BOL-TI Promo 1';
+                        $jurnal->debet = 0;
+                        $jurnal->kredit = $bol;
+                        $jurnal->tanggal_posting = ' ';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->unit; 
+                        $jurnal->save();
+
                            
                         // // 1482000	Persediaan Barang Dagang
                         // $jurnal = new TabelTransaksi;
@@ -926,6 +983,35 @@ class PenjualanDetailMemberInsanController extends Controller
                         $jurnal->keterangan_posting = '0';
                         $jurnal->id_admin = Auth::user()->id; 
                         $jurnal->save();                     
+
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  Auth::user()->unit; 
+                        $jurnal->kode_transaksi = $request['idpenjualan'];
+                        $jurnal->kode_rekening = 1482000;
+                        $jurnal->tanggal_transaksi = $now;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'BOL-TI Promo 1';
+                        $jurnal->debet = $bol;
+                        $jurnal->kredit = 0;
+                        $jurnal->tanggal_posting = ' ';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->unit; 
+                        $jurnal->save();
+
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  Auth::user()->unit; 
+                        $jurnal->kode_transaksi = $request['idpenjualan'];
+                        $jurnal->kode_rekening = 1483000;
+                        $jurnal->tanggal_transaksi = $now;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'BOL-TI Promo 1';
+                        $jurnal->debet = 0;
+                        $jurnal->kredit = $bol;
+                        $jurnal->tanggal_posting = ' ';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->unit; 
+                        $jurnal->save();
+
 
                         // K	1482000	Persediaan Musawamah/Barang Dagang
                         // $jurnal = new TabelTransaksi;
@@ -1150,6 +1236,35 @@ class PenjualanDetailMemberInsanController extends Controller
                         $jurnal->keterangan_posting = '0';
                         $jurnal->id_admin = Auth::user()->id; 
                         $jurnal->save();                     
+
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  Auth::user()->unit; 
+                        $jurnal->kode_transaksi = $request['idpenjualan'];
+                        $jurnal->kode_rekening = 1482000;
+                        $jurnal->tanggal_transaksi = $now;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'BOL-TI Promo 1';
+                        $jurnal->debet = $bol;
+                        $jurnal->kredit = 0;
+                        $jurnal->tanggal_posting = ' ';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->unit; 
+                        $jurnal->save();
+
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  Auth::user()->unit; 
+                        $jurnal->kode_transaksi = $request['idpenjualan'];
+                        $jurnal->kode_rekening = 1483000;
+                        $jurnal->tanggal_transaksi = $now;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'BOL-TI Promo 1';
+                        $jurnal->debet = 0;
+                        $jurnal->kredit = $bol;
+                        $jurnal->tanggal_posting = ' ';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->unit; 
+                        $jurnal->save();
+
 
                         // K	1482000	Persediaan Musawamah/Barang Dagang
                         // $jurnal = new TabelTransaksi;
