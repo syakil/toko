@@ -28,7 +28,7 @@ class TerimaPoController extends Controller
 
     public function listData(){
     
-        $pembelian = Pembelian::leftJoin('supplier', 'supplier.id_supplier', '=', 'pembelian.id_supplier')
+        $pembelian = Pembelian::select('pembelian.*','supplier.nama')->leftJoin('supplier', 'supplier.id_supplier', '=', 'pembelian.id_supplier')
                                 ->where('kode_gudang',Auth::user()->unit)
                                 ->orderBy('pembelian.id_pembelian', 'desc')
                                 ->get();
@@ -39,7 +39,7 @@ class TerimaPoController extends Controller
         $row = array();
         $row[] = $no;
         $row[] = $list->id_pembelian_t;
-        $row[] = $list->created_at;
+        $row[] = tanggal_indonesia($list->created_at);
         $row[] = $list->nama;
         $row[] = $list->total_item;
         $row[] = $list->total_terima;
