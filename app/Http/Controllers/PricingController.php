@@ -117,41 +117,32 @@ class PricingController extends Controller
     }
 
 
-    public function update(Request $request, $id){
+    public function update(Request $request){
 
-        $kode_gudang = Branch::where('kode_gudang',Auth::user()->unit)->get();
+        try {
 
-        $unit = array();
-        foreach ($kode_gudang as $list ) {
-            $unit [] = $list->kode_toko;
+            DB::beginTransaction();
+            $produk = ProdukDetail::where('kode_produk',$request['id'])->where('unit',Auth::user()->unit)->where('stok_detail','>',0)->first();
+            if($produk){
+                $produk = ProdukDetail::where('kode_produk',$request['id'])->where('unit',Auth::user()->unit)->where('stok_detail','>',0)->first(); 
+                $produk->harga_jual_umum = $request['harga_jual']; 
+                $produk->harga_jual_insan = $request['harga_jual']; 
+                $produk->status = 2;
+                $produk->update();
+            }else{
+                return redirect('pricing/index')->with(['error' => 'Stok Di Gudang kosong']);
+            }
+                
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+            return redirect('pricing/index')->with(['error' => $e->getmessage()]);
+        
         }
 
-        // dd($request->status);
-        $produk = Produk::where('kode_produk',$id)->first();
 
-         //update harga jual
-            $produks = Produk::where('kode_produk',$id)->whereIn('unit',$unit)->get();
-
-            foreach($produks as $produk_all){
-
-                $produk_all->param_status = $request['status'];
-                $produk_all->nama_produk = $request['nama_produk'];
-                $produk_all->nama_struk = $request['nama_struk'];
-                $produk_all->harga_beli = $request['harga_beli'];   
-                $produk_all->harga_jual = $request['harga_jual'];   
-                $produk_all->harga_jual_member_insan= $request['harga_jual_insan'];
-                $produk_all->harga_jual_insan= $request['harga_jual_insan'];
-                $produk_all->harga_jual_pabrik= $request['harga_jual']; 
-                $produk_all->update();
-            
-                if ($request['harga_jual'] < $request['harga_beli']) {
-                    $produk_all->promo = 1;
-                    $produk_all->update();
-                }
-
-            }
-
-          return redirect('pricing/index');
+          return redirect('pricing/index')->with(['success' => 'Perubahan Harga Berhasil']);;
+    
     }
 
     public function show(Request $request){

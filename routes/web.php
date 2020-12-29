@@ -205,13 +205,11 @@ Route::get('write_off/index_admin', 'WriteOffController@index_admin')->name('wri
       Route::get('pricing/index', 'PricingController@index')->name('pricing.index');
       Route::get('pricing/data', 'PricingController@listData')->name('pricing.data');
       Route::get('pricing/edit/{id}', 'PricingController@edit')->name('pricing.edit');
-      Route::post('pricing/update/{id}', 'PricingController@update')->name('pricing.update');
-Route::get('pricing/promo/{id}', 'PricingController@tambah_promo')->name('pricing.promo');
+      Route::post('pricing/update/', 'PricingController@update')->name('pricing.update');
+      Route::get('pricing/promo/{id}', 'PricingController@tambah_promo')->name('pricing.promo');
       Route::post('pricing/update_promo', 'PricingController@update_promo')->name('pricing.update_promo');
       Route::put('pricing/update_margin/', 'PricingController@show')->name('pricing.margin');
       
-      Route::resource('pricing', 'PricingController');
-
 
       // laporan Musawamah
       Route::get('laporan/muswamah','LaporanMusawamahController@index')->name('muswamah.index');
@@ -311,14 +309,7 @@ Route::group(['middleware' => ['web', 'cekuser:4' ]], function(){
    Route::post('stock_opname/tambah', 'StockOpnameGudangController@tambah')->name('stock_opname.tambah');
    Route::get('stock_opname/simpan_/{id}', 'StockOpnameGudangController@simpan_')->name('stock_opname.simpan');
 
-   Route::resource('stock_opname', 'StockOpnameGudangController');
-
-// approval
-   Route::get('approve/index', 'ApprovalGudangController@index')->name('approve.index');
-   Route::get('approve/listData', 'ApprovalGudangController@listData')->name('approve.data');
-   Route::put('approve/store', 'ApprovalGudangController@store')->name('approve.store');
-   Route::resource('approve', 'ApprovalGudangController');
-   
+   Route::resource('stock_opname', 'StockOpnameGudangController');   
 
    // retur ke supplier
    Route::get('retur_supplier/data', 'ReturSupplierController@listData')->name('retur_supplier.data');
@@ -330,13 +321,6 @@ Route::group(['middleware' => ['web', 'cekuser:4' ]], function(){
    Route::get('retur_supplier_detail/{id}/data', 'ReturSupplierDetailController@listData')->name('retur_supplier_detail.data');
    Route::get('retur_supplier_detail/loadform/{diskon}/{total}', 'ReturSupplierDetailController@loadForm');
    Route::resource('retur_supplier_detail', 'ReturSupplierDetailController');   
-
-
-
-
-
-
-
 
 
 // merubah resource TranferController menjadi ReturGudang Controller untuk controller terima barang retur
@@ -380,7 +364,7 @@ Route::group(['middleware' => ['web', 'cekuser:4' ]], function(){
 
    // approval
    Route::get('approve/index', 'ApprovalGudangController@index')->name('approve.index');
-   Route::get('approve/listData', 'ApprovalGudangController@listData')->name('approve.data');
+   Route::get('approve/listData/{unit}', 'ApprovalGudangController@listData')->name('approve.data');
    Route::put('approve/store', 'ApprovalGudangController@store')->name('approve.store');
    Route::resource('approve', 'ApprovalGudangController');
 
@@ -496,11 +480,11 @@ Route::group(['middleware' => ['web', 'cekuser:5' ]], function(){
    Route::resource('kirim_barang_toko_detail', 'KirimBarangTokoDetailController');  
    ///////////////////////////////
 
-Route::get('stock_opname_toko/index', 'StockOpnameTokoController@index')->name('stock_opname_toko.index');
-   Route::get('stock_opname_toko/data/{id}', 'StockOpnameTokoController@listData')->name('stock_opname_toko.data');
-   route::get('stock_opname_toko/get/{id}', 'StockOpnameTokoController@getData')->name('stock_opname_toko.get');
-   Route::post('stock_opname_toko/tambah', 'StockOpnameTokoController@tambah')->name('stock_opname_toko.tambah');
-   Route::get('stock_opname_toko/simpan_/{id}', 'StockOpnameTokoController@simpan_')->name('stock_opname_toko.simpan');
+   Route::get('stock_opname_toko/index', 'StockOpnameTokoController@index')->name('stock_opname_toko.index');
+   Route::get('stock_opname_toko/data', 'StockOpnameTokoController@listData')->name('stock_opname_toko.data');
+   Route::post('stock_opname_toko/proses', 'StockOpnameTokoController@proses')->name('stock_opname_toko.proses');
+   Route::post('stock_opname_toko/import_excel', 'StockOpnameTokoController@import_excel')->name('stock_opname_toko.import_excel');
+   Route::get('stock_opname_toko/export_excel', 'StockOpnameTokoController@export_excel')->name('stock_opname_toko.export_excel');
 
    Route::resource('stock_opname_toko', 'StockOpnameTokoController');
 });
