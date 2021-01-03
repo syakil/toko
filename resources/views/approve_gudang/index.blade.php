@@ -17,57 +17,62 @@
 
 @section('content')
 
+@if ($message = Session::get('error'))
+    <script>
+    var pesan = "{{$message}}"
+    swal("Maaf !", pesan, "error"); 
+    </script>
+@elseif ($message = Session::get('success'))
+    <script>
+    var pesan = "{{$message}}"
+    swal("Selamat !", pesan, "success"); 
+    </script>
+@endif
 <div class="row">
-<div class="col-md-3">
-          <div class="box box-default collapsed-box">
+    <div class="col-md-3">
+        <div class="box box-default collapsed-box">
             <div class="box-header with-border">
 
-            <label for="exampleFormControlSelect1">Pilih Toko</label>
-                <select class="form-control" id="toko" onclick="pilihUnit();">
-                    <option value="">pilih toko</option>
-            @foreach($unit as $id)
+                <label for="exampleFormControlSelect1">Pilih Toko</label>
+                <select class="form-control" id="toko">
+                    <option value="unit">pilih toko</option>
+                    @foreach($unit as $id)
                     <option value="{{$id->kode_toko}}">{{$id->nama_toko}}</option>
-            @endforeach
+                    @endforeach
                 </select>
             </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
+        <!-- /.box-body -->
         </div>
+    <!-- /.box -->
+    </div>
 
-  <div class="col-xs-12">
-    <div class="box">
-      <div class="box-header">
-            <input type="checkbox" name="select-all" id="select-all" class="checkbox"> Pilih Semua
-      </div>
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-body"> 
       <div class="box-body"> 
+            <div class="box-body"> 
                 <form action="{{ route('approve_gudang.store') }}" method="post">
                 {{ csrf_field() }}
-            <table class="table table-striped tabel-so">
-                <thead>
-                    <tr>
-                        <th width='1%'></th>
-                        <th width='1%'>No.</th>
-                        <th>Barcode</th>
-                        <th>Nama Produk</th>
-                        <th>Tanggal SO</th>
-                        <th>Stock Sistem</th>
-                        <th>Stock Sebenarnya</th>
-                        <th>Nama Gudang</th>
-                    </tr>
-                </thead>
-                <tbody>
-                
-                </tbody>
-            </table>
-                <button type="submit" class="btn btn-danger pull-right approve" disabled>Approve</button>
+                <input type="hidden" name="unit" id="unit">
+                <table class="table table-striped tabel-so">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Barcode</th>
+                            <th>Nama Produk</th>
+                            <th>Stok Opname</th>
+                            <th>Stok Sistem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-danger pull-right approve">Approve</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-    <!-- /.content -->
 
 @endsection
 
@@ -76,67 +81,30 @@
 
 
 <script language="JavaScript">
-var table = $('table-so');
-$('#select-all').click(function(event) {   
-    if(this.checked) {
-        // Iterate each checkbox
-        $(':checkbox').each(function() {
-            this.checked = true;
-            $(".approve").attr("disabled",false);                        
-        });
-    } else {
-        $(':checkbox').each(function() {
-            this.checked = false;
-            $(".approve").attr("disabled",true);                       
-        });
-    }
-});
 
-
-
-function pilihUnit(){
+$("select#toko").change(function(){        
+    var unit = $(this).children("option:selected").val();
     $('.tabel-so').DataTable().destroy();
-}
-
-$(document).ready(function(){
-    $("select#toko").change(function(){
-        
-        var unit = $(this).children("option:selected").val();
-        getData(unit);
-    });
+    getData(unit);
 });
-
 
 
 function getData(unit) {
-var table;
-$(function(){
+
+    var url = "{{route('approve.data',':unit')}}"
+    url = url.replace(':unit',unit)
+    $("#unit").val(unit);
     table = $('.tabel-so').DataTable({
         "processing" : true,
         "paging" : true,
-dom: 'Bfrtip',
         "serverside" : true,
         "reload":true,
         "ajax" : {
-        "url" : "approve_gudang/data/" + unit,
-        "type" : "GET"
-            }
+            "url" : url,
+            "type" : "GET"
+        }
     });
-});
 }
-var n;
-
-function check(){
-    n = $("input:checked").length;
-
-    if (n >= 1) {
-        $(".approve").attr("disabled",false);
-    }else{
-        $(".approve").attr("disabled",true);
-    }
-}
-
-
 </script>
 
 

@@ -302,13 +302,14 @@ Route::get('pembelian_detail/{id}/update_harga', 'PembelianDetailController@upda
 
 Route::group(['middleware' => ['web', 'cekuser:4' ]], function(){
 
-// stock opname
+   // stock opname
+   
    Route::get('stock_opname/index', 'StockOpnameGudangController@index')->name('stock_opname.index');
-   Route::get('stock_opname/data/{id}', 'StockOpnameGudangController@listData')->name('stock_opname.data');
-   route::get('stock_opname/get/{id}', 'StockOpnameGudangController@getData')->name('stock_opname.get');
-   Route::post('stock_opname/tambah', 'StockOpnameGudangController@tambah')->name('stock_opname.tambah');
-   Route::get('stock_opname/simpan_/{id}', 'StockOpnameGudangController@simpan_')->name('stock_opname.simpan');
-
+   Route::get('stock_opname/data', 'StockOpnameGudangController@listData')->name('stock_opname.data');
+   Route::post('stock_opname/proses', 'StockOpnameGudangController@proses')->name('stock_opname.proses');
+   Route::post('stock_opname/import_excel', 'StockOpnameGudangController@import_excel')->name('stock_opname.import_excel');
+   Route::get('stock_opname/export_excel', 'StockOpnameTokoController@export_excel')->name('stock_opname.export_excel');
+   
    Route::resource('stock_opname', 'StockOpnameGudangController');   
 
    // retur ke supplier
@@ -507,8 +508,8 @@ Route::group(['middleware' => ['web', 'cekuser:6' ]], function(){
    // approval
    Route::get('approve_kp/index', 'ApprovalKpController@index')->name('approve_kp.index');
    Route::put('approve_kp/store', 'ApprovalKpController@store')->name('approve_kp.store');
+   Route::get('approve_kp/data/{id}', 'ApprovalKpController@listData')->name('approve_kp.data');
    Route::resource('approve_kp', 'ApprovalKpController');
-
     // report jatpo
     Route::get('report_jatpo/index','ReportJatuhTempoController@index')->name('report_jatpo.index');
     Route::get('report_jatpo/data','ReportJatuhTempoController@listData')->name('report_jatpo.data');
