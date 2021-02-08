@@ -93,7 +93,6 @@ class TerimaGudangController extends Controller
     }
 
     public function create_jurnal(Request $request){
-        // menampung id_pembelian yang di checklist
         $data = $request->check;
         
         // update_stok

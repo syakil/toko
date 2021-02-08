@@ -65,10 +65,10 @@
        <td>{{ ++$no }}</td>
        <td>{{ substr($data->kode_produk,8) }}</td>
        <td>{{ $data->nama_produk }}</td>
-       <td align="right">{{ format_uang($data->harga_jual) }}</td>
+       <td align="right">{{ format_uang(round($data->harga_jual)) }}</td>
        <td>x{{ $data->jumlah }}</td>
        <td align="rikeght">{{ format_uang($data->diskon) }}</td>
-       <td align="right">{{ format_uang($data->sub_total) }}</td>
+       <td align="right">{{ format_uang(round($data->sub_total)) }}</td>
     </tr>
     @endforeach
    

@@ -12,6 +12,7 @@ use App\Setting;
 use DB;
 use App\PenjualanDetailTemporary;
 use App\TabelTransaksi;
+use App\KartuStok;
 use App\PenjualanDetail; 
 use App\Branch; 
 
@@ -127,7 +128,8 @@ class PenjualanDetailCashInsanController extends Controller
       $penjualan->total_item = 0;    
       $penjualan->total_harga = 0;    
       $penjualan->total_harga_beli = 0;    
-      
+      $penjualan->unit = Auth::user()->unit;
+      $penjualan->type_transaksi = 'cash';
       $penjualan->diskon = 0;    
       $penjualan->bayar = 0;    
       $penjualan->diterima = 0;    
@@ -256,7 +258,16 @@ class PenjualanDetailCashInsanController extends Controller
                $new_detail->sub_total_beli = $produk_detail->harga_beli * $stok_toko;  
                $new_detail->no_faktur = $produk_detail->no_faktur;
                $new_detail->save();
-               
+                
+               $kartu_stok = new KartuStok;
+               $kartu_stok->buss_date = date('Y-m-d');
+               $kartu_stok->kode_produk = $kode;
+               $kartu_stok->masuk = 0;
+               $kartu_stok->keluar = $jumlah_penjualan;
+               $kartu_stok->status = 'penjualan';
+               $kartu_stok->kode_transaksi = $id_penjualan;
+               $kartu_stok->unit = Auth::user()->unit;
+               $kartu_stok->save();
             // jika selisih qty penjualan dengan jumlah stok yang tersedia
             }else {
             
@@ -327,6 +338,17 @@ class PenjualanDetailCashInsanController extends Controller
                   $new_detail->no_faktur = $produk_detail->no_faktur;
                   $new_detail->save();
 
+                   
+                  $kartu_stok = new KartuStok;
+                  $kartu_stok->buss_date = date('Y-m-d');
+                  $kartu_stok->kode_produk = $kode;
+                  $kartu_stok->masuk = 0;
+                  $kartu_stok->keluar = $stok_toko;
+                  $kartu_stok->status = 'penjualan';
+                  $kartu_stok->kode_transaksi = $id_penjualan;
+                  $kartu_stok->unit = Auth::user()->unit;
+                  $kartu_stok->save();
+
                   // sisa qty penjualan yang dikurangi stok toko yang harganya paling rendah
                   $jumlah_penjualan = $stok;
 
@@ -392,6 +414,17 @@ class PenjualanDetailCashInsanController extends Controller
                   $new_detail->sub_total_beli = $produk_detail->harga_beli * $jumlah_penjualan;
                   $new_detail->no_faktur = $produk_detail->no_faktur;
                   $new_detail->save();
+
+                   
+                  $kartu_stok = new KartuStok;
+                  $kartu_stok->buss_date = date('Y-m-d');
+                  $kartu_stok->kode_produk = $kode;
+                  $kartu_stok->masuk = 0;
+                  $kartu_stok->keluar = $jumlah_penjualan;
+                  $kartu_stok->status = 'penjualan';
+                  $kartu_stok->kode_transaksi = $id_penjualan;
+                  $kartu_stok->unit = Auth::user()->unit;
+                  $kartu_stok->save();
                
                }
             }
@@ -508,8 +541,7 @@ class PenjualanDetailCashInsanController extends Controller
 
          }
 
-         if ($cek_promo) {
-            
+         if ($cek_promo) {     
             //BOL-TI Promo/Discount/Kupon
             $jurnal = new TabelTransaksi;
             $jurnal->unit =  Auth::user()->unit; 

@@ -11,6 +11,7 @@ use App\TabelTransaksi;
 use Auth;
 use Ramsey\Uuid\Uuid;
 use App\Branch;
+use App\ProdukSelisih;
 use App\ParamTgl;
 
 class ApprovalGudangController extends Controller
@@ -84,12 +85,34 @@ class ApprovalGudangController extends Controller
                         $harga_beli = $data_produk_detail->harga_beli * $selisih;
                         $margin = abs($harga_jual - $harga_beli);
                         
-                        $data_produk_detail->stok_detail += $selisih;
-                        $data_produk_detail->update();
-
                         $master_produk->stok += $selisih;
                         $master_produk->update();    
-                            
+                        
+                        $produk_selisih = new ProdukSelisih;
+                        $produk_selisih->kode_produk = $data_produk_detail->kode_produk;
+                        $produk_selisih->jumlah = $selisih;
+                        $produk_selisih->harga_beli = $data_produk_detail->harga_beli;
+                        $produk_selisih->harga_jual = $data_produk_detail->harga_jual_umum;
+                        $produk_selisih->unit = $unit;
+                        $produk_selisih->status = 1;
+                        $produk_selisih->ket = 'lebih';
+                        $produk_selisih->tanggal_so = $tanggal;
+                        $produk_selisih->save();
+
+                        $produk_detail_baru = new ProdukDetail;
+                        $produk_detail_baru->kode_produk = $value->kode_produk;
+                        $produk_detail_baru->nama_produk = $master_produk->nama_produk;
+                        $produk_detail_baru->stok_detail = $selisih;
+                        $produk_detail_baru->harga_beli = $data_produk_detail->harga_beli;
+                        $produk_detail_baru->harga_jual_umum = $data_produk_detail->harga_jual_umum;
+                        $produk_detail_baru->harga_jual_insan = $data_produk_detail->harga_jual_umum;
+                        $produk_detail_baru->tanggal_masuk = $tanggal;
+                        $produk_detail_baru->unit = $unit;
+                        $produk_detail_baru->status = null;
+                        $produk_detail_baru->expired_date = '2021-01-01';
+                        $produk_detail_baru->no_faktur = null;
+                        $produk_detail_baru->save();
+
                         // Persediaan Musawamah/Barang Dagang
                         $jurnal = new TabelTransaksi;
                         $jurnal->unit =  $unit; 
@@ -105,11 +128,11 @@ class ApprovalGudangController extends Controller
                         $jurnal->id_admin = Auth::user()->id; 
                         $jurnal->save();
                         
-                        // RAK PASIVA - KP
+                        // Selisih lebih barang
                         $jurnal = new TabelTransaksi;
                         $jurnal->unit =  $unit; 
                         $jurnal->kode_transaksi = $kode_transaksi;
-                        $jurnal->kode_rekening = 2500000;
+                        $jurnal->kode_rekening = 2474000;
                         $jurnal->tanggal_transaksi  = $tanggal;
                         $jurnal->jenis_transaksi  = 'Jurnal System';
                         $jurnal->keterangan_transaksi = 'Stok Opname '. $value->kode_produk;
@@ -155,10 +178,20 @@ class ApprovalGudangController extends Controller
                         $produk_detail_baru->tanggal_masuk = $tanggal;
                         $produk_detail_baru->unit = $unit;
                         $produk_detail_baru->status = null;
-                        $produk_detail_baru->expired_date = $tanggal;
+                        $produk_detail_baru->expired_date = '2021-01-01';
                         $produk_detail_baru->no_faktur = null;
                         $produk_detail_baru->save();
 
+                        $produk_selisih = new ProdukSelisih;
+                        $produk_selisih->kode_produk = $master_produk->kode_produk;
+                        $produk_selisih->jumlah = $selisih;
+                        $produk_selisih->harga_beli = $master_produk->harga_beli;
+                        $produk_selisih->harga_jual = $master_produk->harga_jual;
+                        $produk_selisih->unit = $unit;
+                        $produk_selisih->status = 1;
+                        $produk_selisih->ket = 'lebih';
+                        $produk_selisih->tanggal_so = $tanggal;
+                        $produk_selisih->save();
                         
                         // Persediaan Musawamah/Barang Dagang
                         $jurnal = new TabelTransaksi;
@@ -168,23 +201,23 @@ class ApprovalGudangController extends Controller
                         $jurnal->tanggal_transaksi  = $tanggal;
                         $jurnal->jenis_transaksi  = 'Jurnal System';
                         $jurnal->keterangan_transaksi = 'Stok Opname '. $value->kode_produk;
-                        $jurnal->debet = 0;
-                        $jurnal->kredit = $harga_jual;
+                        $jurnal->debet = $harga_jual;
+                        $jurnal->kredit = 0;
                         $jurnal->tanggal_posting = '';
                         $jurnal->keterangan_posting = '0';
                         $jurnal->id_admin = Auth::user()->id; 
                         $jurnal->save();
                         
-                        // RAK PASIVA - KP
+                        // Selisih lebih barang
                         $jurnal = new TabelTransaksi;
                         $jurnal->unit =  $unit; 
                         $jurnal->kode_transaksi = $kode_transaksi;
-                        $jurnal->kode_rekening = 2500000;
+                        $jurnal->kode_rekening = 2474000;
                         $jurnal->tanggal_transaksi  = $tanggal;
                         $jurnal->jenis_transaksi  = 'Jurnal System';
                         $jurnal->keterangan_transaksi = 'Stok Opname '. $value->kode_produk;
-                        $jurnal->debet = $harga_beli;
-                        $jurnal->kredit = 0;
+                        $jurnal->debet = 0;
+                        $jurnal->kredit = $harga_beli;
                         $jurnal->tanggal_posting = '';
                         $jurnal->keterangan_posting = '0';
                         $jurnal->id_admin = Auth::user()->id; 
@@ -198,13 +231,13 @@ class ApprovalGudangController extends Controller
                         $jurnal->tanggal_transaksi  = $tanggal;
                         $jurnal->jenis_transaksi  = 'Jurnal System';
                         $jurnal->keterangan_transaksi = 'Stok Opname '. $value->kode_produk;
-                        $jurnal->debet = $margin;
-                        $jurnal->kredit = 0;
+                        $jurnal->debet = 0;
+                        $jurnal->kredit = $margin;
                         $jurnal->tanggal_posting = '';
                         $jurnal->keterangan_posting = '0';
                         $jurnal->id_admin = Auth::user()->id; 
                         $jurnal->save();
-
+                        
                     }
 
                 }else {
@@ -232,10 +265,22 @@ class ApprovalGudangController extends Controller
                         $harga_beli = $produk_detail->harga_beli * $produk_detail->stok_detail;
                         $margin = abs($harga_jual - $harga_beli);
                         
+                        
+                        $produk_selisih = new ProdukSelisih;
+                        $produk_selisih->kode_produk = $produk_detail->kode_produk;
+                        $produk_selisih->jumlah = $produk_detail->stok_detail;
+                        $produk_selisih->harga_beli = $produk_detail->harga_beli;
+                        $produk_selisih->harga_jual = $produk_detail->harga_jual_umum;
+                        $produk_selisih->unit = $unit;
+                        $produk_selisih->status = 1;
+                        $produk_selisih->ket = 'kurang';
+                        $produk_selisih->tanggal_so = $tanggal;
+                        $produk_selisih->save();
+
                         $jurnal = new TabelTransaksi;
                         $jurnal->unit =  $unit; 
                         $jurnal->kode_transaksi = $kode_transaksi;
-                        $jurnal->kode_rekening = 2500000;
+                        $jurnal->kode_rekening = 1969000;
                         $jurnal->tanggal_transaksi  = $tanggal;
                         $jurnal->jenis_transaksi  = 'Jurnal System';
                         $jurnal->keterangan_transaksi = 'Stok Opname ' . $value->kode_produk;
@@ -291,10 +336,21 @@ class ApprovalGudangController extends Controller
                             $harga_beli = $produk_detail->harga_beli * $produk_detail->stok_detail;
                             $margin = abs($harga_jual - $harga_beli);
                         
+                            $produk_selisih = new ProdukSelisih;
+                            $produk_selisih->kode_produk = $produk_detail->kode_produk;
+                            $produk_selisih->jumlah = $produk_detail->stok_detail;
+                            $produk_selisih->harga_beli = $produk_detail->harga_beli;
+                            $produk_selisih->harga_jual = $produk_detail->harga_jual_umum;
+                            $produk_selisih->unit = $unit;
+                            $produk_selisih->status = 1;
+                            $produk_selisih->ket = 'kurang';
+                            $produk_selisih->tanggal_so = $tanggal;
+                            $produk_selisih->save();
+
                             $jurnal = new TabelTransaksi;
                             $jurnal->unit =  $unit; 
                             $jurnal->kode_transaksi = $kode_transaksi;
-                            $jurnal->kode_rekening = 2500000;
+                            $jurnal->kode_rekening = 1969000;
                             $jurnal->tanggal_transaksi  = $tanggal;
                             $jurnal->jenis_transaksi  = 'Jurnal System';
                             $jurnal->keterangan_transaksi = 'Stok Opname ' . $value->kode_produk;
@@ -350,10 +406,22 @@ class ApprovalGudangController extends Controller
                             $harga_beli = $produk_detail->harga_beli * $selisih;
                             $margin = abs($harga_jual - $harga_beli);
 
+                            
+                            $produk_selisih = new ProdukSelisih;
+                            $produk_selisih->kode_produk = $produk_detail->kode_produk;
+                            $produk_selisih->jumlah = $selisih;
+                            $produk_selisih->harga_beli = $produk_detail->harga_beli;
+                            $produk_selisih->harga_jual = $produk_detail->harga_jual_umum;
+                            $produk_selisih->unit = $unit;
+                            $produk_selisih->status = 1;
+                            $produk_selisih->ket = 'kurang';
+                            $produk_selisih->tanggal_so = $tanggal;
+                            $produk_selisih->save();
+
                             $jurnal = new TabelTransaksi;
                             $jurnal->unit =  $unit; 
                             $jurnal->kode_transaksi = $kode_transaksi;
-                            $jurnal->kode_rekening = 2500000;
+                            $jurnal->kode_rekening = 1969000;
                             $jurnal->tanggal_transaksi  = $tanggal;
                             $jurnal->jenis_transaksi  = 'Jurnal System';
                             $jurnal->keterangan_transaksi = 'Stok Opname ' . $value->kode_produk;

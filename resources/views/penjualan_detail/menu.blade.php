@@ -163,7 +163,7 @@ function addFormKoperasi(){
        $('.tabel-member-awal').DataTable();
    } );
    </script>
-      @endsection
+@endsection
 
 
 

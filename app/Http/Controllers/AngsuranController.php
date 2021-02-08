@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use App\Setting;
+use PDF;
 use Ramsey\Uuid\Uuid;
 use Auth;
 use App\TabelTransaksi;
@@ -41,8 +43,6 @@ class AngsuranController extends Controller
         $data_member->titipan = $sum_titipan->titipan;
         $data_member->os = $musawamah->os;
         
-        
-
         echo json_encode($data_member);
 
     }
@@ -123,301 +123,92 @@ class AngsuranController extends Controller
 
     public function addTransaksi(Request $request){
 
+        try{
         
-        $kode=Uuid::uuid4()->getHex();
-        $kode_t=substr($kode,25);
-        $unit=Auth::user()->unit;
-        $kode_t="BU/-".$unit.$kode_t;
-
-        
-        $id = $request['id'];
-        $jenis_transaksi = $request['keterangan_transaksi'];
-
-        $param_tgl = \App\ParamTgl::where('nama_param_tgl','tanggal_transaksi')->where('unit',Auth::user()->id)->first();
-        $tanggal = $param_tgl->param_tgl;
-        // $tanggal = date('Y-m-d');
-        $musawamah = DB::table('musawamah')->where('id_member',$id)->first();
-        $nama = $musawamah->Cust_Short_name;
-        $ijaroh = $musawamah->ijaroh;
-        $saldo_margin = $musawamah->saldo_margin;
-        $unit_member = $musawamah->unit;
-
-        $setoran = $request['nominal'];
-        $angsuran = $musawamah->angsuran;
-        $sisa = $setoran - $angsuran;
-        
-        $sum_titipan = DB::table('list_toko')->select(DB::raw(
-            'SUM(KREDIT - DEBIT) AS titipan'
-            ))
-            ->where('id_member',$id)
-            ->first();
-
-        $titipan = $sum_titipan->titipan;
-        $sisa_titipan = $titipan-$angsuran;
-        
-        $os = $musawamah->os;
-        $sisa_os = $setoran - $os;
-
-
-        $kode_kelompok = $musawamah->code_kel;
-        $cao = $musawamah->cao;
-
-        
-        switch ($jenis_transaksi) {
-            case 'titipan':
-
-               if($titipan < $angsuran){
-                   
-                   $data = array(
-                           "alert" => "Titipan Kurang dari Angsuran (Angsuran : ".number_format($angsuran)."|Titipan : ".number_format($titipan)." )",
-                           );
-                   return response()->json($data);
-               
-                }
-
-                break;
+            DB::beginTransaction();
             
-            case 'pelunasan':
+            $kode=Uuid::uuid4()->getHex();
+            $kode_t=substr($kode,25);
+            $unit=Auth::user()->unit;
+            $kode_t="BU/-".$unit.$kode_t;
 
-                if($titipan < $os){
-                   
+            
+            $id = $request['id'];
+            $jenis_transaksi = $request['keterangan_transaksi'];
+
+            $param_tgl = \App\ParamTgl::where('nama_param_tgl','tanggal_transaksi')->where('unit',Auth::user()->id)->first();
+            $tanggal = $param_tgl->param_tgl;
+            $musawamah = DB::table('musawamah')->where('id_member',$id)->first();
+            $nama = $musawamah->Cust_Short_name;
+            $ijaroh = $musawamah->ijaroh;
+            $saldo_margin = $musawamah->saldo_margin;
+            $unit_member = $musawamah->unit;
+
+            $setoran = $request['nominal'];
+            $angsuran = $musawamah->angsuran;
+            $sisa = $setoran - $angsuran;
+            
+            $sum_titipan = DB::table('list_toko')->select(DB::raw(
+                'SUM(KREDIT - DEBIT) AS titipan'
+                ))
+                ->where('id_member',$id)
+                ->first();
+
+            $titipan = $sum_titipan->titipan;
+            $sisa_titipan = $titipan-$angsuran;
+            
+            $os = $musawamah->os;
+            $sisa_os = $setoran - $os;
+
+
+            $kode_kelompok = $musawamah->code_kel;
+            $cao = $musawamah->cao;
+
+            
+            switch ($jenis_transaksi) {
+                case 'titipan':
+
+                if($titipan < $angsuran){
+                    
                     $data = array(
-                        "alert" => "Titipan Kurang dari Outstanding (Os : ".number_format($os)."|Titipan : ".number_format($titipan)." )",
+                            "alert" => "Titipan Kurang dari Angsuran (Angsuran : ".number_format($angsuran)."|Titipan : ".number_format($titipan)." )",
                             );
                     return response()->json($data);
                 
-                 }
- 
-                
-                break;
-            
-            default:
-                break;
-        }
-        
-        switch ($jenis_transaksi) {
-            
-            case 'titipan':
-                
-                $jurnal = new TabelTransaksi;
-                $jurnal->unit =  $unit_member; 
-                $jurnal->kode_transaksi = $kode_t;
-                $jurnal->kode_rekening = 2891000;
-                $jurnal->tanggal_transaksi  = $tanggal;
-                $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
-                $jurnal->debet = $angsuran;
-                $jurnal->kredit = 0;
-                $jurnal->tanggal_posting = '';
-                $jurnal->keterangan_posting = '0';
-                $jurnal->id_admin = Auth::user()->id; 
-                $jurnal->save();
-                
-                $jurnal = new TabelTransaksi;
-                $jurnal->unit =  $unit_member; 
-                $jurnal->kode_transaksi = $kode_t;
-                $jurnal->kode_rekening = 1412000;
-                $jurnal->tanggal_transaksi  = $tanggal;
-                $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
-                $jurnal->debet =0;
-                $jurnal->kredit = $angsuran;
-                $jurnal->tanggal_posting = '';
-                $jurnal->keterangan_posting = '0';
-                $jurnal->id_admin = Auth::user()->id; 
-                $jurnal->save();
-                
-                
-                $jurnal = new TabelTransaksi;
-                $jurnal->unit =  $unit_member; 
-                $jurnal->kode_transaksi = $kode_t;
-                $jurnal->kode_rekening = 1422000;
-                $jurnal->tanggal_transaksi  = $tanggal;
-                $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
-                $jurnal->debet = $ijaroh;
-                $jurnal->kredit =0;
-                $jurnal->tanggal_posting = '';
-                $jurnal->keterangan_posting = '0';
-                $jurnal->id_admin = Auth::user()->id; 
-                $jurnal->save();
-                
-
-                $jurnal = new TabelTransaksi;
-                $jurnal->unit =  $unit_member; 
-                $jurnal->kode_transaksi = $kode_t;
-                $jurnal->kode_rekening = 41001;
-                $jurnal->tanggal_transaksi  = $tanggal;
-                $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
-                $jurnal->debet =0;
-                $jurnal->kredit = $ijaroh;
-                $jurnal->tanggal_posting = '';
-                $jurnal->keterangan_posting = '0';
-                $jurnal->id_admin = Auth::user()->id; 
-                $jurnal->save();
-
-                $member = new ListToko;
-                $member->buss_date = $tanggal;
-                $member->norek   = $id;
-                $member->unit = $unit_member;
-                $member->id_member =$id;
-                $member->code_kel =$kode_kelompok;
-                $member->DEBIT = $angsuran;
-                $member->type ='02';
-                $member->KREDIT =0;
-                $member->userid =Auth::user()->id;
-                $member->ket ='Setoran Angsuran Dari Titipan';
-                $member->kode_transaksi = $kode_t;
-                $member->tgl_input = $tanggal;
-                $member->cao =$cao;
-                $member->save();
-
-                $musawamah = Musawamah::where('id_member',$id)->first();
-                
-                // mengurangi tunggakan       
-                if($musawamah->bulat > 0 ){  
-                
-                    $tunggakan = new TunggakanToko;
-                    $tunggakan->tgl_tunggak = $tanggal;
-                    $tunggakan->NOREK = $id;
-                    $tunggakan->unit = $unit_member;
-                    $tunggakan->CIF = $id;
-                    $tunggakan->CODE_KEL = $kode_kelompok;
-                    $tunggakan->DEBIT = $angsuran;
-                    $tunggakan->type = "01";
-                    $tunggakan->KREDIT = 0;
-                    $tunggakan->USERID = $unit;
-                    $tunggakan->KET = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
-                    $tunggakan->cao = $cao;
-                    $tunggakan->blok = 1;
-                    $tunggakan->save();
-
-                    
-                    if ($os > $angsuran) {
-                        
-                        // os dikurangin sesuai angsuran
-                        $musawamah = Musawamah::where('id_member',$id)->first();
-                        $musawamah->os -= $angsuran;
-                        $musawamah->saldo_margin -= $ijaroh;
-                        $musawamah->update();
-
-                        if ($musawamah->bulat > $musawamah->angsuran) {
-                        
-                            $musawamah->bulat -= $musawamah->angsuran;
-                            $musawamah->update();
-                        
-                        }else {
-                        
-                            $musawamah->bulat =0;
-                            $musawamah->update();
-                        
-                        }
-
-                    }else {
-
-                        
-                        $musawamah->os = 0;
-                        $musawamah->saldo_margin = 0;
-                        $musawamah->bulat = 0;
-                        $musawamah->ijaroh = 0;
-                        $musawamah->update();   
-
                     }
+
+                    break;
                 
-                }else {
+                case 'pelunasan':
+
+                    if($titipan < $os){
                     
+                        $data = array(
+                            "alert" => "Titipan Kurang dari Outstanding (Os : ".number_format($os)."|Titipan : ".number_format($titipan)." )",
+                                );
+                        return response()->json($data);
                     
-                    $musawamah = Musawamah::where('id_member',$id)->first();
-                    $musawamah->os -= $angsuran;
-                    $musawamah->saldo_margin -= $ijaroh;
-                    $musawamah->update();
-                    
-                }
-                 
-                $musawamah = Musawamah::where('id_member',$id)->first();
-                // jika tidak ada lgi tunggakan 
-                if ($musawamah->bulat == 0) {
-                    
-                    $member_status = Member::where('kode_member',$id)->first();
-                    // status member di aktifkan kembali
-                    $member_status->status_member ="active";
-                    $member_status->update();            
+                    }
     
-                }
-
-
-                break;
-
+                    
+                    break;
                 
-            // storan angsuran ketitipan
-            case 'kurang':                
-                                    
-                $jurnal = new TabelTransaksi;
-                $jurnal->unit =  $unit; 
-                $jurnal->kode_transaksi = $kode_t;
-                $jurnal->kode_rekening = 1120000;
-                $jurnal->tanggal_transaksi  = $tanggal;
-                $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Setoran Ke Titipan' . ' ' . $id . ' an/ ' . $nama;
-                $jurnal->debet = $setoran;
-                $jurnal->kredit = 0;
-                $jurnal->tanggal_posting = '';
-                $jurnal->keterangan_posting = '0';
-                $jurnal->id_admin = Auth::user()->id; 
-                $jurnal->save();
-                
-                $jurnal = new TabelTransaksi;
-                $jurnal->unit =  $unit; 
-                $jurnal->kode_transaksi = $kode_t;
-                $jurnal->kode_rekening = 2891000;
-                $jurnal->tanggal_transaksi  = $tanggal;
-                $jurnal->jenis_transaksi  = 'Jurnal System';
-                $jurnal->keterangan_transaksi = 'Setoran Ke Titipan' . ' ' . $id . ' an/ ' . $nama;
-                $jurnal->debet =0;
-                $jurnal->kredit = $setoran;
-                $jurnal->tanggal_posting = '';
-                $jurnal->keterangan_posting = '0';
-                $jurnal->id_admin = Auth::user()->id; 
-                $jurnal->save();
-
-                $member = new ListToko;
-                $member->buss_date = $tanggal;
-                $member->norek   = $id;
-                $member->unit = $unit_member;
-                $member->id_member =$id;
-                $member->code_kel =$kode_kelompok;
-                $member->DEBIT =0;
-                $member->type ='02';
-                $member->KREDIT = $setoran;
-                $member->userid =Auth::user()->id;
-                $member->ket ='Setoran Ke Titipan';
-                $member->kode_transaksi = $kode_t;
-                $member->tgl_input = $tanggal;
-                $member->cao =$cao;
-                $member->save();
-  
-                $musawamah = Musawamah::where('id_member',$id)->first();
-                
-                
-                $member_status = Member::where('kode_member',$id)->first();
-                // status di blokir karena ada tunggakan
-                $member_status->status_member ="Blok";
-                $member_status->update();
-                
-                
-                break;
+                default:
+                    break;
+            }
             
-            default:
-        
+            switch ($jenis_transaksi) {
+                
+                case 'titipan':
+                    
                     $jurnal = new TabelTransaksi;
                     $jurnal->unit =  $unit_member; 
                     $jurnal->kode_transaksi = $kode_t;
                     $jurnal->kode_rekening = 2891000;
                     $jurnal->tanggal_transaksi  = $tanggal;
                     $jurnal->jenis_transaksi  = 'Jurnal System';
-                    $jurnal->keterangan_transaksi = 'Pelunasan' . ' ' . $id . ' an/ ' . $nama;
-                    $jurnal->debet = $os;
+                    $jurnal->keterangan_transaksi = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
+                    $jurnal->debet = $angsuran;
                     $jurnal->kredit = 0;
                     $jurnal->tanggal_posting = '';
                     $jurnal->keterangan_posting = '0';
@@ -430,53 +221,179 @@ class AngsuranController extends Controller
                     $jurnal->kode_rekening = 1412000;
                     $jurnal->tanggal_transaksi  = $tanggal;
                     $jurnal->jenis_transaksi  = 'Jurnal System';
-                    $jurnal->keterangan_transaksi = 'Pelunasan' . ' ' . $id . ' an/ ' . $nama;
+                    $jurnal->keterangan_transaksi = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
                     $jurnal->debet =0;
-                    $jurnal->kredit = $os;
+                    $jurnal->kredit = $angsuran;
                     $jurnal->tanggal_posting = '';
                     $jurnal->keterangan_posting = '0';
                     $jurnal->id_admin = Auth::user()->id; 
                     $jurnal->save();
-
+                    
+                    
                     $jurnal = new TabelTransaksi;
                     $jurnal->unit =  $unit_member; 
                     $jurnal->kode_transaksi = $kode_t;
                     $jurnal->kode_rekening = 1422000;
                     $jurnal->tanggal_transaksi  = $tanggal;
                     $jurnal->jenis_transaksi  = 'Jurnal System';
-                    $jurnal->keterangan_transaksi = 'Pelunasan' . ' ' . $id . ' an/ ' . $nama;
-                    $jurnal->debet = $saldo_margin;
+                    $jurnal->keterangan_transaksi = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
+                    $jurnal->debet = $ijaroh;
                     $jurnal->kredit =0;
                     $jurnal->tanggal_posting = '';
                     $jurnal->keterangan_posting = '0';
                     $jurnal->id_admin = Auth::user()->id; 
                     $jurnal->save();
                     
+
                     $jurnal = new TabelTransaksi;
                     $jurnal->unit =  $unit_member; 
                     $jurnal->kode_transaksi = $kode_t;
                     $jurnal->kode_rekening = 41001;
                     $jurnal->tanggal_transaksi  = $tanggal;
                     $jurnal->jenis_transaksi  = 'Jurnal System';
-                    $jurnal->keterangan_transaksi = 'Pelunasan' . ' ' . $id . ' an/ ' . $nama;
+                    $jurnal->keterangan_transaksi = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
                     $jurnal->debet =0;
-                    $jurnal->kredit = $saldo_margin;
+                    $jurnal->kredit = $ijaroh;
                     $jurnal->tanggal_posting = '';
                     $jurnal->keterangan_posting = '0';
                     $jurnal->id_admin = Auth::user()->id; 
                     $jurnal->save();
-    
+
                     $member = new ListToko;
                     $member->buss_date = $tanggal;
                     $member->norek   = $id;
                     $member->unit = $unit_member;
                     $member->id_member =$id;
-                    $member->code_kel = $kode_kelompok;
-                    $member->DEBIT = $os;
+                    $member->code_kel =$kode_kelompok;
+                    $member->DEBIT = $angsuran;
                     $member->type ='02';
                     $member->KREDIT =0;
                     $member->userid =Auth::user()->id;
-                    $member->ket ='Pelunasan';
+                    $member->ket ='Setoran Angsuran Dari Titipan';
+                    $member->kode_transaksi = $kode_t;
+                    $member->tgl_input = $tanggal;
+                    $member->cao =$cao;
+                    $member->save();
+
+                    $musawamah = Musawamah::where('id_member',$id)->first();
+                    
+                    // mengurangi tunggakan       
+                    if($musawamah->bulat > 0 ){  
+                    
+                        $tunggakan = new TunggakanToko;
+                        $tunggakan->tgl_tunggak = $tanggal;
+                        $tunggakan->NOREK = $id;
+                        $tunggakan->unit = $unit_member;
+                        $tunggakan->CIF = $id;
+                        $tunggakan->CODE_KEL = $kode_kelompok;
+                        $tunggakan->DEBIT = $angsuran;
+                        $tunggakan->type = "01";
+                        $tunggakan->KREDIT = 0;
+                        $tunggakan->USERID = $unit;
+                        $tunggakan->KET = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
+                        $tunggakan->cao = $cao;
+                        $tunggakan->blok = 1;
+                        $tunggakan->save();
+
+                        
+                        if ($os > $angsuran) {
+                            
+                            // os dikurangin sesuai angsuran
+                            $musawamah = Musawamah::where('id_member',$id)->first();
+                            $musawamah->os -= $angsuran;
+                            $musawamah->saldo_margin -= $ijaroh;
+                            $musawamah->update();
+
+                            if ($musawamah->bulat > $musawamah->angsuran) {
+                            
+                                $musawamah->bulat -= $musawamah->angsuran;
+                                $musawamah->update();
+                            
+                            }else {
+                            
+                                $musawamah->bulat =0;
+                                $musawamah->update();
+                            
+                            }
+
+                        }else {
+
+                            
+                            $musawamah->os = 0;
+                            $musawamah->saldo_margin = 0;
+                            $musawamah->bulat = 0;
+                            $musawamah->ijaroh = 0;
+                            $musawamah->update();   
+
+                        }
+                    
+                    }else {
+                        
+                        
+                        $musawamah = Musawamah::where('id_member',$id)->first();
+                        $musawamah->os -= $angsuran;
+                        $musawamah->saldo_margin -= $ijaroh;
+                        $musawamah->update();
+                        
+                    }
+                    
+                    $musawamah = Musawamah::where('id_member',$id)->first();
+                    // jika tidak ada lgi tunggakan 
+                    if ($musawamah->bulat == 0) {
+                        
+                        $member_status = Member::where('kode_member',$id)->first();
+                        // status member di aktifkan kembali
+                        $member_status->status_member ="active";
+                        $member_status->update();            
+        
+                    }
+
+
+                    break;
+
+                    
+                // storan angsuran ketitipan
+                case 'kurang':                
+                                        
+                    $jurnal = new TabelTransaksi;
+                    $jurnal->unit =  $unit; 
+                    $jurnal->kode_transaksi = $kode_t;
+                    $jurnal->kode_rekening = 1120000;
+                    $jurnal->tanggal_transaksi  = $tanggal;
+                    $jurnal->jenis_transaksi  = 'Jurnal System';
+                    $jurnal->keterangan_transaksi = 'Setoran Ke Titipan' . ' ' . $id . ' an/ ' . $nama;
+                    $jurnal->debet = $setoran;
+                    $jurnal->kredit = 0;
+                    $jurnal->tanggal_posting = '';
+                    $jurnal->keterangan_posting = '0';
+                    $jurnal->id_admin = Auth::user()->id; 
+                    $jurnal->save();
+                    
+                    $jurnal = new TabelTransaksi;
+                    $jurnal->unit =  $unit; 
+                    $jurnal->kode_transaksi = $kode_t;
+                    $jurnal->kode_rekening = 2891000;
+                    $jurnal->tanggal_transaksi  = $tanggal;
+                    $jurnal->jenis_transaksi  = 'Jurnal System';
+                    $jurnal->keterangan_transaksi = 'Setoran Ke Titipan' . ' ' . $id . ' an/ ' . $nama;
+                    $jurnal->debet =0;
+                    $jurnal->kredit = $setoran;
+                    $jurnal->tanggal_posting = '';
+                    $jurnal->keterangan_posting = '0';
+                    $jurnal->id_admin = Auth::user()->id; 
+                    $jurnal->save();
+
+                    $member = new ListToko;
+                    $member->buss_date = $tanggal;
+                    $member->norek   = $id;
+                    $member->unit = $unit_member;
+                    $member->id_member =$id;
+                    $member->code_kel =$kode_kelompok;
+                    $member->DEBIT =0;
+                    $member->type ='02';
+                    $member->KREDIT = $setoran;
+                    $member->userid =Auth::user()->id;
+                    $member->ket ='Setoran Ke Titipan';
                     $member->kode_transaksi = $kode_t;
                     $member->tgl_input = $tanggal;
                     $member->cao =$cao;
@@ -484,36 +401,145 @@ class AngsuranController extends Controller
     
                     $musawamah = Musawamah::where('id_member',$id)->first();
                     
-                    if($musawamah->bulat > 0 ){
-                    $tunggakan = new TunggakanToko;
-                    $tunggakan->tgl_tunggak = $tanggal;
-                    $tunggakan->NOREK = $id;
-                    $tunggakan->unit = $unit_member;
-                    $tunggakan->CIF = $id;
-                    $tunggakan->CODE_KEL = $kode_kelompok;
-                    $tunggakan->DEBIT = $os;
-                    $tunggakan->type = "01";
-                    $tunggakan->KREDIT = 0;
-                    $tunggakan->USERID = Auth::user()->id;
-                    $tunggakan->KET = 'Pelunasan' . ' ' . $id . ' an/ ' . $nama;
-                    $tunggakan->cao = $cao;
-                    $tunggakan->blok = 1;
-                    $tunggakan->save();
-                    }
-                    $musawamah->bulat = 0;    
-                    $musawamah->os = 0;
-                    $musawamah->angsuran = 0;
-                    $musawamah->saldo_margin = 0;
-                    $musawamah->ijaroh = 0;
-                    $musawamah->update();
-                
+                    
                     $member_status = Member::where('kode_member',$id)->first();
-                    $member_status->status_member ="active";
+                    // status di blokir karena ada tunggakan
+                    $member_status->status_member ="Blok";
                     $member_status->update();
+                    
+                    
+                    break;
+                
+                default:
+            
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  $unit_member; 
+                        $jurnal->kode_transaksi = $kode_t;
+                        $jurnal->kode_rekening = 2891000;
+                        $jurnal->tanggal_transaksi  = $tanggal;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'Pelunasan' . ' ' . $id . ' an/ ' . $nama;
+                        $jurnal->debet = $os;
+                        $jurnal->kredit = 0;
+                        $jurnal->tanggal_posting = '';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->id; 
+                        $jurnal->save();
+                        
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  $unit_member; 
+                        $jurnal->kode_transaksi = $kode_t;
+                        $jurnal->kode_rekening = 1412000;
+                        $jurnal->tanggal_transaksi  = $tanggal;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'Pelunasan' . ' ' . $id . ' an/ ' . $nama;
+                        $jurnal->debet =0;
+                        $jurnal->kredit = $os;
+                        $jurnal->tanggal_posting = '';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->id; 
+                        $jurnal->save();
 
-                break;
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  $unit_member; 
+                        $jurnal->kode_transaksi = $kode_t;
+                        $jurnal->kode_rekening = 1422000;
+                        $jurnal->tanggal_transaksi  = $tanggal;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'Pelunasan' . ' ' . $id . ' an/ ' . $nama;
+                        $jurnal->debet = $saldo_margin;
+                        $jurnal->kredit =0;
+                        $jurnal->tanggal_posting = '';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->id; 
+                        $jurnal->save();
+                        
+                        $jurnal = new TabelTransaksi;
+                        $jurnal->unit =  $unit_member; 
+                        $jurnal->kode_transaksi = $kode_t;
+                        $jurnal->kode_rekening = 41001;
+                        $jurnal->tanggal_transaksi  = $tanggal;
+                        $jurnal->jenis_transaksi  = 'Jurnal System';
+                        $jurnal->keterangan_transaksi = 'Pelunasan' . ' ' . $id . ' an/ ' . $nama;
+                        $jurnal->debet =0;
+                        $jurnal->kredit = $saldo_margin;
+                        $jurnal->tanggal_posting = '';
+                        $jurnal->keterangan_posting = '0';
+                        $jurnal->id_admin = Auth::user()->id; 
+                        $jurnal->save();
+        
+                        $member = new ListToko;
+                        $member->buss_date = $tanggal;
+                        $member->norek   = $id;
+                        $member->unit = $unit_member;
+                        $member->id_member =$id;
+                        $member->code_kel = $kode_kelompok;
+                        $member->DEBIT = $os;
+                        $member->type ='02';
+                        $member->KREDIT =0;
+                        $member->userid =Auth::user()->id;
+                        $member->ket ='Pelunasan';
+                        $member->kode_transaksi = $kode_t;
+                        $member->tgl_input = $tanggal;
+                        $member->cao =$cao;
+                        $member->save();
+        
+                        $musawamah = Musawamah::where('id_member',$id)->first();
+                        
+                        if($musawamah->bulat > 0 ){
+                        $tunggakan = new TunggakanToko;
+                        $tunggakan->tgl_tunggak = $tanggal;
+                        $tunggakan->NOREK = $id;
+                        $tunggakan->unit = $unit_member;
+                        $tunggakan->CIF = $id;
+                        $tunggakan->CODE_KEL = $kode_kelompok;
+                        $tunggakan->DEBIT = $os;
+                        $tunggakan->type = "01";
+                        $tunggakan->KREDIT = 0;
+                        $tunggakan->USERID = Auth::user()->id;
+                        $tunggakan->KET = 'Pelunasan' . ' ' . $id . ' an/ ' . $nama;
+                        $tunggakan->cao = $cao;
+                        $tunggakan->blok = 1;
+                        $tunggakan->save();
+                        }
+                        $musawamah->bulat = 0;    
+                        $musawamah->os = 0;
+                        $musawamah->angsuran = 0;
+                        $musawamah->saldo_margin = 0;
+                        $musawamah->ijaroh = 0;
+                        $musawamah->update();
+                    
+                        $member_status = Member::where('kode_member',$id)->first();
+                        $member_status->status_member ="active";
+                        $member_status->update();
+
+                    break;
+            }
+
+           
+            DB::commit();
+        
+        }catch(\Exception $e){
+
+            DB::rollback();
+            
+            $data = array(
+                    "alert" => $e->getmessage(),
+                    );
+            return response()->json($data);
+        
         }
-
+    
+        $setting=Setting::find(1);
+        $no = 0;
+        $bayar = $setoran;
+        $sisa = $os;
+    
+        $pdf = PDF::loadView('musawamah_detail.printpembayaran', compact('bayar','sisa','os','musawamah','no','setting'));
+        $pdf->setPaper(array(0,0,700,600), 'potrait');      
+        
+        return $pdf->stream();    
+    
         return back();
 
     }
@@ -535,7 +561,6 @@ class AngsuranController extends Controller
     
             $param_tgl = \App\ParamTgl::where('nama_param_tgl','tanggal_transaksi')->where('unit',Auth::user()->id)->first();
             $tanggal = $param_tgl->param_tgl;
-            // $tanggal = date('Y-m-d');
             $musawamah = DB::table('musawamah')->where('id_member',$id_member)->first();
             $angsuran = $musawamah->angsuran;            
             $ijaroh = $musawamah->ijaroh;
@@ -552,40 +577,8 @@ class AngsuranController extends Controller
             // jika dia tidak bayar
             if ($setoran == 0 || $setoran == null) {
                 
-                // // jika punya outstanding
-                // if($os > 0){
-                
-                //     // tunggakan ditambah
-                //     $tunggakan_data = Musawamah::where('id_member',$id_member)->first();
-                //     $tunggakan_data->bulat += $angsuran;
-                //     $tunggakan_data->update();
-
-                //     // status member di blokir
-                //     $member_status = Member::where('kode_member',$id_member)->first();
-                //     $member_status->status_member ="Blok";
-                //     $member_status->update(); 
-                    
-                //     $musawamah = Musawamah::where('id_member',$id)->first();
-                
-                //     // Kredi tunggakan toko sebesar angsuran
-                //     $tunggakan = new TunggakanToko;
-                //     $tunggakan->tgl_tunggak = $tanggal;
-                //     $tunggakan->NOREK = $id;
-                //     $tunggakan->unit = $unit;
-                //     $tunggakan->CIF = $id;
-                //     $tunggakan->CODE_KEL = $kode_kelompok;
-                //     $tunggakan->KREDIT = $angsuran;
-                //     $tunggakan->type = "01";
-                //     $tunggakan->DEBIT = 0;
-                //     $tunggakan->USERID = $unit;
-                //     $tunggakan->KET = 'Setoran Angsuran Dari Titipan' . ' ' . $id . ' an/ ' . $nama;
-                //     $tunggakan->cao = $cao;
-                //     $tunggakan->blok = 1;
-                //     $tunggakan->save();
-                // }
-                
-            // jika setoran lebih dari angsuran
-            }else if ($sisa > 0) {
+          
+           }else if ($sisa > 0) {
                 
                 // KAS
                 $jurnal = new TabelTransaksi;
@@ -959,7 +952,7 @@ class AngsuranController extends Controller
 
 
                 if ($os > $angsuran) {
-                    // os dikurangin sesuai angsuran
+                    
                     $musawamah = Musawamah::where('id_member',$id)->first();
                     $musawamah->os -= $angsuran;
                     $musawamah->saldo_margin -= $ijaroh;

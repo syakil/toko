@@ -46,7 +46,7 @@
         <div class="input-group">
           <input id="kode" type="text" class="form-control" name="kode" autofocus required>
           <span class="input-group-btn">
-            <button onclick="showProduct()" type="button" class="btn btn-info">...</button>
+            <button onclick="showProduct()" type="button" tabindex='2'class="btn btn-info">...</button>
           </span>
         </div>
       </div>
@@ -200,12 +200,17 @@ $(function(){
   $('.tabel-produk').DataTable();
 
   table = $('.tabel-penjualan').DataTable({
-     "dom" : 'Brt',
-     "bSort" : false,
-     "processing" : true,
-"scrollY" : "500px",
-"paging": false,
-     "ajax" : {
+    "processing" : true,
+    "serverside" : true,
+    "paging" :false,
+    "searching":false,
+    "showing":false,
+    "bSort" : true,      
+    "ordering": false,
+    "info":     false,
+    "scrollY" : "200px",
+    "dom" : 'Brt',
+    "ajax" : {
        "url" : "{{ route('memberinsan.data', $idpenjualan) }}",
        "type" : "GET"
      }
@@ -299,6 +304,13 @@ function selectMember(kode){
   loadForm($('#diskon').val());
   $('#diterima').val(0).focus().select();
 }
+
+$(document).keypress(function(e){
+   if(e.charCode == 113){
+      alert("a");
+      return false;
+  }
+ })
 
 function deleteItem(id){
    if(confirm("Apakah yakin data akan dihapus?")){

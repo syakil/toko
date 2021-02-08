@@ -9,6 +9,7 @@ use PDF;
 use App\Penjualan;
 use App\Produk;
 use App\ProdukDetail;
+use App\KartuStok;
 use App\Member;
 use App\Setting;
 use Yajra\Datatables\Datatables;
@@ -22,8 +23,8 @@ use App\MusawamahDetail;
 use Alert;  
 use DB;
 
-class PenjualanDetailMemberPabrikController extends Controller
-{
+class PenjualanDetailMemberPabrikController extends Controller{
+   
    public function index(){
       $member = Member::all();
       $produk = Produk::where('unit',Auth::user()->unit)->where('stok','>',0)->get();
@@ -211,6 +212,8 @@ class PenjualanDetailMemberPabrikController extends Controller
          $penjualan->total_item = 0;    
          $penjualan->total_harga = 0;    
          $penjualan->diskon = 0;    
+         $penjualan->unit = Auth::user()->unit;
+         $penjualan->type_transaksi = 'credit';
          $penjualan->bayar = 0;    
          $penjualan->diterima = 0;    
          $penjualan->id_user = Auth::user()->id;    
@@ -343,7 +346,17 @@ class PenjualanDetailMemberPabrikController extends Controller
                $new_detail->sub_total_beli = $produk_detail->harga_beli * $stok_toko;  
                $new_detail->no_faktur = $produk_detail->no_faktur;
                $new_detail->save();
-               
+                
+               $kartu_stok = new KartuStok;
+               $kartu_stok->buss_date = date('Y-m-d');
+               $kartu_stok->kode_produk = $kode;
+               $kartu_stok->masuk = 0;
+               $kartu_stok->keluar = $stok_toko;
+               $kartu_stok->status = 'penjualan';
+               $kartu_stok->kode_transaksi = $id_penjualan;
+               $kartu_stok->unit = Auth::user()->unit;
+               $kartu_stok->save();
+
             // jika selisih qty penjualan dengan jumlah stok yang tersedia
             }else {
             
@@ -413,6 +426,16 @@ class PenjualanDetailMemberPabrikController extends Controller
                   $new_detail->sub_total_beli = $produk_detail->harga_beli * $stok_toko;
                   $new_detail->no_faktur = $produk_detail->no_faktur;
                   $new_detail->save();
+                   
+                  $kartu_stok = new KartuStok;
+                  $kartu_stok->buss_date = date('Y-m-d');
+                  $kartu_stok->kode_produk = $kode;
+                  $kartu_stok->masuk = 0;
+                  $kartu_stok->keluar = $stok_toko;
+                  $kartu_stok->status = 'penjualan';
+                  $kartu_stok->kode_transaksi = $id_penjualan;
+                  $kartu_stok->unit = Auth::user()->unit;
+                  $kartu_stok->save();
 
                   // sisa qty penjualan yang dikurangi stok toko yang harganya paling rendah
                   $jumlah_penjualan = $stok;
@@ -479,6 +502,16 @@ class PenjualanDetailMemberPabrikController extends Controller
                   $new_detail->sub_total_beli = $produk_detail->harga_beli * $jumlah_penjualan;
                   $new_detail->no_faktur = $produk_detail->no_faktur;
                   $new_detail->save();
+                  
+                  $kartu_stok = new KartuStok;
+                  $kartu_stok->buss_date = date('Y-m-d');
+                  $kartu_stok->kode_produk = $kode;
+                  $kartu_stok->masuk = 0;
+                  $kartu_stok->keluar = $jumlah_penjualan;
+                  $kartu_stok->status = 'penjualan';
+                  $kartu_stok->kode_transaksi = $id_penjualan;
+                  $kartu_stok->unit = Auth::user()->unit;
+                  $kartu_stok->save();
                
                }
             }

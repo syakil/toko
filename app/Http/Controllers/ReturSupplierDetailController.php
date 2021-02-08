@@ -5,6 +5,7 @@ use Redirect;
 use App\Kirim;
 use App\Supplier;
 use Auth;
+use App\ProdukWriteOff;
 use App\Produk;
 use App\ProdukDetail;
 use App\KirimDetail;
@@ -16,9 +17,11 @@ class ReturSupplierDetailController extends Controller
 {
    public function  index(){
       
-      $produk = Produk::where('unit',Auth::user()->unit)
+      $produk = ProdukWriteOff::where('unit',Auth::user()->unit)
       ->where('stok','>',0)
+      ->where('param_status',1)
       ->get();
+      
       $idpembelian = session('idpembelian');
       $supplier = Supplier::find(session('idsupplier'));
       $branch = Branch::find(session('kode_gudang'));
@@ -66,7 +69,7 @@ class ReturSupplierDetailController extends Controller
    
    public function store(Request $request){
     
-      $produk = Produk::where('kode_produk',$request['kode'])->where('unit',Auth::user()->unit)->first();
+      $produk = ProdukWriteOff::where('kode_produk',$request['kode'])->where('unit',Auth::user()->unit)->first();
 
       $detail = new KirimDetailTemporary;
       $detail->id_pembelian = $request['idpembelian'];

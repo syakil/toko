@@ -17,6 +17,17 @@
 
 @section('content')
 
+@if ($message = Session::get('error'))
+  <script>
+    var pesan = "{{$message}}"
+    swal("Maaf !", pesan, "error"); 
+  </script>
+@elseif ($message = Session::get('success'))
+  <script>
+    var pesan = "{{$message}}"
+    swal("Selamat !", pesan, "success"); 
+  </script>
+@endif
 <div class="row">
   <div class="col-xs-12">
     <div class="box">
@@ -30,6 +41,7 @@
                         <th>Barcode</th>
                         <th>Nama Produk</th>
                         <th>Stock</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
 
@@ -41,6 +53,8 @@
         </div>
     </div>
 </div>
+
+@include('toko.editstok')
 
     <!-- /.content -->
 
@@ -78,5 +92,29 @@ $(function(){
    $('div.dataTables_filter input').focus(); 
 });
 </script>
+<script>
 
+function editForm(id){
+  $('#modal-form form')[0].reset();   
+  url = "{{route('stockToko.edit',':id')}}";
+  url = url.replace(':id',id);
+  $.ajax({
+    url : url,
+    type : "GET",
+    dataType : "JSON",
+    success : function(data){
+      $('#modal-form').modal('show');
+      $('.modal-title').text('Edit Stock'); 
+      $('#id').val(data.id_produk);
+      $('#nama').val(data.nama_produk);
+      $('#kode').val(data.kode_produk);
+      $('#jumlah').val(data.stok);
+    },
+    error : function(){
+      alert("Tidak dapat menampilkan data!");
+    }
+  });
+}
+
+</script>
 @endsection

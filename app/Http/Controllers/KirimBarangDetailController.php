@@ -11,9 +11,10 @@ use App\KirimDetailTemporary;
 use App\Branch;
 use DB;
 
-class KirimBarangDetailController extends Controller
-{
+class KirimBarangDetailController extends Controller{
+
    public function  index(){
+      
       $produk = Produk::where('unit', '=', Auth::user()->unit)->where('stok','>',0)->get();
       $idpembelian = session('idpembelian');
       $supplier = Supplier::find(session('idsupplier'));
@@ -52,8 +53,9 @@ class KirimBarangDetailController extends Controller
       $id_toko = Kirim::where('id_pembelian',$id)->first();
       
       foreach($detail as $list){
+         
          $no ++;
-         $stok_toko = Produk::where('kode_produk',$list->kode_produk)->where('unit',$id_toko->id_supplier)->first();
+         $stok_toko = Produk::where('kode_produk',$list->kode_produk)->where('unit',3000)->first();
 
          $row = array();
          $row[] = $no;
@@ -65,7 +67,7 @@ class KirimBarangDetailController extends Controller
          $row[] = "<input type='text' class='form-control' id='exp_$list->id_pembelian_detail' name='expired_$list->id_pembelian_detail' value='$list->expired_date' onChange='changeExpired($list->id_pembelian_detail)'>";
          $row[] = '<a onclick="deleteItem('.$list->id_pembelian_detail.')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>';
          $data[] = $row;
-         $total += $list->harga_beli * $list->jumlah_terima;
+         $total += $list->harga_beli * $list->jumlah;
          $total_item += $list->jumlah_terima;
       }
 

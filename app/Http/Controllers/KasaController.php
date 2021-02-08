@@ -9,6 +9,8 @@ use App\Member;
 use Redirect;
 use PDF;
 use Auth;
+use App\Kirim;
+use App\KirimDetail;
 use App\SaldoToko;
 use App\Pengeluaran;
 use App\Setting;
@@ -16,6 +18,7 @@ use App\Penjualan;
 use App\PembelianTemporary;
 use App\PembelianTemporaryDetail;
 use App\Produk;
+use App\StokOpnameParsial;
 use App\ProdukDetail;
 use DB;
 use Ramsey\Uuid\Uuid;
@@ -100,6 +103,18 @@ class KasaController extends Controller{
             $kode_toko[] = $data->kode_toko;
          }
 
+         $so_parsial = StokOpnameParsial::where("unit",Auth::user()->unit)->where('status',1)->count();
+
+         if ($so_parsial > 0) {
+            return back()->with(["error" => "SO Parsial Belum Di Lakukan!"]);
+         }
+
+         
+         $so_parsial_approve = StokOpnameParsial::where("unit",Auth::user()->unit)->where('status',2)->count();
+
+         if ($so_parsial_approve > 0) {
+            return back()->with(["error" => "SO Parsial Belum Di Approve!"]);
+         }
 
          $produk = Produk::where("unit",Auth::user()->unit)->get();
 
@@ -199,31 +214,80 @@ class KasaController extends Controller{
                      "harga_jual_pabrik" => $produk_detail->harga_jual_umum,
                      
                   ]);
-                  // foreach ($data_master_produk as $master_produk) {  
-                  //    dd($master_produk);
-                  //    $master_produk->harga_beli = $produk_detail->harga_beli;
-                  //    $master_produk->harga_jual = $produk_detail->harga_jual_umum;
-                  //    $master_produk->harga_jual_member_insan = $produk_detail->harga_jual_insan;
-                  //    $master_produk->harga_jual_insan = $produk_detail->harga_jual_insan;
-                  //    $master_produk->harga_jual_pabrik = $produk_detail->harga_jual_umum;
-                  //    $master_produk->update();   
-                  // }
                }               
 
             }
 
          }
-       
+         
+         $produk = Produk::where('unit',Auth::user()->unit)->get();
+         $bulan_sekarang = date("m");
+         $kirim_barang = Kirim::where("kode_gudang",Auth::user()->unit)->whereMonth('created_at',$bulan_sekarang)->get();
+         $terima_barang = Kirim::where("id_supplier",Auth::user()->unit)->whereMonth('created_at',$bulan_sekarang)->get();
+         $pembelian = PembelianTemporary::where("kode_gudang",Auth::user()->unit)->whereMonth('updated_at',$bulan_sekarang)->get();
+         $id_kirim = array();
+         $id_pembelian = array();
+         $id_terima = array();
+         
+
+         foreach ($kirim_barang as $value) {
+            $id_kirim[] = $value->id_pembelian;
+         }
+         
+         foreach ($terima_barang as $value) {
+            $id_terima[] = $value->id_pembelian;
+         }
+         
+         foreach ($pembelian as $value) {
+            $id_pembelian[] = $value->id_pembelian;
+         }
+
+         $jumlah = StokOpnameParsial::where("unit",Auth::user()->unit)->where("status",1)->count();
+            
+         foreach ($produk as $value) {
+            
+            
+            $rata_rata_kirim = KirimDetail::whereIn("id_pembelian",$id_kirim)->where("kode_produk",$value->kode_produk)->avg("jumlah");
+            $rata_rata_terima = KirimDetail::whereIn("id_pembelian",$id_terima)->where("kode_produk",$value->kode_produk)->avg("jumlah_terima");
+            $rata_rata_pembelian = PembelianTemporaryDetail::whereIn("id_pembelian",$id_pembelian)->where("kode_produk",$value->kode_produk)->avg("jumlah_terima");
+            
+            $rata_rata = $rata_rata_kirim + $rata_rata_terima + $rata_rata_pembelian;
+            
+
+            if($rata_rata) {
+               
+               $cek = StokOpnameParsial::where("kode_produk",$value->kode_produk)->where("unit",Auth::user()->unit)->whereMonth("tanggal_so",$bulan_sekarang)->first();
+               
+               if ($cek == null) {
+                  
+                  if ($rata_rata > $value->stok) {
+
+                     if ($jumlah < 5) {
+                     
+                        $stok_opname_parsial = new StokOpnameParsial;
+                        $stok_opname_parsial->kode_produk = $value->kode_produk;
+                        $stok_opname_parsial->unit = Auth::user()->unit;
+                        $stok_opname_parsial->status = 1;
+                        $stok_opname_parsial->save();
+                        
+                        $jumlah++;
+                     }   
+                  }  
+               }
+            }
+            
+         }
+
          DB::commit();
       
       }catch(\Exception $e){
          
          DB::rollback();
-         return back()->with(['error' => $e->getmessage()]);
+         return back()->with(["error" => $e->getmessage()]);
 
       }
 
-      return back()->with(['success' => 'Eod Berhasil']);
+      return back()->with(["success" => "Eod Berhasil"]);
 
    }
 
@@ -241,6 +305,87 @@ class KasaController extends Controller{
          $tanggal_carbon = new \Carbon\Carbon($param_tgl->param_tgl);
          $tanggal_tunggak_carbon = new \Carbon\Carbon($param_tgl->param_tgl);
          
+         
+         $so_parsial = StokOpnameParsial::where("unit",Auth::user()->unit)->where('status',1)->count();
+
+         if ($so_parsial > 0) {
+            return back()->with(["error" => "SO Parsial Belum Di Lakukan!"]);
+         }
+
+         
+         $so_parsial_approve = StokOpnameParsial::where("unit",Auth::user()->unit)->where('status',2)->count();
+
+         if ($so_parsial_approve>0) {
+            return back()->with(["error" => "SO Parsial Belum Di Approve!"]);
+         }
+
+         
+         $produk = Produk::where('unit',Auth::user()->unit)->get();
+         $bulan_sekarang = date("m");
+         $kirim_barang = Kirim::where("kode_gudang",Auth::user()->unit)->whereMonth('created_at',$bulan_sekarang)->get();
+         $terima_barang = Kirim::where("id_supplier",Auth::user()->unit)->whereMonth('created_at',$bulan_sekarang)->get();
+         $penjualan = Penjualan::where("id_user",Auth::user()->id)->whereMonth('updated_at',$bulan_sekarang)->get();
+         $id_kirim = array();
+         $id_pejualan = array();
+         $id_terima = array();
+         
+
+         if ($kirim_barang != null) {
+            
+            foreach ($kirim_barang as $value) {
+               $id_kirim[] = $value->id_pembelian;
+            }
+         }
+         
+         if ($terima_barang != null) {
+            foreach ($terima_barang as $value) {
+               
+               $id_terima[] = $value->id_pembelian;
+            }
+         }
+         
+         if ($penjualan !=null) {
+            
+            foreach ($penjualan as $value) {
+               $id_penjualan[] = $value->id_penjualan;
+            }
+         }
+
+         $jumlah = StokOpnameParsial::where("unit",Auth::user()->unit)->where("status",1)->count();
+            
+         foreach ($produk as $value) {
+            
+            
+            $rata_rata_kirim = KirimDetail::whereIn("id_pembelian",$id_kirim)->where("kode_produk",$value->kode_produk)->avg("jumlah");
+            $rata_rata_terima = KirimDetail::whereIn("id_pembelian",$id_terima)->where("kode_produk",$value->kode_produk)->avg("jumlah_terima");
+            $rata_rata_pembelian = PenjualanDetail::whereIn("id_penjualan",$id_penjualan)->where("kode_produk",$value->kode_produk)->avg("jumlah");
+            
+            $rata_rata = $rata_rata_kirim + $rata_rata_terima + $rata_rata_pembelian;
+            
+
+            if($rata_rata) {
+               
+               $cek = StokOpnameParsial::where("kode_produk",$value->kode_produk)->where("unit",Auth::user()->unit)->whereMonth("tanggal_so",$bulan_sekarang)->first();
+               
+               if ($cek == null) {
+                  
+                  if ($rata_rata > $value->stok) {
+
+                     if ($jumlah < 5) {
+                     
+                        $stok_opname_parsial = new StokOpnameParsial;
+                        $stok_opname_parsial->kode_produk = $value->kode_produk;
+                        $stok_opname_parsial->unit = Auth::user()->unit;
+                        $stok_opname_parsial->status = 1;
+                        $stok_opname_parsial->save();
+                        
+                        $jumlah++;
+                     }   
+                  }  
+               }
+            }
+            
+         }
          
          
          $daftar_hari = array(
@@ -355,7 +500,6 @@ class KasaController extends Controller{
          }
 
          $delete_tunggakan = DB::table("tunggakan_toko")->where("tgl_tunggak",$tgl_esok)->where("KREDIT",">",0)->where("unit",$unit)->delete();
-// dd($delete_tunggakan);
          // tunggakan
          $member_tunggakan = DB::table("musawamah")->where("unit",$unit)->where("os",">",0)->where("hari",$hari)->where('tgl_wakalah','<=',$tgl_tunggakan)->orderBy('tgl_wakalah','desc')->get();
         

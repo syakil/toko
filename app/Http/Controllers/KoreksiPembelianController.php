@@ -24,10 +24,7 @@ class KoreksiPembelianController extends Controller
 
     public function listData(){
 
-
-        $branch = Branch::where('code_region',Auth::user()->unit)->first();
-
-        $po = PembelianTemporary::where('kode_gudang',$branch->kode_gudang)->where('status',null)->get();
+        $po = PembelianTemporary::where('kode_gudang',Auth::user()->unit)->where('status',null)->get();
 
         $id_pembel = array();
 
@@ -36,9 +33,9 @@ class KoreksiPembelianController extends Controller
         }
 
         $detail = PembelianTemporaryDetail::leftJoin('produk', 'produk.kode_produk', '=', 'pembelian_temporary_detail.kode_produk')
-        ->where('status','edit')
+        ->where('pembelian_temporary_detail.status','edit')
         ->whereIn('id_pembelian',$id_pembel)
-        ->where('produk.unit',$branch->kode_gudang)
+        ->where('produk.unit',Auth::user()->unit)
         ->get();
 
     
@@ -46,7 +43,7 @@ class KoreksiPembelianController extends Controller
         $data = array();        
         foreach($detail as $list){ 
 
-            $region = Branch::where('code_region',Auth::user()->unit)->get();
+            $region = Branch::where('kode_gudang',Auth::user()->unit)->get();
 
             $unit = array();
 
@@ -118,12 +115,11 @@ class KoreksiPembelianController extends Controller
 
         }
 
-// dd($request->kode_baru);
         $detail = PembelianTemporaryDetail::where('id_pembelian_detail',$id)->first();
 
         $kode_lama = $detail->kode_produk;
 
-        $region = Branch::where('code_region',Auth::user()->unit)->get();
+        $region = Branch::where('kode_gudang',Auth::user()->unit)->get();
 
         $unit = array();
 

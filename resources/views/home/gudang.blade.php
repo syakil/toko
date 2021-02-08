@@ -31,7 +31,7 @@
     <div class="box">
        <div class="box-body text-center">
             <h1>Selamat Datang</h1>
-            <h2>Anda login sebagai User Gudang</h2>
+            <h2>Anda login sebagai Admin Gudang</h2>
                   
       </div>
    </div>

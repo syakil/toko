@@ -57,9 +57,10 @@ input[type=number] {
                 <th>No.</th>
                 <th>Kode Produk</th>
                 <th>Nama Produk</th>
-                <th>HPP Terakhir</th>
-                <th>Jumlah</th>
                 <th>HPP Baru</th>
+                <th>Harga Jual Terakhir</th>
+                <th>Margin</th>
+                <th>Harga Pasar</th>
                 <th>Harga Jual NI</th>
                 <th>Harga Jual Pabrik</th>
               </tr>

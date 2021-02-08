@@ -17,10 +17,10 @@ class PricingController extends Controller
 {
     public function index(){
         $produk = Produk::leftJoin('param_status','param_status.id_status','=','produk.param_status')
-                        ->where('produk.unit','3000')
+                        ->where('produk.unit',Auth::user()->unit)
                         ->get();
         $fast = ParamStatus::where('keterangan','Fast Moving')->first();
-        $medium = ParamStatus::where('keterangan','Medium Moving')->first();
+        $medium = ParamStatus::where('keterangan','pesanan')->first();
         $slow = ParamStatus::where('keterangan','Slow Moving')->first();
         $no = 1;
         // dd($produk);

@@ -185,7 +185,7 @@ class WriteOffController extends Controller
                     $jurnal->id_admin = Auth::user()->id; 
                     $jurnal->save();
 
-                    // PPA Umum-PYD Musawamah
+                    // Persediaan
                     $jurnal = new TabelTransaksi;
                     $jurnal->unit =  $produk->unit; 
                     $jurnal->kode_transaksi = $produk->kode_transaksi;

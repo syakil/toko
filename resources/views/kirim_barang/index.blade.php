@@ -36,8 +36,6 @@
       <th>Toko</th>
       <th>Total Item</th>
       <th>Total Harga</th>
-      <th>Diskon</th>
-      <th>Total Jurnal</th>
       <th width="100">Aksi</th>
    </tr>
 </thead>

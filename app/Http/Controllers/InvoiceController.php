@@ -14,14 +14,16 @@ use App\Pembelian;
 class InvoiceController extends Controller
 {
     public function index(){
+    
         return view('invoice/index');
+    
     }
 
     public function listData(){
         
         $pembelian = PembelianTemporary::leftJoin('supplier','pembelian_temporary.id_supplier','=','supplier.id_supplier')
                                         ->leftJoin('branch','pembelian_temporary.kode_gudang','branch.kode_toko')
-                                        ->where('status','1')
+                                        ->where('status','2')
                                         ->select('pembelian_temporary.*','supplier.nama','branch.nama_toko')
                                         ->where('pembelian_temporary.kode_gudang',Auth::user()->unit)
                                         ->get();
@@ -513,7 +515,7 @@ class InvoiceController extends Controller
             }
           
             $data = PembelianTemporary::where('id_pembelian',$id_pembelian)->first();
-            $data->status = 2;
+            $data->status = 3;
             $data->no_invoice = $noinvoice;
             $data->update();
 

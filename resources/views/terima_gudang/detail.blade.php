@@ -30,7 +30,7 @@
                         <th width='1%'>No.</th>
                         <th>Barcode</th>
                         <th>Nama Barang</th>
-                        <th>Jumlah Kirim</th>
+                        <th>Jumlah Kirim<njhggkjg/th>
                         <th>Jumlah Terima</th>
                         <th>Tanggal Expired <small><i>(yyyy-mm-dd)</i></small></th>
                     </tr>

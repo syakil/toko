@@ -20,7 +20,7 @@
       <div class="box-header">
       </div>
       <div class="box-body"> 
-                    <form action="{{ route('terimaGudang.create_jurnal') }}" method="post">
+                    <form action="{{ route('terima_antar_gudang.create_jurnal') }}" method="post">
                     {{ csrf_field() }}
             <table class="table table-striped" id="tables">
                 <thead>
@@ -45,7 +45,7 @@
                         <td>{{$p->total_item}}</td>
                         <td>{{($p->total_terima)}}</td>
                         <td>
-                        <a href="{{ route('terimaGudang.detail',$p->id_pembelian) }}" class="btn btn-success btn-sm"> <i class="fa fa-eye"></i> </a>
+                        <a href="{{ route('terima_antar_gudang.detail',$p->id_pembelian) }}" class="btn btn-success btn-sm"> <i class="fa fa-eye"></i> </a>
                         </td>
                     </tr>
                     

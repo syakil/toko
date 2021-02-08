@@ -15,7 +15,7 @@
     <div class="box">
        <div class="box-body text-center">
             <h1>Selamat Datang</h1>
-            <h2>Anda login sebagai Kantor Pusat</h2>
+            <h2>Anda login sebagai Pricing</h2>
                   
       </div>
    </div>

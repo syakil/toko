@@ -12,25 +12,23 @@
 @section('content') 
 
 <div class="row">
+
 @if($errors->any())
-<div class="col-md-10">
-
-              <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-ban"></i> Alert!</h4>
-                Belum Waktunya Stok Opname <br>
-                <small><i>Silahkan Hubungi Bagian IT</i></small>
-
-              </div>
-              
-</div>
+  <div class="col-md-10">
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+      Belum Waktunya Stok Opname <br>
+      <small><i>Silahkan Hubungi Bagian IT</i></small>
+    </div>
+  </div>
 @endif
 
   <div class="col-xs-12">
     <div class="box">
        <div class="box-body text-center">
             <h1>Selamat Datang</h1>
-            <h2>Anda login sebagai Supervisor Toko</h2>
+            <h2>Anda login sebagai Admin Toko</h2>
                   
       </div>
    </div>

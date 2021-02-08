@@ -27,10 +27,11 @@
    </table>
 </div>
       <div class="modal-footer">
-         <button type="submit" class="btn btn-danger pull-right">Koreksi</button>
+         <button type="submit" class="btn btn-danger pull-right koreksi">Koreksi</button>
          </form>
       </div>
 
         </div>
     </div>
 </div>
+

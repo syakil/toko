@@ -17,6 +17,18 @@
 
 @section('content')
 
+@if ($message = Session::get('error'))
+    <script>
+    var pesan = "{{$message}}"
+    swal("Maaf !", pesan, "error"); 
+    </script>
+@elseif ($message = Session::get('success'))
+    <script>
+    var pesan = "{{$message}}"
+    swal("Selamat !", pesan, "success"); 
+    </script>
+@endif
+
 <div class="row">
     <div class="col-md-3">
         <div class="box box-default collapsed-box">
@@ -43,6 +55,7 @@
                 <form action="{{ route('approve_kp.store') }}" method="post">
                 {{ csrf_field() }}
                 <table class="table table-striped tabel-so">
+                <input type="hidden" name="unit" id="unit">
                     <thead>
                         <tr>
                             <th>No.</th>
@@ -81,6 +94,7 @@ function getData(unit) {
 
     var url = "{{route('approve_kp.data',':unit')}}"
     url = url.replace(':unit',unit)
+    $("#unit").val(unit);
 
     table = $('.tabel-so').DataTable({
         "processing" : true,

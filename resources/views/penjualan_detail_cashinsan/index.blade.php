@@ -158,12 +158,17 @@ $(function(){
   $('.tabel-produk').DataTable();
 
   table = $('.tabel-penjualan').DataTable({
-     "dom" : 'Brt',
-     "bSort" : false,
-     "processing" : true,
-"scrollY" : "500px",
-"paging": false,
-     "ajax" : {
+    "processing" : true,
+    "serverside" : true,
+    "paging" :false,
+    "searching":false,
+    "showing":false,
+    "bSort" : true,      
+    "ordering": false,
+    "info":     false,
+    "scrollY" : "200px",
+    "dom" : 'Brt',
+    "ajax" : {
        "url" : "{{ route('cashinsan.data', $idpenjualan) }}",
        "type" : "GET"
      }

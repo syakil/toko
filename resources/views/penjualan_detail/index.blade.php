@@ -38,7 +38,7 @@
       <label for="kode" class="col-md-2 control-label">Kode Produk</label>
       <div class="col-md-5">
         <div class="input-group">
-          <input id="kode" type="text" class="form-control" name="kode" autofocus required>
+          <input id="kode" type="text" class="form-control" name="kode" required>
           <span class="input-group-btn">
             <button onclick="showProduct()" type="button" class="btn btn-info">...</button>
           </span>
@@ -49,7 +49,7 @@
 
 <form class="form-keranjang">
 {{ csrf_field() }} {{ method_field('PATCH') }}
-<table class="table table-striped tabel-penjualan">
+<table class="table table-bordered tabel-penjualan">
 <thead>
    <tr>
       <th width="30">No</th>
@@ -63,7 +63,8 @@
       <th width="100">Aksi</th>
    </tr>
 </thead>
-<tbody></tbody>
+<tbody>
+</tbody>
 </table>
 </form>
 
@@ -153,47 +154,54 @@ $(function(){
   $('.tabel-produk').DataTable();
 
   table = $('.tabel-penjualan').DataTable({
-     "dom" : 'Brt',
-     "bSort" : true,
-     "processing" : true,
-"scrollY" : "500px",
-"paging" : false,
-     "ajax" : {
-       "url" : "{{ route('transaksi.data', $idpenjualan) }}",
-       "type" : "GET"
-     }
+    "processing" : true,
+    "serverside" : true,
+    "paging" :false,
+    "searching":false,
+    "showing":false,
+    "bSort" : true,      
+    "ordering": false,
+    "info":     false,
+    "scrollY" : "200px",
+    "dom" : 'Brt',
+    "ajax" : {
+      "url" : "{{ route('transaksi.data', $idpenjualan) }}",
+      "type" : "GET"
+    }
   }).on('draw.dt', function(){
     loadForm($('#diskon').val());
   });
 
-   $('.form-produk').on('submit', function(){
-      return false;
-   });
+  $('.form-produk').on('submit', function(){
+    return false;
+  });
 
-   $('body').addClass('sidebar-collapse');
+  $('body').addClass('sidebar-collapse');
 
-   $('#kode').change(function(){
-      addItem();
-   });
+  $('#kode').change(function(){
+    addItem();
+  });
 
-   $('.form-keranjang').submit(function(){
-     return false;
-   });
+  $('.form-keranjang').submit(function(){
+    return false;
+  });
 
-   $('#member').change(function(){
-      selectMember($(this).val());
-   });
+  $('#member').change(function(){
+    selectMember($(this).val());
+  });
 
-   $('#diterima').change(function(){
-      if($(this).val() == "") $(this).val(0).select();
-      loadForm($('#diskon').val(), $(this).val());
-   }).focus(function(){
+  $('#diterima').change(function(){
+      if($(this).val() == "") {
+        $(this).val(0).select();
+        loadForm($('#diskon').val(), $(this).val());
+      }
+    }).focus(function(){
       $(this).select();
-   });
+    });
 
-   $('.simpan').click(function(){
-      $('.form-penjualan').submit();
-   });
+  $('.simpan').click(function(){
+    $('.form-penjualan').submit();
+  });
 
 });
 
@@ -206,11 +214,15 @@ function addItem(){
       $('#kode').val('').focus();
       table.ajax.reload(function(){
          loadForm($('#diskon').val());
-      });             
+      });                   
     },
     error : function(){
       alert("Tidak dapat menyimpan data!");
     }   
+  });
+
+  $('.jumlah').first().hover(function(){
+    $(this).focus()
   });
 }
 

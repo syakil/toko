@@ -60,7 +60,7 @@
     <th>Nama Produk</th>
     <th>Stok</th>
     <th>Jumlah</th>
-    <th align="right">Tanggal Kadaluarsa</th>
+    <th align="right">Keterangan</th>
     <th width="100">Aksi</th>
   </tr>
 </thead>
@@ -129,12 +129,12 @@ $(function(){
      "dom" : 'Brt',
      "bSort" : false,
      "processing" : true,
-"scrollY" : "200px",
-"paging": false,
+    "scrollY" : "200px",
+    "paging": false,
      "ajax" : {
        "url" : "{{ route('barang_toko_detail.data', $idpembelian) }}",
        "type" : "GET"
-     }
+      }
   }).on('draw.dt', function(){
     loadForm("{{$idpembelian}}");
   });
@@ -177,8 +177,8 @@ function selectItem(kode){
   addItem();
 }
 
-function changeCount(id){
-  var url = "{{route('barang_toko_detail.update',':id')}}";
+function changeKeterangan(id){
+  var url = "{{route('barang_toko_detail.update_keterangan',':id')}}";
   url = url.replace(':id', id);
      $.ajax({
         url : url,
@@ -198,8 +198,9 @@ function changeCount(id){
      });
 }
 
-function changeExpired(id){
-  var url = "{{route('barang_toko_detail.update_expired',':id')}}";
+
+function changeCount(id){
+  var url = "{{route('barang_toko_detail.update',':id')}}";
   url = url.replace(':id', id);
      $.ajax({
         url : url,

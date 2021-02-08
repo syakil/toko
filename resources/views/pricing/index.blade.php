@@ -33,10 +33,10 @@
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header">
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+            <!-- <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
                 Ubah Margin
-            </button>
-            <a href="{{ route('pricing.tambah') }}" class="btn btn-warning">Tambah Produk</a>
+            </button> -->
+            <!-- <a href="{{ route('pricing.tambah') }}" class="btn btn-warning">Tambah Produk</a> -->
             </div>
                 <div class="box-body">
                 <div class="table-responsive">
@@ -87,7 +87,7 @@
             <input type="number" class="form-control" id="fast" name="fast" value="{{$fast->margin}}">
         </div>
         <div class="form-group">
-            <label>Medium Moving %</label>
+            <label>Pesanan %</label>
             <input type="number" class="form-control" id="medium" name="medium" value="{{$medium->margin}}">
         </div>
         <div class="form-group">
