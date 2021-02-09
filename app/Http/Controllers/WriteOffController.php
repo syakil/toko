@@ -10,6 +10,7 @@ use App\TabelTransaksi;
 use App\Produk;
 use App\ProdukDetail;
 use App\ProdukWriteOff;
+use App\KartuStok;
 
 
 
@@ -358,8 +359,9 @@ class WriteOffController extends Controller
             $kode_rndm="WO/-".$unit->kode_toko.$rndm;
 
             $produk = Produk::where('kode_produk',$kode_produk)->where('unit',$unit->kode_toko)->first();
-            
-            if ($produk < $jumlah) {
+            $produk_detail_wo = ProdukDetail::where('kode_produk',$kode_produk)->where('unit',$unit->kode_toko)->sum('stok_detail');
+
+            if ($produk->stok < $jumlah || $produk_detail_wo < $jumlah) {
 
                 return back()->with(['error' => 'Stock '. $produk->kode_produk .' '. $produk->nama_produk . ' Kurang']);
             
@@ -369,6 +371,17 @@ class WriteOffController extends Controller
                 $produk->update();
 
             }
+
+            // crate kartu stok
+            $kartu_stok = new KartuStok;
+            $kartu_stok->buss_date = date('Y-m-d');
+            $kartu_stok->kode_produk = $kode_produk;
+            $kartu_stok->masuk = 0;
+            $kartu_stok->keluar = $jumlah;
+            $kartu_stok->status = 'WO';
+            $kartu_stok->kode_transaksi = $kode_rndm;
+            $kartu_stok->unit = Auth::user()->unit;
+            $kartu_stok->save();
         
             // mengaambil stok di produk_detail berdasar barcode dan harga beli lebih rendah (stok yang tesedria) yang terdapat di penjualan_detail_temporary
             produk:
