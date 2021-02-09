@@ -2396,7 +2396,7 @@ class ApprovalTerimaReturController extends Controller{
                                 $jurnal->kode_rekening = 1482000;
                                 $jurnal->tanggal_transaksi  = $tanggal;
                                 $jurnal->jenis_transaksi  = 'Jurnal System';
-                                $jurnal->keterangan_transaksi = 'Selisih Kirim Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
+                                $jurnal->keterangan_transaksi = 'Selisih Lebih Kirim Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
                                 $jurnal->debet = $harga_jual_normal;
                                 $jurnal->kredit = 0;
                                 $jurnal->tanggal_posting = '';
@@ -2411,7 +2411,7 @@ class ApprovalTerimaReturController extends Controller{
                                 $jurnal->kode_rekening = 1483000;
                                 $jurnal->tanggal_transaksi  = $tanggal;
                                 $jurnal->jenis_transaksi  = 'Jurnal System';
-                                $jurnal->keterangan_transaksi = 'Selisih Kirim Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
+                                $jurnal->keterangan_transaksi = 'Selisih Lebih Kirim Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
                                 $jurnal->debet = 0;
                                 $jurnal->kredit = $harga_jual_normal - $harga_beli_normal;
                                 $jurnal->tanggal_posting = '';
@@ -2426,7 +2426,7 @@ class ApprovalTerimaReturController extends Controller{
                                 $jurnal->kode_rekening = 2500000;
                                 $jurnal->tanggal_transaksi  = $tanggal;
                                 $jurnal->jenis_transaksi  = 'Jurnal System';
-                                $jurnal->keterangan_transaksi = 'Selisih Kirim Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
+                                $jurnal->keterangan_transaksi = 'Selisih Lebih Kirim Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
                                 $jurnal->debet = 0;
                                 $jurnal->kredit = $harga_beli_normal;
                                 $jurnal->tanggal_posting = '';
@@ -2445,7 +2445,7 @@ class ApprovalTerimaReturController extends Controller{
                                 $jurnal->kode_rekening = 1482000;
                                 $jurnal->tanggal_transaksi  = $tanggal;
                                 $jurnal->jenis_transaksi  = 'Jurnal System';
-                                $jurnal->keterangan_transaksi = 'Selisih Kirim Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
+                                $jurnal->keterangan_transaksi = 'Selisih Lebih Kirim Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
                                 $jurnal->debet = $harga_beli_promo;
                                 $jurnal->kredit = 0;
                                 $jurnal->tanggal_posting = '';
@@ -2460,7 +2460,7 @@ class ApprovalTerimaReturController extends Controller{
                                 $jurnal->kode_rekening = 2500000;
                                 $jurnal->tanggal_transaksi  = $tanggal;
                                 $jurnal->jenis_transaksi  = 'Jurnal System';
-                                $jurnal->keterangan_transaksi = 'Selisih Kirim Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
+                                $jurnal->keterangan_transaksi = 'Selisih Lebih Kirim Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
                                 $jurnal->debet = 0;
                                 $jurnal->kredit = $harga_beli_promo;
                                 $jurnal->tanggal_posting = '';
@@ -2479,7 +2479,7 @@ class ApprovalTerimaReturController extends Controller{
                             $jurnal->kode_rekening = 1010 . '-' . $gl_pengirim;
                             $jurnal->tanggal_transaksi  = $tanggal;
                             $jurnal->jenis_transaksi  = 'Jurnal System';
-                            $jurnal->keterangan_transaksi = 'Selisih Kirim Lebih Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
+                            $jurnal->keterangan_transaksi = 'Selisih Lebih Kirim Lebih Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
                             $jurnal->debet = $harga_beli;
                             $jurnal->kredit = 0;
                             $jurnal->tanggal_posting = '';
@@ -2494,7 +2494,7 @@ class ApprovalTerimaReturController extends Controller{
                             $jurnal->kode_rekening = 1010 . '-' . $gl_pengirim;
                             $jurnal->tanggal_transaksi  = $tanggal;
                             $jurnal->jenis_transaksi  = 'Jurnal System';
-                            $jurnal->keterangan_transaksi = 'Selisih Kirim Lebih Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
+                            $jurnal->keterangan_transaksi = 'Selisih Lebih Kirim Lebih Retur Toko ' . $master_produk->kode_produk . ' ' . $nama_pengirim->nama_toko ;
                             $jurnal->debet = 0;
                             $jurnal->kredit = $harga_beli;
                             $jurnal->tanggal_posting = '';
