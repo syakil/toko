@@ -32,7 +32,7 @@ class ReportKirimBarangController extends Controller
         $data = array();
         foreach($kirim_barang as $list){
 
-            $branch = Branch::where('kode_toko',$lst->kode_gudang)->first();
+            $branch = Branch::where('kode_toko',$list->kode_gudang)->first();
 
             $no ++;
             $row = array();
