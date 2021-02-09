@@ -149,7 +149,7 @@ class PembelianController extends Controller
       $pembelian->jatuh_tempo = date('Y-m-d');
       $pembelian->kode_gudang = 0;    
       $pembelian->tipe_bayar = 0;    
-      $pembelian->status = 1;
+      $pembelian->status = null;
       $pembelian->id_user = Auth::user()->id;
       $pembelian->kode_gudang = Auth::user()->unit;
           
