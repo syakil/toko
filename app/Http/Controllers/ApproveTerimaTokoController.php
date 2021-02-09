@@ -343,7 +343,7 @@ class ApproveTerimaTokoController extends Controller{
                             $selisih_kirim_barang->sub_total_jual = $stok_toko * $list->harga_jual;
                             $selisih_kirim_barang->sub_total = $stok_toko * $produk_detail->harga_beli;
                             $selisih_kirim_barang->expired_date = $produk_detail->expired_date;
-                            $selisih_kirim_barang->keterangan = 'Selisih_Kirim_Barang';
+                            $selisih_kirim_barang->keterangan = 'Selisih_Kurang_Kirim_Barang';
                             $selisih_kirim_barang->no_faktur = $produk_detail->no_faktur;
                             $selisih_kirim_barang->unit = $pengirim;
                             $selisih_kirim_barang->save();
@@ -555,7 +555,7 @@ class ApproveTerimaTokoController extends Controller{
                                 $selisih_kirim_barang->sub_total_jual = $stok_toko * $list->harga_jual;
                                 $selisih_kirim_barang->sub_total = $stok_toko * $produk_detail->harga_beli;
                                 $selisih_kirim_barang->expired_date = $produk_detail->expired_date;
-                                $selisih_kirim_barang->keterangan = 'Selisih_Kirim_Barang';
+                                $selisih_kirim_barang->keterangan = 'Selisih_Kurang_Kirim_Barang';
                                 $selisih_kirim_barang->no_faktur = $produk_detail->no_faktur;
                                 $selisih_kirim_barang->unit = $pengirim;
                                 $selisih_kirim_barang->save();
@@ -763,7 +763,7 @@ class ApproveTerimaTokoController extends Controller{
                                 $selisih_kirim_barang->sub_total_jual = $stok_toko * $list->harga_jual;
                                 $selisih_kirim_barang->sub_total = $stok_toko * $produk_detail->harga_beli;
                                 $selisih_kirim_barang->expired_date = $produk_detail->expired_date;
-                                $selisih_kirim_barang->keterangan = 'Selisih_Kirim_Barang';
+                                $selisih_kirim_barang->keterangan = 'Selisih_Kurang_Kirim_Barang';
                                 $selisih_kirim_barang->no_faktur = $produk_detail->no_faktur;
                                 $selisih_kirim_barang->unit = $pengirim;
                                 $selisih_kirim_barang->save();
@@ -1141,6 +1141,20 @@ class ApproveTerimaTokoController extends Controller{
                         $kartu_stok->unit = $pengirim;
                         $kartu_stok->save();                        
                         
+                        $selisih_kirim_barang = new SelisihKirimBarang;
+                        $selisih_kirim_barang->id_pembelian = $id;
+                        $selisih_kirim_barang->kode_produk = $list->kode_produk;
+                        $selisih_kirim_barang->harga_jual = $list->harga_jual;
+                        $selisih_kirim_barang->harga_beli = $list->harga_beli;
+                        $selisih_kirim_barang->jumlah = $jumlah_selisih;
+                        $selisih_kirim_barang->sub_total_jual = $stok_toko * $list->harga_jual;
+                        $selisih_kirim_barang->sub_total = $jumlah_selisih * $produk_detail->harga_beli;
+                        $selisih_kirim_barang->expired_date = $produk_detail->expired_date;
+                        $selisih_kirim_barang->keterangan = 'Selisih_Lebih_Kirim_Barang';
+                        $selisih_kirim_barang->no_faktur = $list->no_faktur;
+                        $selisih_kirim_barang->unit = $pengirim;
+                        $selisih_kirim_barang->save();
+
                         // Persediaan Barang Dagang
                         $jurnal = new TabelTransaksi;
                         $jurnal->unit =  $pengirim; 
