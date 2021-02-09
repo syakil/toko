@@ -32,10 +32,10 @@
     <tr>
       <th>Tanggal</th>
       <th>Surat Jalan</th>
-      <th>Unit</th>
+      <th>Penerima</th>
       <th>Jumlah Kirim</th>
       <th>Jumlah Terima</th>
-      <th>Kode Gudang</th>
+      <th>Pengirim</th>
       <th>Aksi</th>
     </tr> 
 </thead>

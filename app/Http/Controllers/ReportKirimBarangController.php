@@ -20,25 +20,19 @@ class ReportKirimBarangController extends Controller
 
     public function listData(){
 
-        // if (Auth::user()->level == 1) {
-            $kirim_barang = Kirim::where('status',2)
+        $kirim_barang = Kirim::where('status',2)
             ->leftJoin('branch','branch.kode_toko','kirim_barang.id_supplier')
             ->select('kirim_barang.*','branch.nama_toko')
             ->where('kirim_barang.kode_gudang',Auth::user()->unit)
             ->orWhere('kirim_barang.id_supplier',Auth::user()->unit)->get();
-        // }else {
-        //     $kirim_barang = KirimBarang::
-        //     leftJoin('branch',function($join){
-        //         $join->on('branch.kode_toko', '=', 'kirim_barang.id_supplier');
-        //         $join->on('branch.kode_toko','=','kirim_barang.kode_gudang');    
-        //     })
-        //     ->where('status',2)->get();
-        // }
 
         
         $no = 0;
         $data = array();
         foreach($kirim_barang as $list){
+
+            $branch = Branch::where('kode_toko',$lst->kode_gudang)->first();
+
             $no ++;
             $row = array();
             $row[] = tanggal_indonesia($list->created_at);
@@ -46,7 +40,7 @@ class ReportKirimBarangController extends Controller
             $row[] = $list->nama_toko;
             $row[] = $list->total_item;
             $row[] = $list->total_terima;
-            $row[] = $list->kode_gudang;
+            $row[] = $branch->nama_toko;
             $row[] = '<div class="btn-group">
             <a href="'.route('report_kirim.detail',$list->id_pembelian).'" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i></a>
             </div>';
