@@ -1057,7 +1057,7 @@ class ApprovalTerimaReturController extends Controller{
 
                             // rak pasiva
                             $jurnal = new TabelTransaksi;
-                            $jurnal->unit =  $pengirim; 
+                            $jurnal->unit =  $penerima; 
                             $jurnal->kode_transaksi = $id;
                             $jurnal->kode_rekening = 2500000;
                             $jurnal->tanggal_transaksi  = $tanggal;
@@ -2298,7 +2298,7 @@ class ApprovalTerimaReturController extends Controller{
 
                             // rak pasiva
                             $jurnal = new TabelTransaksi;
-                            $jurnal->unit =  $pengirim; 
+                            $jurnal->unit =  $penerima; 
                             $jurnal->kode_transaksi = $id;
                             $jurnal->kode_rekening = 2500000;
                             $jurnal->tanggal_transaksi  = $tanggal;
