@@ -126,7 +126,7 @@ $(function(){
       "dom" : 'Brt',
       "bSort" : false,
       "processing" : true,
-      "scrollY" : "500px",
+      "scrollY" : "200px",
       "paging" : false,
      "ajax" : {
        "url" : "{{ route('terima_po_detail.data', $idpembelian) }}",
