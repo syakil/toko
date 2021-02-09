@@ -26,11 +26,11 @@ class PembelianController extends Controller
       $pembelian = PembelianTemporary::leftJoin('supplier', 'supplier.id_supplier', '=', 'pembelian_temporary.id_supplier')
       ->leftJoin('pembelian_status','pembelian_status.id_status','pembelian_temporary.status')
       ->where('kode_gudang',Auth::user()->unit)
-      ->whereNotIn('pembelian_temporary.status',null)
+      ->whereNotIn('pembelian_temporary.status',[null])
       ->select('pembelian_temporary.*','supplier.nama','pembelian_status.keterangan')
       ->orderBy('pembelian_temporary.id_pembelian','desc')
       ->get();
-     
+
       $no = 0;
       $data = array();
       foreach($pembelian as $list){
