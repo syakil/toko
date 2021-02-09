@@ -34,7 +34,8 @@
             <th width="30">No</th>
             <th>Kod Produk</th>
             <th>Nama Produk</th>
-            <th>Jumlah</th>
+            <th>Jumlah Pembelian</th>
+            <th>Jumlah Terima</th>
             <th>Expired</th>
           </tr>
         </thead>

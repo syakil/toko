@@ -39,6 +39,7 @@ class ApprovalTerimaPoController extends Controller{
         $no = 0;
         $data = array();
         foreach($pembelian as $list){
+
             $no ++;
             $row = array();
             $row[] = $no;
@@ -73,12 +74,14 @@ class ApprovalTerimaPoController extends Controller{
         $data = array();
 
         foreach($detail as $list){
+            
             $no ++;
             $row = array();
             $row[] = $no;
             $row[] = $list->kode_produk;
             $row[] = $list->nama_produk;
             $row[] = $list->jumlah;
+            $row[] = $list->jumlah_terima;
             $row[] = $list->expired_date;
 
             $data[] = $row;
