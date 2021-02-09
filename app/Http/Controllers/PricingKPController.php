@@ -26,7 +26,7 @@ class PricingKPController extends Controller
                                         ->leftJoin('branch','branch.kode_toko','=','pembelian_temporary.kode_gudang')
                                         ->select('pembelian_temporary.*','supplier.nama','supplier.id_supplier','branch.nama_toko')
                                         ->where('pembelian_temporary.kode_gudang',$unit)
-                                        ->where('status','3')
+                                        ->where('pembelian_temporary.status','3')
                                         ->get();
 
         $no = 1;

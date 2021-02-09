@@ -23,7 +23,7 @@ class InvoiceController extends Controller
         
         $pembelian = PembelianTemporary::leftJoin('supplier','pembelian_temporary.id_supplier','=','supplier.id_supplier')
                                         ->leftJoin('branch','pembelian_temporary.kode_gudang','branch.kode_toko')
-                                        ->where('status','2')
+                                        ->where('pembelian_temporary.status','2')
                                         ->select('pembelian_temporary.*','supplier.nama','branch.nama_toko')
                                         ->where('pembelian_temporary.kode_gudang',Auth::user()->unit)
                                         ->get();

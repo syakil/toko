@@ -39,7 +39,7 @@
   <div class="form-group">
     <label for="status" class="col-md-3 control-label">Satuan</label>
     <div class="col-md-6">
-      <select id="status" type="text" class="form-control" name="status" required>
+      <select id="status" type="text" class="form-control" name="satuan" required>
         <option value=""> -- Pilih Satuan-- </option>
         <option value="Pcs">Pcs</option>
         <option value="Kg">Kg</option>

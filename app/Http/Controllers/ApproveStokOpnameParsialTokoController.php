@@ -39,7 +39,7 @@ class ApproveStokOpnameParsialTokoController extends Controller
         ->leftJoin('produk','produk.kode_produk','stok_opname_parsial.kode_produk')
         ->whereIn('stok_opname_parsial.unit',$kode_branch)
         ->where('produk.unit',Auth::user()->unit)
-        ->where('status',2)
+        ->where('stok_opname_parsial.status',2)
         ->get();
 
         $data = array();

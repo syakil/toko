@@ -37,7 +37,7 @@ class StockOpnameTokoController extends Controller{
 
         }else {
             
-            return Redirect::back()->withErrors(['Belum Waktunya Stok Opname']);;
+            return Redirect::route('home')->withErrors(['Belum Waktunya Stok Opname']);;
         
         }
         

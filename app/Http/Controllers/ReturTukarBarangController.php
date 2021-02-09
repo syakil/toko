@@ -25,7 +25,7 @@ class ReturTukarBarangController extends Controller{
         $kirim = Kirim::leftJoin('branch', 'branch.kode_toko', '=', 'kirim_barang.id_supplier')
                         ->where('status_kirim','tukar_barang')
                         ->where('tujuan','supplier')
-                        ->where('status','hold')
+                        ->where('kirim_barang.status','hold')
                         ->where('kirim_barang.kode_gudang',Auth::user()->unit)
                         ->orderBy('kirim_barang.updated_at', 'desc')
                         ->get();
@@ -49,7 +49,7 @@ class ReturTukarBarangController extends Controller{
         ->leftJoin('supplier', 'supplier.id_supplier', '=', 'kirim_barang.id_supplier')
         ->where('kirim_barang.kode_gudang',Auth::user()->unit)
         ->where('tujuan','supplier')
-        ->where('status',1)
+        ->where('kirim_barang.status',1)
         ->where('status_kirim','tukar_barang')
         ->orderBy('kirim_barang.id_pembelian', 'desc')
         ->get();

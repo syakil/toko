@@ -33,7 +33,7 @@ class ApprovalTerimaPoController extends Controller{
 
         $pembelian = Pembelian::select('pembelian.*','supplier.nama')->leftJoin('supplier', 'supplier.id_supplier', '=', 'pembelian.id_supplier')
                                 ->where('kode_gudang',Auth::user()->unit)
-                                ->where('status',1)
+                                ->where('pembelian.status',1)
                                 ->orderBy('pembelian.id_pembelian', 'desc')
                                 ->get();
         $no = 0;

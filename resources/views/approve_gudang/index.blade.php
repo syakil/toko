@@ -91,7 +91,7 @@ $("select#toko").change(function(){
 
 function getData(unit) {
 
-    var url = "{{route('approve.data',':unit')}}"
+    var url = "{{route('approve_gudang.data',':unit')}}"
     url = url.replace(':unit',unit)
     $("#unit").val(unit);
     table = $('.tabel-so').DataTable({

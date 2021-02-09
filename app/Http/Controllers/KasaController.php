@@ -124,7 +124,7 @@ class KasaController extends Controller{
             
             if ($produk_detail) {
                
-               $produk_ubah = ProdukDetail::where("kode_produk",$list->kode_produk)->whereIn("unit",$kode_toko)->get();
+               $produk_ubah = ProdukDetail::where("kode_produk",$list->kode_produk)->whereIn("unit",$kode_toko)->where("status",null)->get();
                
                foreach ($produk_ubah as $ubah) {
 
@@ -215,7 +215,9 @@ class KasaController extends Controller{
                      
                   ]);
                }               
-
+		
+		$produk_detail->status = null;
+                $produk_detail->update();
             }
 
          }

@@ -162,7 +162,7 @@
         <!-- approve produk -->
         <li><a href="{{ route('approve_produk.index') }}"><i class="fa fa-cube"></i> <span>Approve Produk</span></a></li>
         <!-- permohhonan pembelian -->
-        <li><a href="{{ route('permohonan_pembelian.index') }}"><i class="fa fa-file-pdf-o"></i><span>Permohonan Pembelian</span></a></li>  
+        <!-- <li><a href="{{ route('permohonan_pembelian.index') }}"><i class="fa fa-file-pdf-o"></i><span>Permohonan Pembelian</span></a></li>  -->
         <!-- riwayat stok -->
         <li><a href="{{ route('riwayat_stok.index') }}"><i class="fa fa-file-pdf-o"></i><span>Stok</span></a></li>  
         <!-- koreksi_po -->

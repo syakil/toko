@@ -15,7 +15,7 @@ class StokOpnameParsialTokoController extends Controller{
 
     public function index(){
 
-        $data_produk = StokOpnameParsial::leftJoin('produk','produk.kode_produk','stok_opname_parsial.kode_produk')->where('produk.unit',Auth::user()->unit)->where('stok_opname_parsial.unit',Auth::user()->unit)->where('status',1)->get();
+        $data_produk = StokOpnameParsial::leftJoin('produk','produk.kode_produk','stok_opname_parsial.kode_produk')->where('produk.unit',Auth::user()->unit)->where('stok_opname_parsial.unit',Auth::user()->unit)->where('stok_opname_parsial.status',1)->get();
         $nomer = 1;
         return view('stok_opname_parsial_toko.index',compact('data_produk','nomer'));
 

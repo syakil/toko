@@ -22,12 +22,12 @@ class KartuStokTokoController extends Controller
         $kartu = DB::table('kartu_stok')->select(DB::raw('
             produk.kode_produk,
             nama_produk,
-            SUM(IF(status="stok_awal",masuk,0)) AS stok_awal,
-            SUM(IF(status="stok_tamba",masuk,0)) AS stok_tambah,            
-            SUM(IF(status="terima_toko",masuk,0)) AS terima_toko,
-            SUM(IF(status="stok_kurang",keluar,0)) AS stok_kurang,
-            SUM(IF(status="kirim_barang",keluar,0)) AS kirim_barang,
-            SUM(IF(status="penjualan",keluar,0)) AS penjualan
+            SUM(IF(kartu_stok.status="stok_awal",masuk,0)) AS stok_awal,
+            SUM(IF(kartu_stok.status="stok_tambah",masuk,0)) AS stok_tambah,            
+            SUM(IF(kartu_stok.status="terima_toko",masuk,0)) AS terima_toko,
+            SUM(IF(kartu_stok.status="stok_kurang",keluar,0)) AS stok_kurang,
+            SUM(IF(kartu_stok.status="kirim_barang",keluar,0)) AS kirim_barang,
+            SUM(IF(kartu_stok.status="penjualan",keluar,0)) AS penjualan
         '))
         ->groupBy('kartu_stok.kode_produk')
         ->leftJoin('produk','produk.kode_produk','kartu_stok.kode_produk')

@@ -32,7 +32,7 @@ class ApprovalGudangController extends Controller
                                 ->leftJoin('produk','produk.kode_produk','produk_so.kode_produk')
                                 ->where('produk_so.unit',$unit)
                                 ->where('produk.unit',$unit)
-                                ->where('status',1)
+                                ->where('produk_so.status',1)
                                 ->get();
         
         $no = 0;
