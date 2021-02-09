@@ -179,7 +179,7 @@ class ApprovalTerimaPoController extends Controller{
             }
             
             $pembelianT=PembelianTemporary::where('id_pembelian',$pembelian->id_pembelian_t);
-            $pembelianT->update(['status'=>1]);
+            $pembelianT->update(['status'=>2]);
             
             Pembelian::where('id_pembelian',$id)->update(['status'=>2]);
             PembelianTemporaryDetail::where('id_pembelian',$pembelian->id_pembelian_t)->where('jumlah_terima',0)->delete();
