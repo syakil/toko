@@ -185,9 +185,9 @@ class TerimaPoController extends Controller
 
             DB::commit();
 
-            session(['idtemporary' => $request->idtemporary]);
-            session(['idpembelian' => $request->idpembelian]);
-            session(['idsupplier' => $request->idsupplier]);
+              $request->session()->forget(['idtemporary' => $request->idtemporary]);
+              $request->session()->forget(['idpembelian' => $request->idpembelian]);
+              $request->session()->forget(['idsupplier' => $request->idsupplier]);
 
             return Redirect::route('terima_po.index')->with((['success' => 'Terima Barang Berhasil Disimpan !']));      
         
