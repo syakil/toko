@@ -112,14 +112,14 @@ var table;
 $(function(){
   $('.tabel-produk').DataTable();
   table = $('.tabel-pembelian').DataTable({
-     "dom" : 'Brt',
-     "bSort" : false,
-     "processing" : true,
-"scrollY" : "500px",
-"paging": false,
-     "ajax" : {
-       "url" : "{{ route('pembelian_detail.data', $idpembelian) }}",
-       "type" : "GET"
+      "dom" : 'Brt',
+      "bSort" : false,
+      "processing" : true,
+      "scrollY" : "200px",
+      "paging": false,
+      "ajax" : {
+        "url" : "{{ route('pembelian_detail.data', $idpembelian) }}",
+        "type" : "GET"
      }
   }).on('draw.dt', function(){
     loadForm($('#diskon').val());
