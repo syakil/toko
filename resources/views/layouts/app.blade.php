@@ -180,7 +180,7 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="{{ route('kirim_barang.index') }}"><i class="fa fa-cubes"></i> <span>Kirim Toko</span></a></li>
-            <li><a href="{{ route('kirim_antar_gudang.index') }}"><i class="fa fa-cubes"></i> <span>Kirim Barang Antar Gudang</span></a></li>
+            <!-- <li><a href="{{ route('kirim_antar_gudang.index') }}"><i class="fa fa-cubes"></i> <span>Kirim Barang Antar Gudang</span></a></li> -->
           </ul>
         </li>
         
@@ -213,7 +213,7 @@
             <li><a href="{{ route('terima_po.index') }}"><i class="fa fa-cubes"></i> <span>Terima Barang PO</span></a></li>
             <li><a href="{{ route('retur.index') }}"><i class="fa fa-cubes"></i> <span>Terima Retur Toko</span></a></li>     
             <li><a href="{{ route('terima_retur_tukar_barang.index') }}"><i class="fa fa-cubes"></i> <span>Terima Retur Tukar Barang</span></a></li>     
-            <li><a href="{{ route('terima_antar_gudang.index') }}"><i class="fa fa-cubes"></i> <span>Terima Tranfer Antar Gudang</span></a></li>      
+            <!-- <li><a href="{{ route('terima_antar_gudang.index') }}"><i class="fa fa-cubes"></i> <span>Terima Tranfer Antar Gudang</span></a></li>       -->
           </ul>
         </li>
         <li><a href="{{ route('write_off.index') }}"><i class="fa fa-cubes"></i> <span>Write OFF</span></a></li>
