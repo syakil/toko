@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 use App\Kirim;
+use App\Branch;
 use App\KirimDetail;
 use App\Produk;
 use DB;
