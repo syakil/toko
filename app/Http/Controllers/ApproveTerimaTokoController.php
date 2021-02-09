@@ -760,8 +760,8 @@ class ApproveTerimaTokoController extends Controller{
                                 $selisih_kirim_barang->harga_jual = $produk_detail->harga_jual_umum;
                                 $selisih_kirim_barang->harga_beli = $produk_detail->harga_beli;
                                 $selisih_kirim_barang->jumlah = $jumlah_selisih;
-                                $selisih_kirim_barang->sub_total_jual = $stok_toko * $list->harga_jual;
-                                $selisih_kirim_barang->sub_total = $stok_toko * $produk_detail->harga_beli;
+                                $selisih_kirim_barang->sub_total_jual = $jumlah_selisih * $list->harga_jual;
+                                $selisih_kirim_barang->sub_total = $jumlah_selisih * $produk_detail->harga_beli;
                                 $selisih_kirim_barang->expired_date = $produk_detail->expired_date;
                                 $selisih_kirim_barang->keterangan = 'Selisih_Kurang_Kirim_Barang';
                                 $selisih_kirim_barang->no_faktur = $produk_detail->no_faktur;
