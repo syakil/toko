@@ -22,7 +22,6 @@
           <table class="table table-striped">
             <thead>
               <tr>
-                <th width="20">No</th>
                 <th>Kode Produk</th>
                 <th>Nama Produk</th>
                 <th>Stok Awal</th>
@@ -30,6 +29,7 @@
                 <th>Terima Selisih Kirim</th>
                 <th>Stok Opname Tambah</th>
                 <th>Stok Opname Kurang</th>
+                <th>Kirim Barang</th>
                 <th>Penjualan</th>
                 <th>Stok Akhir</th>
               </tr>

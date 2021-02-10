@@ -46,7 +46,6 @@ class KartuStokTokoController extends Controller
 
             $no ++;
             $row = array();
-            $row[] = $no;
             $row[] = $list->kode_produk;
             $row[] = $list->nama_produk;            
             $row[] = $list->stok_awal;
