@@ -27,8 +27,9 @@
                 <th>Nama Produk</th>
                 <th>Stok Awal</th>
                 <th>Terima Barang</th>
-                <th>Stok Opname</th>
-                <th>Stok Opname</th>
+                <th>Terima Selisih Kirim</th>
+                <th>Stok Opname Tambah</th>
+                <th>Stok Opname Kurang</th>
                 <th>Penjualan</th>
                 <th>Stok Akhir</th>
               </tr>
