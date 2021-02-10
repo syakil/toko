@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Redirect;
 use App\PembelianTemporaryDetail;
+use DB;
 use App\Supplier;
 use Auth;
 use App\Produk;
@@ -52,19 +53,21 @@ class PembelianDetailController extends Controller
    }
    public function store(Request $request)
    {
-      $produk = DB::table('produk')->where('kode_produk', '=', $request['kode'])
-      ->where('unit', '=',  Auth::user()->unit)
-      ->first();
-      // dd($request);
+      $produk = DB::select('select kode_produk,id_kategori,harga_jual_member_insan,harga_beli,promo,diskon from produk where kode_produk = '.$request["kode"] .' and unit = '.Auth::user()->unit);
+      // dd($produk);
+      // $new_produk = new stdClass;
+      // $new_produk->harga_beli = $produk->
+
+      // dd($produk);
       $detail = new PembelianTemporaryDetail;
       $detail->id_pembelian = $request['idpembelian'];
-      $detail->kode_produk = $request['kode'];
-      $detail->harga_beli = $produk->harga_beli;
-      $detail->id_kategori =$produk->id_kategori;
+      $detail->kode_produk = $produk[0]->kode_produk;
+      $detail->harga_beli = $produk[0]->harga_beli;
+      $detail->id_kategori =$produk[0]->id_kategori;
       $detail->jumlah = 1;
       $detail->expired_date =date('Y-m-d');
       $detail->jumlah_terima = 0;
-      $detail->sub_total = $produk->harga_beli;
+      $detail->sub_total = $produk[0]->harga_beli;
       $detail->jurnal_status = 0;
       $detail->save();
    }

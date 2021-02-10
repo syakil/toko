@@ -116,9 +116,7 @@ class PenjualanDetailMemberInsanController extends Controller
 
    public function store(Request $request){
 
-      $produk = Produk::where('kode_produk', '=', $request['kode'])
-                     ->where('unit', '=',  Auth::user()->unit)
-                     ->first();
+      $produk = DB::select('select kode_produk,id_kategori,harga_jual_member_insan,harga_beli,promo,diskon from produk where kode_produk = '.$request["kode"] .' and unit = '.Auth::user()->unit);
 
       $penjualan = Penjualan::where('id_penjualan',$request['idpenjualan'])->first();
 
@@ -128,7 +126,7 @@ class PenjualanDetailMemberInsanController extends Controller
 
       if ($data_margin->kenaikan > 0) {
       
-         $harga_jual_kenaikan = ($produk->harga_jual_member_insan * $data_margin->kenaikan / 100);
+         $harga_jual_kenaikan = ($produk[0]->harga_jual_member_insan * $data_margin->kenaikan / 100);
       
       }else {
          $harga_jual_kenaikan = 0;
@@ -136,16 +134,16 @@ class PenjualanDetailMemberInsanController extends Controller
 
       $detail = new PenjualanDetailTemporary;
       $detail->id_penjualan = $request['idpenjualan'];
-      $detail->kode_produk = $request['kode'];
-      $detail->harga_jual = $produk->harga_jual_member_insan + $harga_jual_kenaikan;
-      $detail->harga_sebelum_margin = $produk->harga_jual_member_insan;
-      $detail->harga_beli = $produk->harga_beli;
-      $detail->promo = $produk->promo;
+      $detail->kode_produk = $produk[0]->kode_produk;
+      $detail->harga_jual = $produk[0]->harga_jual_member_insan + $harga_jual_kenaikan;
+      $detail->harga_sebelum_margin = $produk[0]->harga_jual_member_insan;
+      $detail->harga_beli = $produk[0]->harga_beli;
+      $detail->promo = $produk[0]->promo;
       $detail->jumlah = '';
-      $detail->diskon = $produk->diskon;
-      $detail->sub_total_sebelum_margin = ($produk->harga_jual_member_insan - ($produk->diskon)) * $detail->jumlah;
-      $detail->sub_total = ($produk->harga_jual_member_insan + $harga_jual_kenaikan - ($produk->diskon)) * $detail->jumlah;
-      $detail->sub_total_beli = $produk->harga_beli;  
+      $detail->diskon = $produk[0]->diskon;
+      $detail->sub_total_sebelum_margin = ($produk[0]->harga_jual_member_insan - ($produk[0]->diskon)) * $detail->jumlah;
+      $detail->sub_total = ($produk[0]->harga_jual_member_insan + $harga_jual_kenaikan - ($produk[0]->diskon)) * $detail->jumlah;
+      $detail->sub_total_beli = $produk[0]->harga_beli;  
       $detail->save();
 
    }

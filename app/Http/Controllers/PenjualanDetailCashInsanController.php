@@ -83,20 +83,18 @@ class PenjualanDetailCashInsanController extends Controller
    
    public function store(Request $request){
 
-      $produk = Produk::where('kode_produk', '=', $request['kode'])
-                     ->where('unit', '=',  Auth::user()->unit)
-                     ->first();
+      $produk = DB::select('select kode_produk,harga_jual_member_insan,harga_beli,promo,diskon from produk where kode_produk = '.$request["kode"] .' and unit = '.Auth::user()->unit);
 
       $detail = new PenjualanDetailTemporary;
       $detail->id_penjualan = $request['idpenjualan'];
-      $detail->kode_produk = $request['kode'];
-      $detail->harga_jual = $produk->harga_jual_member_insan;
-      $detail->harga_beli = $produk->harga_beli;
-      $detail->promo = $produk->promo;
+      $detail->kode_produk = $produk[0]->kode_produk;
+      $detail->harga_jual = $produk[0]->harga_jual_member_insan;
+      $detail->harga_beli = $produk[0]->harga_beli;
+      $detail->promo = $produk[0]->promo;
       $detail->jumlah = '';
-      $detail->diskon = $produk->diskon;
-      $detail->sub_total = ($produk->harga_jual_member_insan - ($produk->diskon)) * $detail->jumlah;
-      $detail->sub_total_beli = $produk->harga_beli;  
+      $detail->diskon = $produk[0]->diskon;
+      $detail->sub_total = ($produk[0]->harga_jual_member_insan - ($produk[0]->diskon)) * $detail->jumlah;
+      $detail->sub_total_beli = $produk[0]->harga_beli;  
       $detail->save();
 
    }
