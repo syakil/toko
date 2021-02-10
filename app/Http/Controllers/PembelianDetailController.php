@@ -12,7 +12,7 @@ use App\PembelianTemporary;
 class PembelianDetailController extends Controller
 {
    public function  index(){
-      $produk = Produk::where('unit',Auth::user()->unit)->get();
+      $produk = DB::table('produk')->where('unit',Auth::user()->unit)->get();
       $idpembelian = session('idpembelian');
       // dd($idpembelian);
       $supplier = Supplier::find(session('idsupplier'));
@@ -52,7 +52,7 @@ class PembelianDetailController extends Controller
    }
    public function store(Request $request)
    {
-      $produk = Produk::where('kode_produk', '=', $request['kode'])
+      $produk = DB::table('produk')->where('kode_produk', '=', $request['kode'])
       ->where('unit', '=',  Auth::user()->unit)
       ->first();
       // dd($request);
