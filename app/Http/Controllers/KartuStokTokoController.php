@@ -25,7 +25,7 @@ class KartuStokTokoController extends Controller
             SUM(IF(kartu_stok.status="stok_awal",masuk,0)) AS stok_awal,
             SUM(IF(kartu_stok.status="stok_tambah",masuk,0)) AS stok_tambah,            
             SUM(IF(kartu_stok.status="terima_toko",masuk,0)) AS terima_toko,
-            SUM(IF(kartu_stok.status="terima_selisih_toko",masuk,0)) AS terima_selisih_toko,
+            SUM(IF(kartu_stok.status="terima_selisih_toko",masuk,0)) AS terima_selisih_retur_toko,
             SUM(IF(kartu_stok.status="stok_kurang",keluar,0)) AS stok_kurang,
             SUM(IF(kartu_stok.status="kirim_barang",keluar,0)) AS kirim_barang,
             SUM(IF(kartu_stok.status="penjualan",keluar,0)) AS penjualan
@@ -42,7 +42,7 @@ class KartuStokTokoController extends Controller
         
         foreach($kartu as $list){
             
-            $stok_akhir = $list->stok_awal + $list->terima_toko + $list->stok_tambah + $list->terima_selisih_toko - $list->kirim_barang - $list->stok_kurang ;
+            $stok_akhir = $list->stok_awal + $list->terima_toko + $list->stok_tambah + $list->terima_selisih_retur_toko - $list->kirim_barang - $list->stok_kurang ;
 
             $no ++;
             $row = array();
