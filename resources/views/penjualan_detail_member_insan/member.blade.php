@@ -18,6 +18,7 @@
             <th>Nama Member</th>
             <th>Alamat</th>
             <th>Plafond</th>
+            <th>Tenor</th>
             <th>Musawamah</th>            
             <th>Status</th>        
             <th>Aksi</th>
@@ -30,6 +31,7 @@
             <th>{{ $data->nama }}</th>
             <th>{{ $data->unit }}</th>
             <th>{{ number_format($data->Plafond) }}</th>
+            <th>{{ number_format($data->Tenor) }}</th>       
             <th>{{ number_format($data->os) }}</th>        
             <th>{{ $data->status_member }}</th>
             <th><button onclick="getMember({{ $data->id_member }})" class="btn btn-primary"><i class="fa fa-check-circle"></i> Pilih</button></th>
