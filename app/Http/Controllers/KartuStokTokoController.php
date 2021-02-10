@@ -51,7 +51,7 @@ class KartuStokTokoController extends Controller
             $row[] = $list->nama_produk;            
             $row[] = $list->stok_awal;
             $row[] = $list->terima_toko;
-            $row[] = $list->terima_selisih_toko;
+            $row[] = $list->terima_selisih_retur_toko;
             $row[] = $list->stok_tambah;
             $row[] = $list->stok_kurang;
             $row[] = $list->kirim_barang;
