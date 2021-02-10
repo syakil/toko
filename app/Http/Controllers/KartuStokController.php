@@ -26,8 +26,9 @@ class KartuStokController extends Controller{
             SUM(IF(kartu_stok.status="pembelian",masuk,0)) AS pembelian,
             SUM(IF(kartu_stok.status="terima_barang",masuk,0)) AS terima_barang_retur,
             SUM(IF(kartu_stok.status="kirim_barang",keluar,0)) AS kirim_barang,
-            SUM(IF(kartu_stok.status="kirim_barang_retur",keluar,0)) AS kirim_barang_retur
+            SUM(IF(kartu_stok.status="write_off",keluar,0)) AS write_off
         '))
+
         ->groupBy('kartu_stok.kode_produk')
         ->leftJoin('produk','produk.kode_produk','kartu_stok.kode_produk')
         ->where('kartu_stok.unit',Auth::user()->unit)
@@ -40,7 +41,7 @@ class KartuStokController extends Controller{
         
         foreach($kartu as $list){
             
-            $stok_akhir = $list->stok_awal + $list->pembelian + $list->terima_barang_retur - $list->kirim_barang - $list->kirim_barang_retur;
+            $stok_akhir = $list->stok_awal + $list->pembelian + $list->terima_barang_retur - $list->kirim_barang - $list->write_off;
 
             $no ++;
             $row = array();
@@ -51,7 +52,7 @@ class KartuStokController extends Controller{
             $row[] = $list->pembelian;
             $row[] = $list->terima_barang_retur;
             $row[] = $list->kirim_barang;
-            $row[] = $list->kirim_barang_retur;
+            $row[] = $list->write_off;
             $row[] = $stok_akhir;
             $data[] = $row;
         }

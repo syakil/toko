@@ -378,7 +378,7 @@ class WriteOffController extends Controller
             $kartu_stok->kode_produk = $kode_produk;
             $kartu_stok->masuk = 0;
             $kartu_stok->keluar = $jumlah;
-            $kartu_stok->status = 'WO';
+            $kartu_stok->status = 'write_off';
             $kartu_stok->kode_transaksi = $kode_rndm;
             $kartu_stok->unit = Auth::user()->unit;
             $kartu_stok->save();

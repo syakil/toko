@@ -29,7 +29,7 @@
                 <th>Pembelian</th>
                 <th>Terima Retur</th>
                 <th>Kirim Barang</th>
-                <th>Retur Supplier</th>
+                <th>Write OFF</th>
                 <th>Stok Akhir</th>
               </tr>
             </thead>
