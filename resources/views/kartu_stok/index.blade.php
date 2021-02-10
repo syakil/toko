@@ -27,6 +27,7 @@
                 <th>Nama Produk</th>
                 <th>Stok Awal</th>
                 <th>Pembelian</th>
+                <th>Terima Lebih Kirim</th>
                 <th>Terima Retur</th>
                 <th>Kirim Barang</th>
                 <th>Write OFF</th>
