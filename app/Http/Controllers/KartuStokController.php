@@ -24,7 +24,7 @@ class KartuStokController extends Controller{
             nama_produk,
             SUM(IF(kartu_stok.status="stok_awal",masuk,0)) AS stok_awal,
             SUM(IF(kartu_stok.status="pembelian",masuk,0)) AS pembelian,
-            SUM(IF(kartu_stok.status="terima_barang",masuk,0)) AS terima_barang_retur,
+            SUM(IF(kartu_stok.status="terima_retur_toko",masuk,0)) AS terima_barang_retur,
             SUM(IF(kartu_stok.status="kirim_barang",keluar,0)) AS kirim_barang,
             SUM(IF(kartu_stok.status="write_off",keluar,0)) AS write_off
         '))
