@@ -33,11 +33,11 @@
                     
                     <td style="word-wrap: break-word;min-width: 50px;max-width: 100px;" class="text-center">
                         Harga <br> Cash Insan<br>
-                        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"><a href="{{route('cashinsan.new')}}"><i class="fa fa-child" style="color: rgb(255, 255, 255); font-size: 40px; box-sizing: content-box; line-height: 72px; text-align: center; width: 72px; height: 72px; display: inline-block; overflow: hidden; border-radius: 50%; background-color: rgb(16, 148, 53); border: 3px solid rgb(255, 255, 255); "></i></a>
+                        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"><a id='cash-insan' href="{{route('cashinsan.new')}}"><i class="fa fa-child" style="color: rgb(255, 255, 255); font-size: 40px; box-sizing: content-box; line-height: 72px; text-align: center; width: 72px; height: 72px; display: inline-block; overflow: hidden; border-radius: 50%; background-color: rgb(16, 148, 53); border: 3px solid rgb(255, 255, 255); "></i></a>
                     </td>
                     <td style="word-wrap: break-word;min-width: 50px;max-width: 100px;" class="text-center">
                         Harga <br>Cash Pabrik<br>
-                        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"><a href="{{route('transaksi.new')}}"><i class="fa fa-group" style="color: rgb(255, 255, 255); font-size: 40px; text-shadow: 0px 0px 4px rgb(0, 0, 0); box-sizing: content-box; line-height: 72px; text-align: center; width: 72px; height: 72px; display: inline-block; overflow: hidden; border-radius: 50%; background-color: rgb(241, 41, 139); border: 3px solid rgb(255, 255, 255)"></i></a>
+                        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"><a  id='cash'="{{route('transaksi.new')}}"><i class="fa fa-group" style="color: rgb(255, 255, 255); font-size: 40px; text-shadow: 0px 0px 4px rgb(0, 0, 0); box-sizing: content-box; line-height: 72px; text-align: center; width: 72px; height: 72px; display: inline-block; overflow: hidden; border-radius: 50%; background-color: rgb(241, 41, 139); border: 3px solid rgb(255, 255, 255)"></i></a>
                     </td>
                 </tr> 
                 
@@ -64,13 +64,30 @@ $(".allownumericwithoutdecimal").on("keypress keyup blur",function (event) {
 </script>
 <script type="text/javascript">
 
+$(document).keyup(function(event) {
+  if(event.keyCode == 112){ 
+    $('#modal-member').modal('show'); 
+  }
+  if(event.keyCode == 113){ 
+    $('#modal-pabrik').modal('show');
+  }
+  if(event.keyCode == 114){ 
+    event.preventDefault();
+    $('#cash-insan').click();
+  }
+  if(event.keyCode == 115){ 
+    $('#cash').click();
+  }
+})
 
 function addFormInsan(){
    $('#modal-member').modal('show');        
 }
+
 function addFormPabrik(){
    $('#modal-pabrik').modal('show');        
 }
+
 function addFormKoperasi(){
    $('#modal-murabahah').modal('show');        
 }
