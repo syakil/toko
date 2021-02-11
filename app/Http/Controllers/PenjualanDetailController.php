@@ -152,6 +152,37 @@ class PenjualanDetailController extends Controller
    
    }
  
+   public function batal($id){
+
+      try {
+         
+         DB::beginTransaction();
+         
+         $detail = PenjualanDetailTemporary::where('id_penjualan',$id)->first();
+         
+         if ($detail) {
+            
+            return back()->with(['error' => 'Hapus Semua Data Transaksi !']);   
+
+         }
+
+         $penjualan = Penjualan::find($id);
+         $penjualan->delete();
+
+         
+         DB::commit();
+      
+      }catch(\Exception $e){
+         
+         DB::rollback();
+         return back()->with(['error' => $e->getmessage()]);
+ 
+      }
+
+
+      return redirect()->route('transaksi.menu');
+      
+   }
 
    public function saveData(Request $request){
       

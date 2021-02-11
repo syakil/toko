@@ -53,6 +53,7 @@ Route::group(['middleware' => ['web', 'cekuser:2']], function(){
    Route::get('transaksi/notapdf', 'PenjualanDetailController@notaPDF')->name('transaksi.pdf');
    Route::post('transaksi/simpan', 'PenjualanDetailController@saveData');
    Route::get('transaksi/loadform/{diskon}/{total}/{diterima}', 'PenjualanDetailController@loadForm');
+   Route::get('transaksi/batal/{id}', 'PenjualanDetailController@batal')->name('transaksi.batal');
    Route::resource('transaksi', 'PenjualanDetailController');
 
    

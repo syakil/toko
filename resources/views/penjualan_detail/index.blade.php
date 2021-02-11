@@ -150,6 +150,31 @@
 @section('script')
 <script type="text/javascript">
 var table;
+$(document).keyup(function(event) {
+  if(event.keyCode == 112){ 
+    $('.simpan').click();
+  }
+
+  if (event.keyCode == 36) {
+    
+    swal({
+      title: "Anda Yakin Akan Keluar Dari Transaksi Ini?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        
+        window.location.replace("{{route('transaksi.batal',$idpenjualan)}}")
+
+      } else {
+        swal("Data Anda Aman!");
+      }
+    });
+  }
+
+})
 $(function(){
   $('.tabel-produk').DataTable();
 

@@ -71,12 +71,13 @@ $(document).keyup(function(event) {
   if(event.keyCode == 113){ 
     $('#modal-pabrik').modal('show');
   }
-  if(event.keyCode == 114){ 
-    event.preventDefault();
-    $('#cash-insan').click();
+  if(event.keyCode == 119){ 
+    
+    window.location.replace("{{route('cashinsan.new')}}")
+    
   }
-  if(event.keyCode == 115){ 
-    $('#cash').click();
+  if(event.keyCode == 120){ 
+    window.location.replace("{{route('transaksi.new')}}")
   }
 })
 
