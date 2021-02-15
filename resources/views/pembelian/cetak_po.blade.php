@@ -20,7 +20,7 @@
 
     .box2{
         width:250px;
-        height:100px;
+        height:132px;
         padding-top: 12px;
         padding-left: 7px;
         margin-left: 30px;
@@ -43,7 +43,7 @@
     .box-kiri{
         display: inline-block;
         width: 300px;
-        height: 170px;
+        height: 200px;
         margin-left: 84px;
     }
 
@@ -103,7 +103,15 @@
                 <td>Pengirim</td>
                 
                 <td>: {{$alamat->nama}} - ({{substr($alamat->alamat,20)}})</td>
+
                 
+            </tr>
+            <tr>
+            
+                <td>PIC </td>
+                <td>: ({{$alamat->bank}} - {{$alamat->norek}}) a/n {{$alamat->nama_rek}} </td>
+                
+            
             </tr>
         </table>
     </div>
@@ -149,15 +157,7 @@
     </div>
 
     <div style="font-size:12px; margin-left:80px;display:inline-block;">
-        Checker,<br><br><br><br>
-        _____________
-    </div>
-    <div style="font-size:12px; margin-left:80px;display:inline-block;">
-        Sender,<br><br><br><br>
-        _____________
-    </div>
-    <div style="font-size:12px; margin-left:80px;display:inline-block;">
-        Outlet Receiver,<br><br><br><br>
+        Manager Purchasing,<br><br><br><br>
         _____________
     </div>
 </div>
