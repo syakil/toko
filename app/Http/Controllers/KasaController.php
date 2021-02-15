@@ -267,6 +267,7 @@ class KasaController extends Controller{
                      if ($jumlah < 5) {
                      
                         $stok_opname_parsial = new StokOpnameParsial;
+                        $stok_opname_parsial->stok_system = $valie->stok;
                         $stok_opname_parsial->kode_produk = $value->kode_produk;
                         $stok_opname_parsial->unit = Auth::user()->unit;
                         $stok_opname_parsial->status = 1;
@@ -376,6 +377,7 @@ class KasaController extends Controller{
                      if ($jumlah < 5) {
                      
                         $stok_opname_parsial = new StokOpnameParsial;
+                        $stok_opname_parsial->stok_system = $valie->stok;
                         $stok_opname_parsial->kode_produk = $value->kode_produk;
                         $stok_opname_parsial->unit = Auth::user()->unit;
                         $stok_opname_parsial->status = 1;
