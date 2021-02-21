@@ -13,7 +13,7 @@ use App\PembelianTemporary;
 class PembelianDetailController extends Controller
 {
    public function  index(){
-      $produk = DB::table('produk')->where('unit',Auth::user()->unit)->get();
+      $produk = DB::table('produk')->where('unit',Auth::user()->unit)->where('produk.status',0)->get();
       $idpembelian = session('idpembelian');
       // dd($idpembelian);
       $supplier = Supplier::find(session('idsupplier'));
@@ -23,7 +23,7 @@ class PembelianDetailController extends Controller
    {
    // dd($id);
      $detail = PembelianTemporaryDetail::leftJoin('produk', 'produk.kode_produk', '=', 'pembelian_temporary_detail.kode_produk')
-->select('pembelian_temporary_detail.*','produk.nama_produk')
+         ->select('pembelian_temporary_detail.*','produk.nama_produk')
          ->where('id_pembelian', '=', $id)
          ->where('unit', '=',  Auth::user()->unit)
          ->orderBy('id_pembelian_detail','desc')

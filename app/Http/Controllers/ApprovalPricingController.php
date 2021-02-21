@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Produk;
 use App\PembelianTemporary;
+use App\PembelianTemporaryDetail;
 use DB;
 use Auth;
 use App\ProdukDetail;
@@ -63,10 +64,13 @@ class ApprovalPricingController extends Controller{
     public function reject($id){
 
         $produk = ProdukDetail::where('id_produk_detail',$id)->first();
-        $produk->status = 2;
+        $produk->status = 1;
         $produk->update();
 
-        $pembelian_tempo = PembelianTemporary::where('id_pembelian',$produk->no_invoice)->update(['status'=>2]);
+        $pembelian_tempo = PembelianTemporary::where('id_pembelian',$produk->no_faktur)->update(['status'=>3]);
+        $pembelian_detail = PembelianTemporaryDetail::where('id_pembelian',$produk->no_faktur)->where('kode_produk',$produk->kode_produk)->first();
+        $pembelian_detail->status = 1;
+        $pembelian_detail->update();
         
         return back()->with(['success' => 'Harga Berhasil Di Tolak !']);
 

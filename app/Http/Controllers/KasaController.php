@@ -216,8 +216,8 @@ class KasaController extends Controller{
                   ]);
                }               
 		
-		$produk_detail->status = null;
-                $produk_detail->update();
+               $produk_detail->status = null;
+               $produk_detail->update();
             }
 
          }

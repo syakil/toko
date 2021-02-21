@@ -17,7 +17,7 @@ class PembelianController extends Controller
 {
    public function index()
    {
-      $supplier = Supplier::all();
+      $supplier = Supplier::where('status',0)->get();
       return view('pembelian.index', compact('supplier')); 
    }
 

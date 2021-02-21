@@ -30,8 +30,8 @@
 
       <table>
         <tr><td width="150">Supplier</td><td><b>{{ $supplier->nama }}</b></td></tr>
-        <tr><td>Alamat</td><td><b>{{ $supplier->alamat }}</b></td></tr>
-        <tr><td>Telpon</td><td><b>{{ $supplier->telpon }}</b></td></tr>
+        <tr><td>Alamat</td><td><b>{{ $supplier->alamat_supplier }}</b></td></tr>
+        <tr><td>Telpon</td><td><b>{{ $supplier->telepon }}</b></td></tr>
       </table>
       <hr>
 

@@ -33,6 +33,7 @@ class TerimaPoController extends Controller
     
         $pembelian = Pembelian::select('pembelian.*','supplier.nama')->leftJoin('supplier', 'supplier.id_supplier', '=', 'pembelian.id_supplier')
                                 ->where('kode_gudang',Auth::user()->unit)
+                                ->where('pembelian.status',1)
                                 ->orderBy('pembelian.id_pembelian', 'desc')
                                 ->get();
         $no = 0;
@@ -134,7 +135,7 @@ class TerimaPoController extends Controller
         $pembelian->bayar = 0;      
         $pembelian->jatuh_tempo = date('Y-m-d');
         $pembelian->kode_gudang = 0;    
-        $pembelian->status = 1;
+        $pembelian->status = 0;
         $pembelian->tipe_bayar = 2;    
         $pembelian->id_user = Auth::user()->id;
         $pembelian->kode_gudang = Auth::user()->unit;
@@ -172,6 +173,7 @@ class TerimaPoController extends Controller
             $pembelian->total_harga = $request['total'];
             $pembelian->diskon = $request['diskon'];
             $pembelian->bayar = $request['bayar'];
+            $pembelian->status = 1;
             $pembelian->update();
 
             $pembelian_temporary = PembelianTemporary::find($pembelian->id_pembelian_t);
@@ -185,9 +187,9 @@ class TerimaPoController extends Controller
 
             DB::commit();
 
-              $request->session()->forget(['idtemporary' => $request->idtemporary]);
-              $request->session()->forget(['idpembelian' => $request->idpembelian]);
-              $request->session()->forget(['idsupplier' => $request->idsupplier]);
+              $request->session()->forget('idtemporary');
+              $request->session()->forget('idpembelian');
+              $request->session()->forget('idsupplier');
 
             return Redirect::route('terima_po.index')->with((['success' => 'Terima Barang Berhasil Disimpan !']));      
         

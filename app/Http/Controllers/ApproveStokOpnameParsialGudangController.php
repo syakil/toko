@@ -30,6 +30,7 @@ class ApproveStokOpnameParsialGudangController extends Controller
 
         $data_unit = Branch::where('kode_gudang',Auth::user()->unit)->groupBy('kode_gudang')->get();
         $kode_branch = array();
+
         foreach ($data_unit as $value) {
             if ($value->kode_toko != Auth::user()->unit) {
                 $kode_branch[] = $value->kode_gudang;
@@ -40,7 +41,7 @@ class ApproveStokOpnameParsialGudangController extends Controller
         ->leftJoin('produk','produk.kode_produk','stok_opname_parsial.kode_produk')
         ->whereIn('stok_opname_parsial.unit',$kode_branch)
         ->where('produk.unit',3000)
-        ->where('status',2)
+        ->where('stok_opname_parsial.status',2)
         ->get();
 
         $data = array();

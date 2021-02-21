@@ -25,8 +25,10 @@
       <th>Kode Produk</th>
       <th>Nama Produk</th>
       <th>Stok</th>
-      <th>Harga PB</th>
-      <th>Harga NI</th>
+      @foreach($tenor as $list)
+      <th>Tenor {{$list->pekan}} Minggu</th>
+      @endforeach
+      <th>Harga Normal</th>
    </tr>
 </thead>
 <tbody></tbody>

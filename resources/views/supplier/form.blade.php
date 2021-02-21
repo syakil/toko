@@ -32,7 +32,7 @@
 
    <div class="form-group">
       <label for="alamat" class="col-md-3 control-label">Alamat</label>
-      <div class="col-md-8">
+      <div class="col-md-6">
          <input id="alamat" type="text" class="form-control" name="alamat" required>
          <span class="help-block with-errors"></span>
       </div>

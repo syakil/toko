@@ -59,6 +59,7 @@ class TerimaPoDetailController extends Controller{
                                 ->where('unit', '=',  Auth::user()->unit)
                                 ->orderBy('pembelian_detail.id_pembelian_detail', 'desc')
                                 ->get();
+                                
         $no = 0;
         $data = array();
         $total = 0;
@@ -85,18 +86,19 @@ class TerimaPoDetailController extends Controller{
 
     public function store(Request $request){
 
-        $produk = Produk::where('kode_produk', '=', $request['kode'])
-                        ->where('unit', '=',  Auth::user()->unit)
+        $produk = Produk::where('produk.kode_produk','like','%'.$request['kode'])
+                        ->where('produk.unit',Auth::user()->unit)
+                        ->orderByRaw('CHAR_LENGTH(kode_produk)')
                         ->first();
 
         $pembelian = PembelianTemporaryDetail::where('id_pembelian', '=', session('idtemporary'))
-                                            ->where('kode_produk', '=', $request['kode'])
+                                            ->where('kode_produk', '=', $produk->kode_produk)
                                             ->first();
         
         $detail = new PembelianDetail;
         $detail->id_pembelian = $request['idpembelian'];
         $detail->id_kategori = $produk->id_kategori;
-        $detail->kode_produk = $request['kode'];
+        $detail->kode_produk = $produk->kode_produk;
         $detail->harga_beli = $pembelian->harga_beli;
         $detail->jumlah = $pembelian->jumlah;
         $detail->expired_date = date('Y-m-d');

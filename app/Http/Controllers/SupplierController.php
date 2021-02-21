@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use DB;
 use Auth;
 use App\Supplier;
+use App\PembelianTemporary;
+use App\Kirim;
 
 class SupplierController extends Controller
 {
@@ -25,14 +27,14 @@ class SupplierController extends Controller
          $row[] = $no;
          $row[] = $list->nama;
          $row[] = $list->alamat_supplier;
-         $row[] = $list->telpon;
+         $row[] = $list->telepon;
          $row[] = $list->pic;
          $row[] = $list->norek;
          $row[] = $list->bank;
          $row[] = $list->metode_bayar;
          $row[] = '<div class="btn-group">
                   <a onclick="editForm('.$list->id_supplier.')" class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></a>
-                  <a onclick="deleteData('.$list->id_supplier.')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a></div>';
+                  <a href="'. route('supplier.delete',$list->id_supplier).'" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a></div>';
          $data[] = $row;
       }
 
@@ -107,10 +109,37 @@ class SupplierController extends Controller
       }
    }
 
-   public function destroy($id){
+   public function delete($id){
 
-      $supplier = Supplier::find($id);
-      $supplier->delete();
+
+      try {
+         
+         DB::beginTransaction();
+
+         $cek_pembelian = PembelianTemporary::where('id_supplier',$id)->first();
+
+         $cek_kirim = Kirim::where('id_supplier',$id)->first();
+
+         if ($cek_pembelian) {
+            return back()->with(['error' => 'Ada History Transaksi !']);   
+         }
+
+         if ($cek_kirim) {
+            return back()->with(['error' => 'Ada History Transaksi !']);   
+         }
+
+         $supplier = Supplier::find($id);
+         $supplier->delete();
+   
+         DB::commit();
+         return back()->with(['success' => 'Supplier Berhasil di Hapus !']);
+
+      }catch(\Exception $e){
+            
+         DB::rollback();
+         return back()->with(['error' => $e->getmessage()]);
+
+      }
    
    }
 }

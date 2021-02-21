@@ -568,6 +568,7 @@ Route::group(['middleware' => ['web', 'cekuser:8' ]], function(){
    Route::get('supplier/{id}/edit', 'SupplierController@edit')->name('supplier.edit');
    Route::post('supplier/update_supplier/{id}', 'SupplierController@update_supplier')->name('supplier.update_supplier');
    Route::get('supplier/data', 'SupplierController@listData')->name('supplier.data');
+   Route::get('supplier/delete/{id}', 'SupplierController@delete')->name('supplier.delete');
 
    // produk
    Route::get('produk/index', 'ProdukController@index')->name('produk.index');

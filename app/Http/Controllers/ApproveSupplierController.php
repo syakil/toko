@@ -29,7 +29,7 @@ class ApproveSupplierController extends Controller{
             $row[] = $no;
             $row[] = $list->nama;
             $row[] = $list->alamat_supplier;
-            $row[] = $list->telpon;
+            $row[] = $list->telepon;
             $row[] = $list->pic;
             $row[] = $list->norek;
             $row[] = $list->bank;

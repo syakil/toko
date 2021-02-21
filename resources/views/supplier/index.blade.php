@@ -110,20 +110,5 @@ function editForm(id){
   });
 }
 
-function deleteData(id){
-  if(confirm("Apakah yakin data akan dihapus?")){
-    $.ajax({
-      url : "supplier/"+id,
-      type : "POST",
-      data : {'_method' : 'DELETE', '_token' : $('meta[name=csrf-token]').attr('content')},
-      success : function(data){
-        table.ajax.reload();
-      },
-      error : function(){
-        alert("Tidak dapat menghapus data!");
-      }
-    });
-  }
-}
 </script>
 @endsection

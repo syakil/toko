@@ -58,6 +58,7 @@ class PricingKPController extends Controller
         $pembelian_detail = PembelianTemporaryDetail::where('id_pembelian', $id)
             ->leftJoin('produk','pembelian_temporary_detail.kode_produk','produk.kode_produk')
             ->select('pembelian_temporary_detail.*','produk.harga_beli','produk.harga_jual_insan','produk.harga_indo','produk.harga_alfa','produk.harga_olshop','produk.harga_grosir','produk.nama_produk')
+            ->where('pembelian_temporary_detail.status',1)
             ->groupBy('produk.kode_produk')
             ->get();
 
@@ -75,7 +76,7 @@ class PricingKPController extends Controller
             $row [] = $no++;
             $row [] = $list->kode_produk;
             $row [] = $list->nama_produk ;
-            $row [] = $hpp_baru;
+            $row [] = number_format($hpp_baru);
             $row [] = number_format($list->harga_jual_insan);
             $row [] = number_format($list->harga_jual_insan - $hpp_baru);
             $row[] = number_format(min($harga_pasar));
@@ -138,7 +139,7 @@ class PricingKPController extends Controller
         $param_tgl = \App\ParamTgl::where('nama_param_tgl','tanggal_transaksi')->where('unit',Auth::user()->id)->first();
         $tanggal = $param_tgl->param_tgl;
 
-        $pembelian_detail = PembelianTemporaryDetail::where('id_pembelian',$id_pembelian)->get();
+        $pembelian_detail = PembelianTemporaryDetail::where('id_pembelian',$id_pembelian)->where('status',1)->get();
             
         foreach ($pembelian_detail as $list ) {
             
@@ -169,6 +170,8 @@ class PricingKPController extends Controller
         $pembelian = PembelianTemporary::where('id_pembelian',$id)->first();
         $pembelian->status = 4;
         $pembelian->update();
+
+        $pembelian_detail_tempo = DB::table('pembelian_temporary_detail')->where('id_pembelian',$id)->where('status',1)->update(['status' => 2]);
 
         return redirect()->route('pricing_kp.index')->with(['berhasil' => 'PO '. $id_pembelian . ' Berhasil Disimpan']);
 
