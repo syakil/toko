@@ -34,21 +34,21 @@ class KasaController extends Controller{
       $param_tgl = \App\ParamTgl::where('nama_param_tgl','tanggal_transaksi')->where('unit',Auth::user()->id)->first();
       $tanggal = $param_tgl->param_tgl;
 
-      $penjualan_cash = TabelTransaksi::
-                  select('kode_rekening', \DB::raw('sum(debet) as cash'))
+      $penjualan_cash = Penjualan::
+                  select(\DB::raw('sum(sub_total) as cash'))
                   ->where('tanggal_transaksi', '=', $tanggal)
                   ->where('unit', '=', Auth::user()->unit)
-                  ->whereIn('keterangan_transaksi',['Penjualan','Musawamah','Setoran Angsuran Musawamah'])
-                  ->where('kode_rekening','1120000' )
+                  ->whereIn('type_transaksi','cash')
                   ->first();
       $cash = $penjualan_cash->cash;
-      $penjualan_musawamah = TabelTransaksi::
-                  select('kode_rekening', \DB::raw('sum(debet-kredit) as musawamah'))
-                  ->where('tanggal_transaksi', '=', $tanggal)
-      //                  ->where('kode_rekening','1412000')
-                  ->where('keterangan_transaksi','Musawamah')
-                  ->where('unit', '=', Auth::user()->unit)
-                  ->first();
+
+      $penjualan_musawamah = Penjualan::
+                           select(\DB::raw('sum(sub_total) as musawamah'))
+                           ->where('tanggal_transaksi', '=', $tanggal)
+                           ->where('unit', '=', Auth::user()->unit)
+                           ->whereIn('type_transaksi','credit')
+                           ->first();
+
       $musawamah = $penjualan_musawamah->musawamah;
 
       return view('kasa.index',compact('cash','musawamah')); 
