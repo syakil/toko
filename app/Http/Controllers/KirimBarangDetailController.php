@@ -55,7 +55,7 @@ class KirimBarangDetailController extends Controller{
       foreach($detail as $list){
          
          $no ++;
-         $stok_toko = Produk::where('kode_produk',$list->kode_produk)->where('unit',3000)->first();
+         $stok_toko = Produk::where('kode_produk',$list->kode_produk)->where('unit',$id_toko->id_supplier)->first();
 
          $row = array();
          $row[] = $no;
