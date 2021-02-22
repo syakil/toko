@@ -215,6 +215,7 @@ class PenjualanDetailMemberInsanController extends Controller
          $penjualan->bayar = 0;    
          $penjualan->diterima = 0;   
          $penjualan->type_transaksi = 'credit'; 
+         $penjualan->unit = Auth::user()->unit;
          $penjualan->id_user = Auth::user()->id;    
          $penjualan->save();
          
