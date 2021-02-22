@@ -50,9 +50,15 @@ class KasaController extends Controller{
                            ->where('type_transaksi','credit')
                            ->first();
 
+      $setoran = TabelTransaksi::select(\DB::raw('sum(debet) as setoran'))
+      ->where('kode_rekening',1120000)->where('tanggal_transaksi',$tanggal)
+      ->where('unit',Auth::user()->unit)
+      ->where('keterangan_transaksi',['Setoran_angsuran_Musawamah'])
+      ->first();
+
       $musawamah = $penjualan_musawamah->musawamah;
 
-      return view('kasa.index',compact('cash','musawamah')); 
+      return view('kasa.index',compact('cash','musawamah','setoran')); 
    
    }
 
