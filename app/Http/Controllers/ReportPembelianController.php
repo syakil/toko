@@ -24,7 +24,7 @@ class ReportPembelianController extends Controller
                     leftJoin('branch','pembelian_temporary.kode_gudang','=','branch.kode_toko')
                     ->select('pembelian_temporary.*','supplier.nama','branch.nama_toko')
                     ->leftJoin('supplier', 'supplier.id_supplier', '=', 'pembelian_temporary.id_supplier')
-                    ->whereIn('status',[1,2,3,4])
+                    ->whereIn('pembelian_temporary.status',[1,2,3,4])
 ->where('pembelian_temporary.kode_gudang',Auth::user()->unit)
                     ->orderBy('pembelian_temporary.id_pembelian','desc')
                     ->get();
