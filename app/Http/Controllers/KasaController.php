@@ -51,9 +51,10 @@ class KasaController extends Controller{
                            ->first();
 
       $setoran = TabelTransaksi::select(\DB::raw('sum(debet) as setoran'))
-      ->where('kode_rekening',1120000)->where('tanggal_transaksi',$tanggal)
+      ->where('kode_rekening',1120000)
+      ->where('tanggal_transaksi',$tanggal)
       ->where('unit',Auth::user()->unit)
-      ->whereIn('keterangan_transaksi',['Setoran_angsuran_Musawamah'])
+      ->whereIn('keterangan_transaksi',['Setoran angsuran Musawamah'])
       ->first();
 
       $musawamah = $penjualan_musawamah->musawamah;
