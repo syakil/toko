@@ -35,7 +35,7 @@ class KasaController extends Controller{
       $tanggal = $param_tgl->param_tgl;
 
       $penjualan_cash = Penjualan::
-                  select(\DB::raw('sum(sub_total) as cash'))
+                  select(\DB::raw('sum(total_harga) as cash'))
                   ->where('tanggal_transaksi', '=', $tanggal)
                   ->where('unit', '=', Auth::user()->unit)
                   ->where('type_transaksi','cash')
@@ -44,7 +44,7 @@ class KasaController extends Controller{
       $cash = $penjualan_cash->cash;
 
       $penjualan_musawamah = Penjualan::
-                           select(\DB::raw('sum(sub_total) as musawamah'))
+                           select(\DB::raw('sum(total_harga) as musawamah'))
                            ->where('tanggal_transaksi', '=', $tanggal)
                            ->where('unit', '=', Auth::user()->unit)
                            ->where('type_transaksi','credit')
