@@ -32,12 +32,21 @@ class ApprovalPricingController extends Controller{
             $produk = Produk::where('kode_produk',$list->kode_produk)->where('unit',Auth::user()->unit)->first();
             $harga_pasar = array($produk->harga_indo,$produk->harga_alfa,$produk->harga_grosir,$produk->harga_olshop);
 
+            $kenaikan = ($list->harga_jual_insan - $produk->harga_jual)/$produk->harga_jual * 100;
+
             $row [] = $no++;
             $row [] = $list->kode_produk;
             $row [] = $list->nama_produk ;
             $row [] = $list->harga_beli;
-            $row [] = number_format($produk->harga_jual);
+            $row [] = number_format($produk->harga_jual);            
+            $row [] = number_format($produk->harga_jual - $list->harga_beli);
             $row [] = number_format($list->harga_jual_insan);
+            $row [] = number_format($list->harga_jual_insan - $list->harga_beli);
+            if ($kenaikan < 0 ) {
+                $row[] = "<i><font color='red'><i class='fa fa-arrow-down'></i>".number_format($kenaikan)."</font></i>";
+            }else {
+                $row[] = "<i><font color='green'><i class='fa fa-arrow-up'></i>".number_format($kenaikan)."</font></i>";
+            }
             $row [] = number_format(min($harga_pasar));
             $row[] = "<div class='btn-group'>
             <a href='".route('approve_pricing.approve',$list->id_produk_detail)."' class='btn btn-success btn-sm'>Approve</a>

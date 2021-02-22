@@ -44,7 +44,10 @@
                             <th>Nama Produk</th>
                             <th>Harga Beli</th>
                             <th>Harga Jual Lama</th>
+                            <th>Margin Lama</th>
                             <th>Harga Jual Baru</th>
+                            <th>Margin Baru</th>
+                            <th>Perubahan</th>
                             <th>Harga Grosir</th>
                             <th>Aksi</th>
                         </tr>
