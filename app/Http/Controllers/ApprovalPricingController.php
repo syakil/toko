@@ -43,9 +43,9 @@ class ApprovalPricingController extends Controller{
             $row [] = number_format($list->harga_jual_insan);
             $row [] = number_format($list->harga_jual_insan - $list->harga_beli);
             if ($kenaikan < 0 ) {
-                $row[] = "<i><font color='red'><i class='fa fa-arrow-down'></i>".number_format($kenaikan)."</font></i>";
+                $row[] = "<i><font color='red'><i class='fa fa-arrow-down'></i>".number_format($kenaikan)."%</font></i>";
             }else {
-                $row[] = "<i><font color='green'><i class='fa fa-arrow-up'></i>".number_format($kenaikan)."</font></i>";
+                $row[] = "<i><font color='green'><i class='fa fa-arrow-up'></i>".number_format($kenaikan)."%</font></i>";
             }
             $row [] = number_format(min($harga_pasar));
             $row[] = "<div class='btn-group'>
