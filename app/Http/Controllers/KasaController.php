@@ -45,7 +45,7 @@ class KasaController extends Controller{
       $penjualan_musawamah = TabelTransaksi::
                   select('kode_rekening', \DB::raw('sum(debet-kredit) as musawamah'))
                   ->where('tanggal_transaksi', '=', $tanggal)
-//                  ->where('kode_rekening','1412000')
+      //                  ->where('kode_rekening','1412000')
                   ->where('keterangan_transaksi','Musawamah')
                   ->where('unit', '=', Auth::user()->unit)
                   ->first();
@@ -126,7 +126,7 @@ class KasaController extends Controller{
                
                $produk_ubah = ProdukDetail::where("kode_produk",$list->kode_produk)->whereIn("unit",$kode_toko)->where("status",null)->get();
                
-               foreach ($produk_ubah as $ubah) {
+               foreach($produk_ubah as $ubah) {
 
                   $kode_produk = $ubah->kode_produk;
                   $harga_lama = $ubah->harga_jual_umum * $ubah->stok_detail;
@@ -377,7 +377,7 @@ class KasaController extends Controller{
                      if ($jumlah < 5) {
                      
                         $stok_opname_parsial = new StokOpnameParsial;
-                        $stok_opname_parsial->stok_system = $valie->stok;
+                        $stok_opname_parsial->stok_system = $value->stok;
                         $stok_opname_parsial->kode_produk = $value->kode_produk;
                         $stok_opname_parsial->unit = Auth::user()->unit;
                         $stok_opname_parsial->status = 1;
