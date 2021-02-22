@@ -38,15 +38,16 @@ class KasaController extends Controller{
                   select(\DB::raw('sum(sub_total) as cash'))
                   ->where('tanggal_transaksi', '=', $tanggal)
                   ->where('unit', '=', Auth::user()->unit)
-                  ->whereIn('type_transaksi','cash')
+                  ->where('type_transaksi','cash')
                   ->first();
+
       $cash = $penjualan_cash->cash;
 
       $penjualan_musawamah = Penjualan::
                            select(\DB::raw('sum(sub_total) as musawamah'))
                            ->where('tanggal_transaksi', '=', $tanggal)
                            ->where('unit', '=', Auth::user()->unit)
-                           ->whereIn('type_transaksi','credit')
+                           ->where('type_transaksi','credit')
                            ->first();
 
       $musawamah = $penjualan_musawamah->musawamah;
