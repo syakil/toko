@@ -66,7 +66,7 @@ class KoreksiPenjualanController extends Controller{
          if($list->type_transaksi == 'credit'){
          
             $row[] = "<div class='btn-group'>
-               <button onclick='getMember(".$list->kode_member.")' class='btn btn-primary'><i class='fa fa-check-circle'></i> Pilih</button>
+               <button onclick='getMember(".$list->id_penjualan.")' class='btn btn-primary'><i class='fa fa-check-circle'></i> Pilih</button>
             </div>";
          
          }else {
@@ -86,7 +86,7 @@ class KoreksiPenjualanController extends Controller{
 
    public function checkPin($id){
 
-      $member = Penjualan::where('member.kode_member',$id)->leftJoin('member','member.kode_member','penjualan.kode_member')
+      $member = Penjualan::where('id_penjualan',$id)->leftJoin('member','member.kode_member','penjualan.kode_member')
       ->first();
       echo json_encode($member);
    
