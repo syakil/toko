@@ -104,12 +104,14 @@ class KoreksiPenjualanController extends Controller{
          $detail->id_penjualan = $id;
          $detail->kode_produk = $list->kode_produk;
          $detail->harga_jual = $list->harga_jual;
+         $detail->harga_sebelum_margin = $list->harga_sebelum_margin;
          $detail->harga_beli = $list->harga_beli;
          $detail->promo = $list->promo;
          $detail->jumlah_awal = $list->jumlah;
          $detail->jumlah = $list->jumlah;
          $detail->diskon = $list->diskon;
          $detail->sub_total = $list->jumlah * $list->harga_jual;
+         $detail->sub_total_sebelum_margin = $list->jumlah * $list->harga_jual_sebelum_margin;
          $detail->sub_total_beli = $list->jumlah * $list->harga_beli;  
          $detail->save();
 
@@ -248,6 +250,7 @@ class KoreksiPenjualanController extends Controller{
          $detail = new PenjualanDetailTemporary;
          $detail->id_penjualan = $id;
          $detail->kode_produk = $list->kode_produk;
+         $detail->harga_sebelum_margin = $list->harga_sebelum_margin;
          $detail->harga_jual = $list->harga_jual;
          $detail->harga_beli = $list->harga_beli;
          $detail->promo = $list->promo;
@@ -255,6 +258,7 @@ class KoreksiPenjualanController extends Controller{
          $detail->jumlah = $list->jumlah;
          $detail->diskon = $list->diskon;
          $detail->sub_total = $list->jumlah * $list->harga_jual;
+         $detail->sub_total_sebelum_margin = $list->jumlah * $list->harga_jual_sebelum_margin;
          $detail->sub_total_beli = $list->jumlah * $list->harga_beli;  
          $detail->save();
 
