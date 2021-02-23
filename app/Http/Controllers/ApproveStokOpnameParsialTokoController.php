@@ -11,6 +11,7 @@ use App\TabelTransaksi;
 use App\Branch;
 use App\Produk;
 use App\ProdukDetail;
+use App\KartuStok;
 use App\StokOpnameParsial;
 use App\ProdukSelisih;
 
