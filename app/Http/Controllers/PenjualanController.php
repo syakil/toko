@@ -49,8 +49,7 @@ class PenjualanController extends Controller{
   
       $penjualan = Penjualan::leftJoin('users', 'users.id', '=', 'penjualan.id_user')
       ->leftJoin('member','member.kode_member','=','penjualan.kode_member')
-      ->leftJoin('pabrik','member.CODE_KEL','=','pabrik.kode_pabrik')
-      ->select('users.*', 'penjualan.*', 'penjualan.created_at as tanggal','member.nama as nama_member','pabrik.kode_pabrik')
+      ->select('users.*', 'penjualan.*', 'penjualan.created_at as tanggal','member.nama as nama_member')
       ->where('penjualan.created_at','LIKE', $awal.'%')
       ->whereIn('id_penjualan',$id_penjualan)
       ->orderBy('penjualan.id_penjualan', 'desc')
@@ -60,8 +59,7 @@ class PenjualanController extends Controller{
       
       $penjualan = Penjualan::leftJoin('users', 'users.id', '=', 'penjualan.id_user')
       ->leftJoin('member','member.kode_member','=','penjualan.kode_member')
-      ->leftJoin('pabrik','member.CODE_KEL','=','pabrik.kode_pabrik')
-      ->select('users.*', 'penjualan.*', 'penjualan.created_at as tanggal','member.nama as nama_member','pabrik.kode_pabrik')
+      ->select('users.*', 'penjualan.*', 'penjualan.created_at as tanggal','member.nama as nama_member')
       ->whereBetween('penjualan.created_at',[$awal.'%',$akhir.'%'])
       ->whereIn('id_penjualan',$id_penjualan)
       ->orderBy('penjualan.id_penjualan', 'desc')
@@ -76,25 +74,17 @@ class PenjualanController extends Controller{
 
     foreach($penjualan as $list){
 
-      if($list->kode_member == 0 || $list->kode_member == null){
-        $tipe_bayar = 'Cash';
-        $nama_member = '';
-      }else{
-        $tipe_bayar = 'Credit';
-        $nama_member = $list->nama_member;
-      }
-
       $no ++;
       $row = array();
       $row[] = $list->id_penjualan;
       $row[] = $list->unit;
       $row[] = tanggal_indonesia(substr($list->tanggal, 0, 10), false);
-      $row[] = $list->kode_pabrik;
+      $row[] = $list->CODE_KEL;
       $row[] = $list->kode_member;
       $row[] = $nama_member;
       $row[] = $list->total_item;
       $row[] = $list->total_harga;
-      $row[] = $tipe_bayar;
+      $row[] = $list->type_transaksi;
       $row[] = '<div class="btn-group">
               <a onclick="deleteData('.$list->id_penjualan.')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
               </div>';
