@@ -116,22 +116,28 @@
 
 
       <label for="jumlah" class="col-md-3 control-label">Penjualan Cash</label>
-            <div class="col-xs-2">
-               <input id="pendapatan" type="text" class="form-control" name="pendapatan" value="{{number_format($cash)}}" readonly>
-               <span class="help-block with-errors"></span>
-            </div>
+      <div class="col-xs-2">
+         <input id="pendapatan" type="text" class="form-control" name="pendapatan" value="{{number_format($cash)}}" readonly>
+         <span class="help-block with-errors"></span>
+      </div>
             
       <label for="jumlah" class="col-md-3 control-label">Setoran Angsuran/Pelunasan</label>
-            <div class="col-xs-2">
-               <input id="pendapatan" type="text" class="form-control" name="pendapatan" value="{{number_format($setoran->setoran)}}" readonly>
-               <span class="help-block with-errors"></span>
-            </div>
+      <div class="col-xs-2">
+         <input id="pendapatan" type="text" class="form-control" name="pendapatan" value="{{number_format($setoran->setoran)}}" readonly>
+         <span class="help-block with-errors"></span>
+      </div>
       
       <label for="jumlah" class="col-md-3 control-label">Penjualan Musawamah</label>
-            <div class="col-xs-2">
-               <input id="pendapatan" type="text" class="form-control" name="pendapatan" value="{{number_format($musawamah)}}" readonly>
-               <span class="help-block with-errors"></span>
-            </div>
+      <div class="col-xs-2">
+         <input id="pendapatan" type="text" class="form-control" name="pendapatan" value="{{number_format($musawamah)}}" readonly>
+         <span class="help-block with-errors"></span>
+      </div>
+
+      <label for="jumlah" class="col-md-3 control-label">Cash Penjualan Lebih Plafond</label>
+      <div class="col-xs-2">
+         <input id="pendapatan" type="text" class="form-control" name="pendapatan" value="{{number_format($cash_lebih_plafond->cash_lebih)}}" readonly>
+         <span class="help-block with-errors"></span>
+      </div>
       
       </div>
 

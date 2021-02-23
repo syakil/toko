@@ -50,6 +50,24 @@ class KasaController extends Controller{
                            ->where('type_transaksi','credit')
                            ->first();
 
+      $id_penjualan = array();
+
+      $transaksi = Penjualan::where('created_at', 'like', $tanggal.'%')
+                           ->where('unit', '=', Auth::user()->unit)
+                           ->where('type_transaksi','credit')
+                           ->get();
+
+      foreach ($transaksi as $key) {
+         $id_penjualan[] = $key->id_penjualan;
+      }
+
+      $cash_lebih_plafond = TabelTransaksi::select(\DB::raw('sum(debet) as cash_lebih'))
+      ->where('kode_rekening',1120000)
+      ->where('tanggal_transaksi',$tanggal)
+      ->where('unit',Auth::user()->unit)
+      ->whereIn('kode_transaksi',$id_penjualan)
+      ->first();
+
       $setoran = TabelTransaksi::select(\DB::raw('sum(debet) as setoran'))
       ->where('kode_rekening',1120000)
       ->where('tanggal_transaksi',$tanggal)
@@ -59,7 +77,7 @@ class KasaController extends Controller{
 
       $musawamah = $penjualan_musawamah->musawamah;
 
-      return view('kasa.index',compact('cash','musawamah','setoran')); 
+      return view('kasa.index',compact('cash','musawamah','setoran','cash_lebih_plafond')); 
    
    }
 
@@ -412,7 +430,7 @@ class KasaController extends Controller{
          
          $namahari = date('l', strtotime($tanggal_esok_carbon->addDays(1)->toDateString()));
          
-         if ($namahari == 'Saturday') {
+         if ($namahari == "Saturday") {
             
             $tgl_esok = $tanggal_carbon->addDays(3);
             $namahari = date('l', strtotime($cek_hari->addDays(3)->toDateString()));
@@ -421,7 +439,7 @@ class KasaController extends Controller{
          }else {
             
             $tgl_esok = $tanggal_carbon->addDays(1);
-            $namahari = date('l', strtotime($cek_hari->addDays(1)->toDateString()));
+            $namahari = date("l", strtotime($cek_hari->addDays(1)->toDateString()));
             $tgl_tunggakan = $tanggal_tunggak_carbon->subDays(14)->toDateString();
          }
 
@@ -513,11 +531,11 @@ class KasaController extends Controller{
 
          $delete_tunggakan = DB::table("tunggakan_toko")->where("tgl_tunggak",$tgl_esok)->where("KREDIT",">",0)->where("unit",$unit)->delete();
          // tunggakan
-         $member_tunggakan = DB::table("musawamah")->where("unit",$unit)->where("os",">",0)->where("hari",$hari)->where('tgl_wakalah','<=',$tgl_tunggakan)->orderBy('tgl_wakalah','desc')->get();
+         $member_tunggakan = DB::table("musawamah")->where("unit",$unit)->where("os",">",0)->where("hari",$hari)->where("tgl_wakalah","<=",$tgl_tunggakan)->orderBy("tgl_wakalah","desc")->get();
         
          foreach ($member_tunggakan as $data){
             
-            $param_tgl = \App\ParamTgl::where("nama_param_tgl","tanggal_transaksi")->where('unit',Auth::user()->id)->first();   
+            $param_tgl = \App\ParamTgl::where("nama_param_tgl","tanggal_transaksi")->where("unit",Auth::user()->id)->first();   
             $tanggal = $param_tgl->param_tgl;
             $kode_kelompok = $data->code_kel;
             $angsuran = $data->angsuran;
