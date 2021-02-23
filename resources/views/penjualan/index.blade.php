@@ -55,7 +55,7 @@
       <th>Kode Transaksi</th>
       <th>Unit</th>
       <th>Tanggal</th>
-      <th>Id Pabrik</th>
+      <th>Kode Kelompok</th>
       <th>Id Member</th>
       <th>Nama</th>
       <th>Total Item</th>
