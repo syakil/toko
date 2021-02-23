@@ -36,7 +36,8 @@ class ApproveStokOpnameParsialTokoController extends Controller
             }
         }   
 
-        $data_so = StokOpnameParsial::leftJoin('branch','branch.kode_toko','stok_opname_parsial.unit')
+        $data_so = StokOpnameParsial::select('stok_opname_parsial.*','produk.nama_produk','branch.nama_toko')
+        ->leftJoin('branch','branch.kode_toko','stok_opname_parsial.unit')
         ->leftJoin('produk','produk.kode_produk','stok_opname_parsial.kode_produk')
         ->whereIn('stok_opname_parsial.unit',$kode_branch)
         ->where('produk.unit',Auth::user()->unit)
