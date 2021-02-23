@@ -531,7 +531,7 @@ class ApproveStokOpnameParsialTokoController extends Controller
            
             DB::rollback();
             
-            return back()->with(['error' => $e->getmessage()]);
+            return back()->with(['error' => $e->getmessage() . $e->getLine()]);
     
         }
 
