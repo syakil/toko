@@ -81,7 +81,7 @@ class PenjualanController extends Controller{
       $row[] = tanggal_indonesia(substr($list->tanggal, 0, 10), false);
       $row[] = $list->CODE_KEL;
       $row[] = $list->kode_member;
-      $row[] = $nama_member;
+      $row[] = $list->nama;
       $row[] = $list->total_item;
       $row[] = $list->total_harga;
       $row[] = $list->type_transaksi;
