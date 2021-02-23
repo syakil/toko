@@ -49,7 +49,7 @@ class PenjualanController extends Controller{
   
       $penjualan = Penjualan::leftJoin('users', 'users.id', '=', 'penjualan.id_user')
       ->leftJoin('member','member.kode_member','=','penjualan.kode_member')
-      ->select('users.*', 'penjualan.*', 'penjualan.created_at as tanggal','member.nama as nama_member')
+      ->select('users.*', 'penjualan.*', 'penjualan.created_at as tanggal','member.nama as nama_member','member.CODE_KEL')
       ->where('penjualan.created_at','LIKE', $awal.'%')
       ->whereIn('id_penjualan',$id_penjualan)
       ->orderBy('penjualan.id_penjualan', 'desc')
@@ -59,7 +59,7 @@ class PenjualanController extends Controller{
       
       $penjualan = Penjualan::leftJoin('users', 'users.id', '=', 'penjualan.id_user')
       ->leftJoin('member','member.kode_member','=','penjualan.kode_member')
-      ->select('users.*', 'penjualan.*', 'penjualan.created_at as tanggal','member.nama as nama_member')
+      ->select('users.*', 'penjualan.*', 'penjualan.created_at as tanggal','member.nama as nama_member','member.CODE_KEL')
       ->whereBetween('penjualan.created_at',[$awal.'%',$akhir.'%'])
       ->whereIn('id_penjualan',$id_penjualan)
       ->orderBy('penjualan.id_penjualan', 'desc')
@@ -81,7 +81,7 @@ class PenjualanController extends Controller{
       $row[] = tanggal_indonesia(substr($list->tanggal, 0, 10), false);
       $row[] = $list->CODE_KEL;
       $row[] = $list->kode_member;
-      $row[] = $list->nama;
+      $row[] = $list->nama_member;
       $row[] = $list->total_item;
       $row[] = $list->total_harga;
       $row[] = $list->type_transaksi;
