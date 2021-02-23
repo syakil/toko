@@ -61,7 +61,7 @@ class KasaController extends Controller{
          $id_penjualan[] = $key->id_penjualan;
       }
 
-      $cash_lebih_plafond = TabelTransaksi::select(\DB::raw('sum(debet) as cash_lebih'))
+      $cash_lebih_plafond = TabelTransaksi::select(\DB::raw('sum(debet-kredit) as cash_lebih'))
       ->where('kode_rekening',1120000)
       ->where('tanggal_transaksi',$tanggal)
       ->where('unit',Auth::user()->unit)
@@ -312,7 +312,7 @@ class KasaController extends Controller{
       }catch(\Exception $e){
          
          DB::rollback();
-         return back()->with(["error" => $e->getmessage()]);
+         return back()->with(["error" => $e->getmessage() . ' ' . $e->getLine() ]);
 
       }
 
@@ -607,7 +607,7 @@ class KasaController extends Controller{
       }catch(\Exception $e){
          
          DB::rollback();
-         return redirect()->route("kasa.index")->with(['error' => $e->getmessage()]);
+         return redirect()->route("kasa.index")->with(['error' => $e->getmessage(). ' ' . $e->getLine()]);
 
       }
                
