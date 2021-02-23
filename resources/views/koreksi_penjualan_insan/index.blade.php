@@ -58,16 +58,16 @@
 <table class="table table-striped tabel-penjualan">
 <thead>
    <tr>
-      <th width="30">No</th>
+      <th>No</th>
       <th>Kode Produk</th>
       <th>Nama Produk</th>
       <th>Stok</th>
       <th>Jumlah Awal</th>
-      <th align="right">Harga</th>
+      <th>Harga</th>
       <th>Jumlah</th>
       <th>Diskon</th>
-      <th align="right">Sub Total</th>
-      <th width="100">Aksi</th>
+      <th>Sub Total</th>
+      <th>Aksi</th>
    </tr>
 </thead>
 <tbody></tbody>
