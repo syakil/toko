@@ -117,6 +117,11 @@ Route::group(['middleware' => ['web', 'cekuser:2']], function(){
    
 Route::group(['middleware' => ['web', 'cekuser:1' ]], function(){
 
+   // reset pin
+   Route::get('reset_pin/index', 'ResetPinController@index')->name('reset_pin.index');
+   Route::get('reset_pin/data', 'ResetPinController@listData')->name('reset_pin.data');
+   Route::get('reset_pin/reset/{kode_member}', 'ResetPinController@reset')->name('reset_pin.reset');
+
    Route::get('member/data', 'MemberController@listData')->name('member.data');
    Route::post('member/cetak', 'MemberController@printCard');
    Route::resource('member', 'MemberController');

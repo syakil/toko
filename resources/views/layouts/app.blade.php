@@ -86,6 +86,7 @@
       @if( Auth::user()->level == 1 )
           
         <li><a href="{{ route('member.index') }}"><i class="fa fa-credit-card"></i> <span>Member</span></a></li>  
+        <li><a href="{{ route('reset_pin.index') }}"><i class="fa fa-credit-card"></i> <span>Reset PIN</span></a></li>  
         <li class="treeview">
           <a href="#">
             <i class="fa fa-shopping-cart"></i>
