@@ -49,7 +49,8 @@
         <form action="{{route('approve_terima_toko.approve')}}" method="post">
           {{csrf_field()}}
           <input type="hidden" name="id" value="{{$id}}">
-          <button type="submit" class='btn btn-danger pull-right'>Prosess</button>
+          <button type="submit" class='btn btn-success pull-right'>Approve</button>
+          <a href="{{route('approve_terima_toko.reject',$id)}}" class='btn btn-danger'>Reject</a>
         </form>
       </div>
     </div>

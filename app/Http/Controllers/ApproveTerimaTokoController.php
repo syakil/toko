@@ -40,7 +40,7 @@ class ApproveTerimaTokoController extends Controller{
         $kirim = Kirim::select('kirim_barang.*','branch.nama_toko')
         ->leftJoin('branch','branch.kode_toko','kirim_barang.kode_gudang')
         ->whereIn('id_supplier',$kode_toko)
-        ->where('kirim_barang.status','approval')
+        ->where('kirim_barang.status','approval_terima')
         ->get();
 
 
@@ -1387,4 +1387,15 @@ class ApproveTerimaTokoController extends Controller{
         }
 
     }
+
+    public function reject($id){
+
+        $kirim = Kirim::where('id_pembelian',$id)->first();
+        $kirim->status = 1;
+        $kirim->update();
+
+        return redirect()->route('approve_terima_toko.index')->with(['success' => 'Surat Jalan Berhasil Di Reject !']);;
+    }
+
+
 }

@@ -746,6 +746,7 @@ Route::group(['middleware' => ['web', 'cekuser:10' ]], function(){
    Route::get('approve_terima_toko/detail/{id}','ApproveTerimaTokoController@detail')->name('approve_terima_toko.detail');
    Route::get('approve_terima_toko/listDetail/{id}','ApproveTerimaTokoController@listDetail')->name('approve_terima_toko.listDetail');
    Route::post('approve_terima_toko/approve', 'ApproveTerimaTokoController@approve')->name('approve_terima_toko.approve');
+   Route::get('approve_terima_toko/reject/{id}', 'ApproveTerimaTokoController@reject')->name('approve_terima_toko.reject');
 
 
 

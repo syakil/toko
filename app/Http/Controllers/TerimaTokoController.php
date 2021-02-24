@@ -100,7 +100,7 @@ class TerimaTokoController extends Controller
             // insert_jurnal
 
             foreach($data as $id){      
-                $kirim_status = Kirim::where('id_pembelian',$id)->update(['status'=>'approval']);
+                $kirim_status = Kirim::where('id_pembelian',$id)->update(['status'=>'approval_terima']);
             }
 
             DB::commit();
