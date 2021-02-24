@@ -285,7 +285,7 @@ class ApproveStokOpnameParsialGudangController extends Controller
                     $kartu_stok->unit = $value->unit;
                     $kartu_stok->save();
 
-                }else {
+                }elseif($value->qty < $master_produk->stok) {
                     
                     $selisih = $value->stok_system - $value->qty;
 

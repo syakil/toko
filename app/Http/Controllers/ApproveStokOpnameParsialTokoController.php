@@ -285,7 +285,7 @@ class ApproveStokOpnameParsialTokoController extends Controller
                         
                     }
 
-                }else {
+                }elseif ($value->qty < $master_produk->stok){
                     
                     $selisih = $value->stok_system - $value->qty;
                     
@@ -305,10 +305,10 @@ class ApproveStokOpnameParsialTokoController extends Controller
                
                     produk:
                     $produk_detail = ProdukDetail::where('kode_produk',$value->kode_produk)
-                        ->where('unit',$unit)
-                        ->where('stok_detail','>','0')
-                        ->orderBy('tanggal_masuk','ASC')
-                        ->first();
+                                    ->where('unit',$unit)
+                                    ->where('stok_detail','>','0')
+                                    ->orderBy('tanggal_masuk','ASC')
+                                    ->first();
                     
                     // buat variable stok toko dari column stok_detail dari table produk_detail
                     $stok_toko = $produk_detail->stok_detail;
