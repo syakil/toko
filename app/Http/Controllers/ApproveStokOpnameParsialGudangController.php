@@ -236,7 +236,7 @@ class ApproveStokOpnameParsialGudangController extends Controller
                         $jurnal->tanggal_transaksi  = $tanggal;
                         $jurnal->jenis_transaksi  = 'Jurnal System';
                         $jurnal->keterangan_transaksi = 'Stok Opname '. $value->kode_produk;
-                        $jurnal->debet = $harga_jual;
+                        $jurnal->debet = $harga_beli;
                         $jurnal->kredit = 0;
                         $jurnal->tanggal_posting = '';
                         $jurnal->keterangan_posting = '0';
@@ -258,20 +258,7 @@ class ApproveStokOpnameParsialGudangController extends Controller
                         $jurnal->id_admin = Auth::user()->id; 
                         $jurnal->save();
                         
-                        // PMYD-PYD Musawamah
-                        $jurnal = new TabelTransaksi;
-                        $jurnal->unit =  $unit; 
-                        $jurnal->kode_transaksi = $kode_transaksi;
-                        $jurnal->kode_rekening = 1483000;
-                        $jurnal->tanggal_transaksi  = $tanggal;
-                        $jurnal->jenis_transaksi  = 'Jurnal System';
-                        $jurnal->keterangan_transaksi = 'Stok Opname '. $value->kode_produk;
-                        $jurnal->debet = 0;
-                        $jurnal->kredit = $margin;
-                        $jurnal->tanggal_posting = '';
-                        $jurnal->keterangan_posting = '0';
-                        $jurnal->id_admin = Auth::user()->id; 
-                        $jurnal->save();
+                    
                         
                     }
 
@@ -347,20 +334,6 @@ class ApproveStokOpnameParsialGudangController extends Controller
                         $jurnal->save();
 
                         $jurnal = new TabelTransaksi;
-                        $jurnal->unit = $unit; 
-                        $jurnal->kode_transaksi = $kode_transaksi;
-                        $jurnal->kode_rekening = 1483000;
-                        $jurnal->tanggal_transaksi  = $tanggal;
-                        $jurnal->jenis_transaksi  = 'Jurnal System';
-                        $jurnal->keterangan_transaksi = 'Stok Opname ' . $value->kode_produk;
-                        $jurnal->debet = $margin;
-                        $jurnal->kredit =0;
-                        $jurnal->tanggal_posting = '';
-                        $jurnal->keterangan_posting = '0';
-                        $jurnal->id_admin = Auth::user()->id; 
-                        $jurnal->save();
-
-                        $jurnal = new TabelTransaksi;
                         $jurnal->unit =  $unit; 
                         $jurnal->kode_transaksi = $kode_transaksi;
                         $jurnal->kode_rekening = 1482000;
@@ -368,7 +341,7 @@ class ApproveStokOpnameParsialGudangController extends Controller
                         $jurnal->jenis_transaksi  = 'Jurnal System';
                         $jurnal->keterangan_transaksi = 'Stok Opname ' . $value->kode_produk;
                         $jurnal->debet =0;
-                        $jurnal->kredit = $harga_jual;
+                        $jurnal->kredit = $harga_beli;
                         $jurnal->tanggal_posting = '';
                         $jurnal->keterangan_posting = '0';
                         $jurnal->id_admin = Auth::user()->id; 
@@ -417,20 +390,6 @@ class ApproveStokOpnameParsialGudangController extends Controller
                             $jurnal->save();
     
                             $jurnal = new TabelTransaksi;
-                            $jurnal->unit = $unit; 
-                            $jurnal->kode_transaksi = $kode_transaksi;
-                            $jurnal->kode_rekening = 1483000;
-                            $jurnal->tanggal_transaksi  = $tanggal;
-                            $jurnal->jenis_transaksi  = 'Jurnal System';
-                            $jurnal->keterangan_transaksi = 'Stok Opname ' . $value->kode_produk;
-                            $jurnal->debet = $margin;
-                            $jurnal->kredit =0;
-                            $jurnal->tanggal_posting = '';
-                            $jurnal->keterangan_posting = '0';
-                            $jurnal->id_admin = Auth::user()->id; 
-                            $jurnal->save();
-    
-                            $jurnal = new TabelTransaksi;
                             $jurnal->unit =  $unit; 
                             $jurnal->kode_transaksi = $kode_transaksi;
                             $jurnal->kode_rekening = 1482000;
@@ -438,7 +397,7 @@ class ApproveStokOpnameParsialGudangController extends Controller
                             $jurnal->jenis_transaksi  = 'Jurnal System';
                             $jurnal->keterangan_transaksi = 'Stok Opname ' . $value->kode_produk;
                             $jurnal->debet =0;
-                            $jurnal->kredit = $harga_jual;
+                            $jurnal->kredit = $harga_beli;
                             $jurnal->tanggal_posting = '';
                             $jurnal->keterangan_posting = '0';
                             $jurnal->id_admin = Auth::user()->id; 
@@ -488,20 +447,6 @@ class ApproveStokOpnameParsialGudangController extends Controller
                             $jurnal->save();
 
                             $jurnal = new TabelTransaksi;
-                            $jurnal->unit = $unit; 
-                            $jurnal->kode_transaksi = $kode_transaksi;
-                            $jurnal->kode_rekening = 1483000;
-                            $jurnal->tanggal_transaksi  = $tanggal;
-                            $jurnal->jenis_transaksi  = 'Jurnal System';
-                            $jurnal->keterangan_transaksi = 'Stok Opname ' . $value->kode_produk;
-                            $jurnal->debet = $margin;
-                            $jurnal->kredit =0;
-                            $jurnal->tanggal_posting = '';
-                            $jurnal->keterangan_posting = '0';
-                            $jurnal->id_admin = Auth::user()->id; 
-                            $jurnal->save();
-
-                            $jurnal = new TabelTransaksi;
                             $jurnal->unit =  $unit; 
                             $jurnal->kode_transaksi = $kode_transaksi;
                             $jurnal->kode_rekening = 1482000;
@@ -509,7 +454,7 @@ class ApproveStokOpnameParsialGudangController extends Controller
                             $jurnal->jenis_transaksi  = 'Jurnal System';
                             $jurnal->keterangan_transaksi = 'Stok Opname ' . $value->kode_produk;
                             $jurnal->debet =0;
-                            $jurnal->kredit = $harga_jual;
+                            $jurnal->kredit = $harga_beli;
                             $jurnal->tanggal_posting = '';
                             $jurnal->keterangan_posting = '0';
                             $jurnal->id_admin = Auth::user()->id; 
