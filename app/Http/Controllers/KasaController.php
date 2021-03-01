@@ -387,7 +387,7 @@ class KasaController extends Controller{
             
             $rata_rata_kirim = KirimDetail::whereIn("id_pembelian",$id_kirim)->where("kode_produk",$value->kode_produk)->avg("jumlah");
             $rata_rata_terima = KirimDetail::whereIn("id_pembelian",$id_terima)->where("kode_produk",$value->kode_produk)->avg("jumlah_terima");
-            $rata_rata_pembelian = PenjualanDetail::where("kode_produk",$value->kode_produk)->leftJoin('penjualan','penjualan.id_penjualan','penjualan_detail.id_penjualan')->where("id_user",Auth::user()->id)->whereMonth('penjualan_detail.updated_at',$bulan_sekarang)->avg("jumlah");
+            $rata_rata_pembelian = PenjualanDetail::where("kode_produk",$value->kode_produk)->leftJoin("penjualan","penjualan.id_penjualan","penjualan_detail.id_penjualan")->where("id_user",Auth::user()->id)->whereMonth('penjualan_detail.updated_at',$bulan_sekarang)->avg("jumlah");
             
             $rata_rata = $rata_rata_kirim + $rata_rata_terima + $rata_rata_pembelian;
             
