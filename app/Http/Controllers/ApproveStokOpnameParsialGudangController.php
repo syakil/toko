@@ -28,13 +28,12 @@ class ApproveStokOpnameParsialGudangController extends Controller
 
     public function listData(){
 
-        $data_unit = Branch::where('kode_gudang',Auth::user()->unit)->groupBy('kode_gudang')->get();
+        $data_unit = Branch::groupBy('kode_gudang')->get();
         $kode_branch = array();
 
         foreach ($data_unit as $value) {
-            if ($value->kode_toko != Auth::user()->unit) {
-                $kode_branch[] = $value->kode_gudang;
-            }
+            $kode_branch[] = $value->kode_gudang;
+
         }   
 
         $data_so = StokOpnameParsial::leftJoin('branch','branch.kode_toko','stok_opname_parsial.unit')
@@ -84,14 +83,15 @@ class ApproveStokOpnameParsialGudangController extends Controller
             
             DB::beginTransaction();
             
-            $data_unit = Branch::where('kode_gudang',Auth::user()->unit)->get();
+            $data_unit = Branch::groupBy('kode_gudang')->get();
             $kode_branch = array();
+    
             foreach ($data_unit as $value) {
-                if ($value->kode_toko != Auth::user()->unit) {
-                    $kode_branch[] = $value->kode_toko;
-                }
+                
+                $kode_branch[] = $value->kode_gudang;
+                
             }   
-
+    
 
             $data = StokOpnameParsial::whereIn('unit',$kode_branch)->where('status',2)->get();
 
