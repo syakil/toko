@@ -42,6 +42,7 @@ class StockTokoController extends Controller
     }
 
     public function detail($id){
+
         $produk = ProdukDetail::where('kode_produk',$id)
                         ->where('unit', '=',  Auth::user()->unit)
                         ->get();
@@ -142,7 +143,13 @@ class StockTokoController extends Controller
                 $kartu_stok->unit = Auth::user()->unit;
                 $kartu_stok->save();
                 
-
+                $stok_opname_parsial = new StokOpnameParsial;
+                $stok_opname_parsial->stok_system = $produk->stok;
+                $stok_opname_parsial->kode_produk = $produk->kode_produk;
+                $stok_opname_parsial->unit = Auth::user()->unit;
+                $stok_opname_parsial->status = 1;
+                $stok_opname_parsial->save();
+    
                     if ($data_produk_detail) {
                         
                         $harga_jual = $data_produk_detail->harga_jual_umum * $selisih;
