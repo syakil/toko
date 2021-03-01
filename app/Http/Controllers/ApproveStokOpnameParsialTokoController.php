@@ -107,6 +107,7 @@ class ApproveStokOpnameParsialTokoController extends Controller
                 
                 $master_produk = Produk::where('kode_produk',$value->kode_produk)->where('unit',$unit)->first();
 
+                $value->status = 3;
                 $value->stok_system = $master_produk->stok;
                 $value->update();
                 
@@ -520,9 +521,6 @@ class ApproveStokOpnameParsialTokoController extends Controller
                     }
 
                 }
-
-                $value->status = 3;
-                $value->update();
 
             }
 
