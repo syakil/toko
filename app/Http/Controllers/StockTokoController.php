@@ -9,6 +9,7 @@ use App\ProdukDetail;
 use App\KartuStok;
 use App\Produk;
 use DB;
+use App\StokOpnameParsial;
 use App\ProdukSelisih;
 use App\TabelTransaksi;
 
