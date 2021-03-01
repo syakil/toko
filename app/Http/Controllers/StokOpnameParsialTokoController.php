@@ -32,8 +32,7 @@ class StokOpnameParsialTokoController extends Controller{
 
     public function store(Request $request){
 
-        
-        $data = DB::table('stok_opname_parsial')->where('unit',Auth::user()->unit)->update(['status' => 2,'tanggal_so' => date('Y-m-d')]);
+        $data = DB::table('stok_opname_parsial')->where('unit',Auth::user()->unit)->where('status',1)->update(['status' => 2,'tanggal_so' => date('Y-m-d')]);
         return redirect()->route('stok_opname_parsial_toko.index')->with(['success' => 'Selamat Stok Opname Parsial Berhasil !']);
 
     }
