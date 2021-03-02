@@ -532,75 +532,77 @@ class KasaController extends Controller{
          $delete_tunggakan = DB::table("tunggakan_toko")->where("tgl_tunggak",$tgl_esok)->where("KREDIT",">",0)->where("unit",$unit)->delete();
          // tunggakan
          $member_tunggakan = DB::table("musawamah")->where("unit",$unit)->where("os",">",0)->where("hari",$hari)->where("tgl_wakalah","<=",$tgl_tunggakan)->orderBy("tgl_wakalah","desc")->get();
-        
-         foreach ($member_tunggakan as $data){
+         $param_libur = \App\ParamLibur::where("tgl_libur",$tgl_esok)->first(); 
+         
+         if (empty($param_libur)) {
             
-            $param_tgl = \App\ParamTgl::where("nama_param_tgl","tanggal_transaksi")->where("unit",Auth::user()->id)->first();   
-            $tanggal = $param_tgl->param_tgl;
-            $kode_kelompok = $data->code_kel;
-            $angsuran = $data->angsuran;
-            $nama = $data->Cust_Short_name;
-            $cao = $data->cao;
-            $id = $data->id_member;
+            foreach ($member_tunggakan as $data){
+            
+               $param_tgl = \App\ParamTgl::where("nama_param_tgl","tanggal_transaksi")->where("unit",Auth::user()->id)->first();   
+               $tanggal = $param_tgl->param_tgl;
+               $kode_kelompok = $data->code_kel;
+               $angsuran = $data->angsuran;
+               $nama = $data->Cust_Short_name;
+               $cao = $data->cao;
+               $id = $data->id_member;
 
-            $tunggakan_data = Musawamah::where("id_member",$data->id_member)->first();
-            $tunggakan_selanjutnya = $tunggakan_data->bulat + $tunggakan_data->angsuran;
+               $tunggakan_data = Musawamah::where("id_member",$data->id_member)->first();
+               $tunggakan_selanjutnya = $tunggakan_data->bulat + $tunggakan_data->angsuran;
 
-            if ($tunggakan_data->bulat < $tunggakan_data->os) {
+               if ($tunggakan_data->bulat < $tunggakan_data->os) {
 
-               if ($tunggakan_selanjutnya > $tunggakan_data->os) {
-               
-                  $nominal_tunggakan = $tunggakan_data->os - $tunggakan_data->bulat;
-                  // dd($tunggakan_selanjutnya)
-                  $tunggakan = new TunggakanToko;
-                  $tunggakan->tgl_tunggak = $tgl_esok;
-                  $tunggakan->NOREK = $id;
-                  $tunggakan->unit = $unit;
-                  $tunggakan->CIF = $id;
-                  $tunggakan->CODE_KEL = $kode_kelompok;
-                  $tunggakan->DEBIT = 0;
-                  $tunggakan->type = "01";
-                  $tunggakan->KREDIT = $nominal_tunggakan;
-                  $tunggakan->USERID = $unit;
-                  $tunggakan->KET = "Tunggakan" . " " . $id . " an/ " . $nama;
-                  $tunggakan->cao = $cao;
-                  $tunggakan->blok = 1;
-                  $tunggakan->save();
+                  if ($tunggakan_selanjutnya > $tunggakan_data->os) {
                   
-                  $tunggakan_data->bulat = $tunggakan_data->os;
-                  $tunggakan_data->update();
-               
-               }else {
-
-                  $tunggakan = new TunggakanToko;
-                  $tunggakan->tgl_tunggak = $tgl_esok;
-                  $tunggakan->NOREK = $id;
-                  $tunggakan->unit = $unit;
-                  $tunggakan->CIF = $id;
-                  $tunggakan->CODE_KEL = $kode_kelompok;
-                  $tunggakan->DEBIT = 0;
-                  $tunggakan->type = "01";
-                  $tunggakan->KREDIT = $angsuran;
-                  $tunggakan->USERID = $unit;
-                  $tunggakan->KET = "Tunggakan" . " " . $id . " an/ " . $nama;
-                  $tunggakan->cao = $cao;
-                  $tunggakan->blok = 1;
-                  $tunggakan->save();
+                     $nominal_tunggakan = $tunggakan_data->os - $tunggakan_data->bulat;
+                     // dd($tunggakan_selanjutnya)
+                     $tunggakan = new TunggakanToko;
+                     $tunggakan->tgl_tunggak = $tgl_esok;
+                     $tunggakan->NOREK = $id;
+                     $tunggakan->unit = $unit;
+                     $tunggakan->CIF = $id;
+                     $tunggakan->CODE_KEL = $kode_kelompok;
+                     $tunggakan->DEBIT = 0;
+                     $tunggakan->type = "01";
+                     $tunggakan->KREDIT = $nominal_tunggakan;
+                     $tunggakan->USERID = $unit;
+                     $tunggakan->KET = "Tunggakan" . " " . $id . " an/ " . $nama;
+                     $tunggakan->cao = $cao;
+                     $tunggakan->blok = 1;
+                     $tunggakan->save();
+                     
+                     $tunggakan_data->bulat = $tunggakan_data->os;
+                     $tunggakan_data->update();
                   
-                  $tunggakan_data->bulat += $angsuran;
-                  $tunggakan_data->update();
+                  }else {
+
+                     $tunggakan = new TunggakanToko;
+                     $tunggakan->tgl_tunggak = $tgl_esok;
+                     $tunggakan->NOREK = $id;
+                     $tunggakan->unit = $unit;
+                     $tunggakan->CIF = $id;
+                     $tunggakan->CODE_KEL = $kode_kelompok;
+                     $tunggakan->DEBIT = 0;
+                     $tunggakan->type = "01";
+                     $tunggakan->KREDIT = $angsuran;
+                     $tunggakan->USERID = $unit;
+                     $tunggakan->KET = "Tunggakan" . " " . $id . " an/ " . $nama;
+                     $tunggakan->cao = $cao;
+                     $tunggakan->blok = 1;
+                     $tunggakan->save();
+                     
+                     $tunggakan_data->bulat += $angsuran;
+                     $tunggakan_data->update();
+         
       
+                  }  
       
-               }  
-      
-            }
+               }
             
                $member_status = Member::where('kode_member',$data->id_member)->first();
                $member_status->status_member ="Blok";
                $member_status->update();            
+            } 
          }
-
-         
             
          DB::commit();
       
