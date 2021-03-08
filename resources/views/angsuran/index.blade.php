@@ -418,7 +418,10 @@ function showMember(){
 
 <script>
 $('.selesai').on('click',function(){
-    location.reload(true);
+    id_member = $('#id_member').val();
+    url = "{{route('angsuran.print',':id')}}"
+    url = url.replace(':id',id_member);
+    window.open(url);
 })
 
 </script>

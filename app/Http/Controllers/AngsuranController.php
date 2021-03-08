@@ -166,6 +166,7 @@ class AngsuranController extends Controller
 
             
             switch ($jenis_transaksi) {
+                
                 case 'titipan':
 
                 if($titipan < $angsuran){
@@ -194,7 +195,8 @@ class AngsuranController extends Controller
                     break;
                 
                 default:
-                    break;
+                
+                break;
             }
             
             switch ($jenis_transaksi) {
@@ -274,8 +276,24 @@ class AngsuranController extends Controller
                     $member->tgl_input = $tanggal;
                     $member->cao =$cao;
                     $member->save();
-
+                    
                     $musawamah = Musawamah::where('id_member',$id)->first();
+                    
+                    $Mdetail = new MusawamahDetail;
+                    $Mdetail->BUSS_DATE = $tanggal;
+                    $Mdetail->NOREK = $musawamah->id_member;
+                    $Mdetail->UNIT = $musa->unit;
+                    $Mdetail->id_member = $musawamah->id_member;
+                    $Mdetail->code_kel = $musawamah->id_member;
+                    $Mdetail->DEBIT = $angsuran;
+                    $Mdetail->TYPE = 3;
+                    $Mdetail->KREDIT =  0;
+                    $Mdetail->USERID =  Auth::user()->id;
+                    $Mdetail->KET =  'musawamah';
+                    $Mdetail->CAO =  $musawamah->cao;
+                    $Mdetail->kode_transaksi = $kode_t;
+                    $Mdetail->save();
+
                     
                     // mengurangi tunggakan       
                     if($musawamah->bulat > 0 ){  
@@ -486,6 +504,21 @@ class AngsuranController extends Controller
         
                         $musawamah = Musawamah::where('id_member',$id)->first();
                         
+                        $Mdetail = new MusawamahDetail;
+                        $Mdetail->BUSS_DATE = $tanggal;
+                        $Mdetail->NOREK = $musawamah->id_member;
+                        $Mdetail->UNIT = $musa->unit;
+                        $Mdetail->id_member = $musawamah->id_member;
+                        $Mdetail->code_kel = $musawamah->id_member;
+                        $Mdetail->DEBIT = $os;
+                        $Mdetail->TYPE = 3;
+                        $Mdetail->KREDIT =  0;
+                        $Mdetail->USERID =  Auth::user()->id;
+                        $Mdetail->KET =  'musawamah';
+                        $Mdetail->CAO =  $musawamah->cao;
+                        $Mdetail->kode_transaksi = $kode_t;
+                        $Mdetail->save();
+                        
                         if($musawamah->bulat > 0 ){
                         $tunggakan = new TunggakanToko;
                         $tunggakan->tgl_tunggak = $tanggal;
@@ -509,9 +542,9 @@ class AngsuranController extends Controller
                         $musawamah->ijaroh = 0;
                         $musawamah->update();
                     
-                        $member_status = Member::where('kode_member',$id)->first();
-                        $member_status->status_member ="active";
-                        $member_status->update();
+                        // $member_status = Member::where('kode_member',$id)->first();
+                        // $member_status->status_member = "active";
+                        // $member_status->update();
 
                     break;
             }
@@ -530,18 +563,24 @@ class AngsuranController extends Controller
         
         }
     
-        $setting=Setting::find(1);
-        $no = 0;
-        $bayar = $setoran;
-        $sisa = $os;
-    
-        $pdf = PDF::loadView('musawamah_detail.printpembayaran', compact('bayar','sisa','os','musawamah','no','setting'));
-        $pdf->setPaper(array(0,0,700,600), 'potrait');      
-        
-        return $pdf->stream();    
-    
         return back();
 
+    }
+
+    public function print($id_member){
+
+        $data = ListToko::where('id_member',$id_member)->orderBy('buss_date','desc')->first();
+        $musawamah = Musawamah::where('id_member',$id_member)->first();
+
+        $setting=Setting::find(1);
+        $no = 0;
+        $bayar = $request['setoran'];
+        $os = $musawamah->os;
+        $sisa = $os - $bayar;
+    
+        $pdf = PDF::loadView('angsuran.printpembayaran', compact('bayar','sisa','os','musawamah','no','setting'));
+        $pdf->setPaper(array(0,0,700,600), 'potrait');      
+  
     }
 
     public function store_kelompok(Request $request){

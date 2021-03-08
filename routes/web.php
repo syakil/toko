@@ -38,6 +38,7 @@ Route::group(['middleware' => ['web', 'cekuser:2']], function(){
    Route::get('angsuran/listTransaksiKelompok/{id}', 'AngsuranController@listTransaksiKelompok')->name('angsuran.listTransaksiKelompok');
    Route::post('angsuran/addTransaksi/', 'AngsuranController@addTransaksi')->name('angsuran.addTransaksi');
    Route::post('angsuran/store_kelompok/','AngsuranController@store_kelompok')->name('angsuran.store_kelompok');
+   Route::post('angsuran/print/{id_member}','AngsuranController@print')->name('angsuran.print');
 
    // cek harga
    Route::get('cek_harga/index', 'CekHargaController@index')->name('cek_harga.index');
