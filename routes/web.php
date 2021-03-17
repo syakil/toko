@@ -38,7 +38,7 @@ Route::group(['middleware' => ['web', 'cekuser:2']], function(){
    Route::get('angsuran/listTransaksiKelompok/{id}', 'AngsuranController@listTransaksiKelompok')->name('angsuran.listTransaksiKelompok');
    Route::post('angsuran/addTransaksi/', 'AngsuranController@addTransaksi')->name('angsuran.addTransaksi');
    Route::post('angsuran/store_kelompok/','AngsuranController@store_kelompok')->name('angsuran.store_kelompok');
-   Route::post('angsuran/print/{id_member}','AngsuranController@print')->name('angsuran.print');
+   Route::get('angsuran/print/{id_member}','AngsuranController@print')->name('angsuran.print');
 
    // cek harga
    Route::get('cek_harga/index', 'CekHargaController@index')->name('cek_harga.index');
@@ -557,6 +557,13 @@ Route::group(['middleware' => ['web', 'cekuser:7' ]], function(){
    Route::get('user/data', 'UserController@listData')->name('user.data');
    Route::resource('user', 'UserController');
    
+   Route::get('param_kenaikan/index', 'ParamKenaikanController@index')->name('param_kenaikan.index');
+   Route::get('param_kenaikan/edit/{id}', 'ParamKenaikanController@edit')->name('param_kenaikan.edit');
+   Route::get('param_kenaikan/data', 'ParamKenaikanController@listData')->name('param_kenaikan.data');
+   Route::post('param_kenaikan/update/{id}', 'ParamKenaikanController@update')->name('param_kenaikan.update');
+   Route::post('param_kenaikan/store', 'ParamKenaikanController@store')->name('param_kenaikan.store');
+   Route::get('param_kenaikan/delete/{id}', 'ParamKenaikanController@delete')->name('param_kenaikan.delete');
+
    Route::get('all_stok/index','AllStokController@index')->name('all_stok.index');
    Route::get('all_stok/data/{unit}', 'AllStokController@listData')->name('all_stok.data');
    route::get('all_stok/detail/{id}','AllStokController@detail')->name('all_stok.detail');

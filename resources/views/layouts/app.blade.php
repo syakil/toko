@@ -248,6 +248,7 @@
         <li><a href="{{ route('all_stok.index') }}"><i class="fa fa-cubes"></i> <span>Stok</span></a></li>
 
         <li><a href="{{ route('user.index') }}""><i class="fa fa-user"></i> <span>User</span></a></li> 
+        <li><a href="{{ route('param_kenaikan.index') }}""><i class="fa fa-user"></i> <span>Param Kenaikan</span></a></li> 
       
       @elseif( Auth::user()->level == 8 )
 

@@ -159,7 +159,7 @@ class PricingKPController extends Controller
             
             if($produk->harga_jual == $list->harga_jual_ni){
                 $produk_detail->status = null;
-            }else {
+            }elseif($margin_baru < $margin->margin) {
                 $produk_detail->status = 3;
             }
             

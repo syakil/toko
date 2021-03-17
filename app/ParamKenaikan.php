@@ -7,4 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class ParamKenaikan extends Model
 {
     protected $table = 'param_kenaikan';
+    protected $primaryKey= 'id_param';
+    protected $timeStamps = false;
 }
