@@ -123,6 +123,12 @@ Route::group(['middleware' => ['web', 'cekuser:1' ]], function(){
    Route::get('reset_pin/data', 'ResetPinController@listData')->name('reset_pin.data');
    Route::get('reset_pin/reset/{kode_member}', 'ResetPinController@reset')->name('reset_pin.reset');
 
+   //report so
+   Route::get('report_so/index', 'ReportStokOpnameController@index')->name('report_so.index');
+   Route::get('report_so/data', 'ReportStokOpnameController@listData')->name('report_so.data');
+    
+
+
    Route::get('member/data', 'MemberController@listData')->name('member.data');
    Route::post('member/cetak', 'MemberController@printCard');
    Route::resource('member', 'MemberController');

@@ -130,7 +130,8 @@
           <ul class="treeview-menu">
             <!-- report pembelian -->
             <li><a href="{{ route('report_pembelian.index') }}"><i class="fa fa-cubes"></i> <span>Report Pembelian</span></a></li>
-          <li><a href="{{ route('report_kirim.index') }}"><i class="fa fa-cubes"></i> <span>Report Kirim Barang</span></a></li>  
+            <li><a href="{{ route('report_kirim.index') }}"><i class="fa fa-cubes"></i> <span>Report Kirim Barang</span></a></li>  
+            <li><a href="{{ route('report_so.index') }}"><i class="fa fa-credit-card"></i> <span>Report Stok Opname</span></a></li>  
           </ul>
         </li>          
         <li><a href="{{ route('pembelian.admin') }}"><i class="fa fa-file-pdf-o"></i> <span>Pembelian</span></a></li>
