@@ -19,7 +19,8 @@
             <th>Alamat</th>
             <th>Plafond</th>
             <th>Tenor</th>
-            <th>Musawamah</th>            
+            <th>Musawamah</th>         
+            <th>Jatpo Kartu</th>   
             <th>Status</th>        
             <th>Aksi</th>
          </tr>
@@ -32,7 +33,8 @@
             <th>{{ $data->unit }}</th>
             <th>{{ number_format($data->Plafond) }}</th>
             <th>{{ number_format($data->Tenor) }}</th>       
-            <th>{{ number_format($data->os) }}</th>        
+            <th>{{ number_format($data->os) }}</th>    
+            <th>{{ $data->maturity_date}}</th>    
             <th>{{ $data->status_member }}</th>
             <th><button onclick="getMember({{ $data->id_member }})" class="btn btn-primary"><i class="fa fa-check-circle"></i> Pilih</button></th>
                               

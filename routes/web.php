@@ -20,6 +20,11 @@ Route::get('/ganti_password/index', 'GantiPasswordController@index')->name('gant
 Route::post('/ganti_password/update', 'GantiPasswordController@update')->name('ganti_password.update');
 Route::get('/ganti_password/reset/{id}', 'GantiPasswordController@reset')->name('ganti_password.reset');
 
+Route::get('tiket','TiketController@index')->name('tiket.index');
+Route::get('tiket/data','TiketController@data')->name('tiket.data');
+Route::post('tiket/store','TiketController@store')->name('tiket.store');
+Route::get('tiket/done/{id}','TiketController@done')->name('tiket.done');
+
 Auth::routes();
 
 Route::group(['middleware' => ['web', 'cekuser:2']], function(){

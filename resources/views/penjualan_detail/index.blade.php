@@ -222,7 +222,7 @@ $(function(){
       }
     }).focus(function(){
       $(this).select();
-    });
+      });
 
   $('.simpan').click(function(){
     $('.form-penjualan').submit();
@@ -295,7 +295,7 @@ function deleteItem(id){
      $.ajax({
        url : "transaksi/"+id,
        type : "POST",
-       data : {'_method' : 'DELETE', '_token' : $('meta[name=csrf-token]').attr('content')},
+       data : {'_method' : 'POST', '_token' : $('meta[name=csrf-token]').attr('content')},
        success : function(data){
          table.ajax.reload(function(){
             loadForm($('#diskon').val());

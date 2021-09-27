@@ -574,7 +574,7 @@ class AngsuranController extends Controller
 
         $setting=Setting::find(1);
         $no = 0;
-        $bayar = $request['setoran'];
+        $bayar = $data->kredit;
         $os = $musawamah->os;
         $sisa = $os - $bayar;
     
@@ -584,6 +584,13 @@ class AngsuranController extends Controller
     }
 
     public function store_kelompok(Request $request){
+
+
+
+        try {
+            
+            DB::commit();
+
 
         $data = $request->id_member;
     
@@ -1015,6 +1022,7 @@ class AngsuranController extends Controller
                 if ($musawamah->bulat == 0) {
                     
                     $member_status = Member::where('kode_member',$id)->first();
+                    // dd($member_status);
                     // status member di aktifkan kembali
                     $member_status->status_member ="active";
                     $member_status->update();            
@@ -1024,7 +1032,19 @@ class AngsuranController extends Controller
             }
         }
 
-        return back();
+        
+            DB::commit();
+            
+        }catch(\Exception $e){
+
+            DB::rollback();
+            
+            return back()->with(['error' => $e->getmessage()]);
+        
+        }
+
+
+        return back()->with(['success'=>'Transaksi Berhasil !']);
 
     }
 

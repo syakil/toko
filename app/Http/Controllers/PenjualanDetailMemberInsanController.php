@@ -41,8 +41,21 @@ class PenjualanDetailMemberInsanController extends Controller
                            
          $status=$memberr->status_member;
          
+         $expired = $memberr->maturity_date;
+         $now = date('Y-m-d H:i:s');
+
+         $tanggal_jatpo = date_create($expired);
+
+         if ($expired < $now) {
+            
+            $idpenjualan = session('idpenjualan');
+            session()->flash('status', 'Kontrak Telah Habis Pada Tanggal ' . date_format($tanggal_jatpo,'d F Y') . ' Hubungi Bagian Administrasi!');
+            return Redirect::route('transaksi.menu');
+
+         }
+
          if($status=='active'){
-         
+            
             $idpenjualan = session('idpenjualan');        
             return view('penjualan_detail_member_insan.index', compact('produk', 'member', 'setting', 'idpenjualan'));
          
@@ -52,6 +65,8 @@ class PenjualanDetailMemberInsanController extends Controller
             session()->flash('status', 'Maaf Status Member blokir');
             return Redirect::route('transaksi.menu');
          }
+
+         
 
       }else{
 
@@ -74,7 +89,7 @@ class PenjualanDetailMemberInsanController extends Controller
    public function listData($id){
       
       $detail = PenjualanDetailTemporary::leftJoin('produk', 'produk.kode_produk', '=', 'penjualan_detail_temporary.kode_produk')
-         ->select('penjualan_detail_temporary.*','produk.nama_produk','produk.stok')
+         ->select('penjualan_detail_temporary.*','produk.nama_produk','produk.stok','produk.satuan')
          ->where('id_penjualan', '=', $id)
          ->where('unit', '=',  Auth::user()->unit)
          ->orderBy('id_penjualan_detail','desc')
@@ -92,8 +107,9 @@ class PenjualanDetailMemberInsanController extends Controller
          $row[] = $list->kode_produk;
          $row[] = $list->nama_produk;
          $row[] = $list->stok;
-         $row[] = "Rp. ".format_uang($list->harga_jual);
+         $row[] = "Rp. ".format_uang($list->harga_jual) ."/".$list->satuan;
          $row[] = "<input type='number' class='form-control' tabindex='.$no.' name='jumlah_$list->id_penjualan_detail' value='$list->jumlah' onChange='changeCount($list->id_penjualan_detail)'>";
+         $row[] = $list->satuan;
          $row[] = $list->diskon;
          $row[] = "Rp. ".format_uang($list->sub_total);
          $row[] = '<div class="btn-group">
@@ -106,7 +122,7 @@ class PenjualanDetailMemberInsanController extends Controller
       }   
         
    
-      $data[] = array("<span class='hide total'>$total</span><span class='hide totalitem'>$total_item</span>", "", "", "", "", "", "", "","");
+      $data[] = array("<span class='hide total'>$total</span><span class='hide totalitem'>$total_item</span>", "","", "", "", "", "", "", "","");
       
       $output = array("data" => $data);
       return response()->json($output);     
@@ -597,6 +613,7 @@ class PenjualanDetailMemberInsanController extends Controller
          $total_diskon = PenjualanDetail::where('id_penjualan',$request['idpenjualan'])->sum('diskon');
          
          $total_harga_jual_sebelum_margin = PenjualanDetail::where('id_penjualan',$request['idpenjualan'])->whereRAW('harga_beli < harga_sebelum_margin')->sum('sub_total_sebelum_margin');
+         
          if ($total_harga_jual_sebelum_margin > 0 ) {
             
             $margin_persediaan = $total_harga_jual_sebelum_margin - $total_harga_beli_non_promo;

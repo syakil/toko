@@ -99,7 +99,7 @@ class ApproveKirimBarangTokoController extends Controller{
 
             $no ++;
 
-            $stok_toko = Produk::where('kode_produk',$list->kode_produk)->where('unit',$id_toko->id_supplier)->first();
+            $stok_toko = Produk::where('kode_produk',$list->kode_produk)->where('unit',$id_toko->kode_toko)->first();
             $row = array();
             $row[] = $no;
             $row[] = $list->kode_produk;
@@ -137,7 +137,7 @@ class ApproveKirimBarangTokoController extends Controller{
             // --- //
             foreach($details as $list){
               
-                $cek_sum_kirim= KirimDetail::where('id_pembelian', $request->idpembelian)->where('kode_produk',$list->kode_produk)->sum('jumlah');
+                $cek_sum_kirim= KirimDetailTemporary::where('id_pembelian', $request->idpembelian)->where('kode_produk',$list->kode_produk)->sum('jumlah');
                 $produk = Produk::where('kode_produk',$list->kode_produk)->where('unit',$pengirim)->first();
                 $produk_detail = ProdukDetail::where('kode_produk',$list->kode_produk)
                 ->where('unit',$pengirim)

@@ -29,10 +29,20 @@ class ApprovalPricingController extends Controller{
             
             $row = array();
             
-            $produk = Produk::where('kode_produk',$list->kode_produk)->where('unit',Auth::user()->unit)->first();
+            $produk = Produk::where('kode_produk',$list->kode_produk)->where('unit',$list->unit)->first();
             $harga_pasar = array($produk->harga_indo,$produk->harga_alfa,$produk->harga_grosir,$produk->harga_olshop);
+            
+            $margin_baru =  ($list->harga_jual_insan - $list->harga_beli)/$list->harga_jual_insan * 100;
 
-            $kenaikan = ($list->harga_jual_insan - $produk->harga_jual)/$produk->harga_jual * 100;
+            if ($produk->harga_jual == 0) {
+            
+                $kenaikan = 100;
+            
+            }else{
+            
+                $kenaikan = ($list->harga_jual_insan - $produk->harga_jual)/$produk->harga_jual * 100;
+                
+            }
 
             $row [] = $no++;
             $row [] = $list->kode_produk;
@@ -41,7 +51,7 @@ class ApprovalPricingController extends Controller{
             $row [] = number_format($produk->harga_jual);            
             $row [] = number_format($produk->harga_jual - $list->harga_beli);
             $row [] = number_format($list->harga_jual_insan);
-            $row [] = number_format($list->harga_jual_insan - $list->harga_beli);
+            $row [] = number_format($list->harga_jual_insan - $list->harga_beli).' <strong>('.number_format($margin_baru) .'%)</strong>';
             if ($kenaikan < 0 ) {
                 $row[] = "<i><font color='red'><i class='fa fa-arrow-down'></i>".number_format($kenaikan)."%</font></i>";
             }else {

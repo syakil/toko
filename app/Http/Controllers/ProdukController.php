@@ -66,7 +66,7 @@ class ProdukController extends Controller{
             $data[] = $row;
         }
         
-        $output = array("data" => $data);
+        $outputterima = array("data" => $data);
         return response()->json($output);    
     }
 

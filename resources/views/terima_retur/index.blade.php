@@ -69,5 +69,5 @@
   </div>
 </div>
 
-<!-- /.content -->
+<!-- /.cont ent -->
 @endsection

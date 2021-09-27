@@ -4,12 +4,12 @@ use Illuminate\Http\Request;
 use Redirect;
 use App\Kirim;
 use App\Supplier;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use App\Produk;
 use App\ProdukDetail;
 use App\KirimDetailTemporary;
 use App\Branch;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class KirimBarangDetailController extends Controller{
 
@@ -41,7 +41,7 @@ class KirimBarangDetailController extends Controller{
    
      $detail = KirimDetailTemporary::leftJoin('produk', 'produk.kode_produk', '=', 'kirim_barang_detail_temporary.kode_produk')
                                     ->where('id_pembelian', '=', $id)
-                                    ->where('unit', '=', Auth::user()->unit)
+                                    ->where('unit', '=', auth::user()->unit)
                                     ->select('kirim_barang_detail_temporary.*','produk.kode_produk','produk.nama_produk','produk.stok')
                                     ->orderBy('updated_at','desc')        
                                     ->get();

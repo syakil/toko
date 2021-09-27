@@ -10,8 +10,8 @@ use App\PembelianDetail;
 use App\TabelTransaksi;
 use App\Produk;
 use App\ProdukDetail;
-use Auth;
-use DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PricingKPController extends Controller
 {
@@ -49,8 +49,10 @@ class PricingKPController extends Controller
     }
 
     public function detail($id){
+
         $id_pembelian = $id;
         return view('pricing_kp/detail',compact('id_pembelian'));
+    
     }
 
     public function listDetail($id){

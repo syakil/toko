@@ -15,6 +15,7 @@
             <th>Nama Member</th>
             <th>Alamat</th>
             <th>Telpon</th>
+            <th>Kadaluarsa Kartu</th>
             <th>Aksi</th>
          </tr>
       </thead>
@@ -25,6 +26,7 @@
             <th>{{ $data->nama }}</th>
             <th>{{ $data->alamat }}</th>
             <th>{{ $data->telepon }}</th>
+            <th>{{ $data->maturity_date}}</th>
             <th><a onclick="selectMember({{ $data->kode_member }})" class="btn btn-primary"><i class="fa fa-check-circle"></i> Pilih</a></th>
           </tr>
          @endforeach

@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Redirect;
-use DB;
-use Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Ramsey\Uuid\Uuid;
 use App\TabelTransaksi;
 use App\Branch;
@@ -39,7 +38,7 @@ class ApproveStokOpnameParsialGudangController extends Controller
         $data_so = StokOpnameParsial::leftJoin('branch','branch.kode_toko','stok_opname_parsial.unit')
         ->leftJoin('produk','produk.kode_produk','stok_opname_parsial.kode_produk')
         ->whereIn('stok_opname_parsial.unit',$kode_branch)
-        ->where('produk.unit',3000)
+        ->where('produk.unit',Auth::user()->unit)
         ->where('stok_opname_parsial.status',2)
         ->get();
 
@@ -48,7 +47,7 @@ class ApproveStokOpnameParsialGudangController extends Controller
 
         foreach($data_so as $list){
 
-            $stok_toko = Produk::where('kode_produk',$list->kode_produk)->where('unit',$list->unit)->first();
+            $stok_toko = Produk::where('kode_produk',$list->kode_produk)->where('unit',Auth::user()->unit)->first();
 
             $row = array();
             $row[] = $no++;

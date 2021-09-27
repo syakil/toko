@@ -96,7 +96,7 @@ class PenjualanDetailController extends Controller
       $produk = Produk::where('kode_produk', '=', $request['kode'])
                      ->where('unit', '=',  Auth::user()->unit)
                      ->first();
-
+                     
       $detail = new PenjualanDetailTemporary;
       $detail->id_penjualan = $request['idpenjualan'];
       $detail->kode_produk = $request['kode'];
@@ -805,7 +805,7 @@ class PenjualanDetailController extends Controller
       $no = 0;
      
       $pdf = PDF::loadView('penjualan_detail.notapdf', compact('detail','toko', 'penjualan', 'setting', 'no'));
-      $pdf->setPaper(array(0,0,700,600), 'potrait');      
+      $pdf->setPaper(array(0,0,800,800), 'potrait');      
       
       return $pdf->stream();
 

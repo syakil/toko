@@ -57,6 +57,7 @@
                 <th>Stok</th>
                 <th align="right">Harga</th>
                 <th>Jumlah</th>
+                <th>Satuan</th>
                 <th>Diskon</th>
                 <th align="right">Sub Total</th>
                 <th width="100">Aksi</th>

@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use DB;
-use Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ReportStokOpnameController extends Controller
 {
@@ -28,7 +27,7 @@ class ReportStokOpnameController extends Controller
          ON 
          produk_selisih.unit = branch.kode_toko
          WHERE
-         produk.unit = 3000
+         produk.unit = '.Auth::user()->unit.'
          AND
          produk_selisih.unit IN (SELECT kode_toko FROM branch WHERE kode_gudang = '.Auth::user()->unit.')'
         );
@@ -43,8 +42,8 @@ class ReportStokOpnameController extends Controller
             $row[] = $value->kode_produk;
             $row[] = $value->nama_produk;
             $row[] = $value->jumlah;
-            $row[] = "Rp. ".format_uang($value->harga_beli);
-            $row[] = "Rp. ".format_uang($value->harga_jual);
+            $row[] = $value->harga_beli;
+            $row[] = $value->harga_jual;
 
             if ($value->ket == 'lebih') {
                 

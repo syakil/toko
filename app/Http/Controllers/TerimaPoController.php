@@ -182,7 +182,7 @@ class TerimaPoController extends Controller
             $pembelian_temporary->total_harga = $request['total'];
             $pembelian_temporary->diskon = $request['diskon'];
             $pembelian_temporary->bayar = $request['bayar'];
-            $pembelian_temporary->status = 2;
+            $pembelian_temporary->status = 1;
             $pembelian_temporary->update();
 
             DB::commit();
